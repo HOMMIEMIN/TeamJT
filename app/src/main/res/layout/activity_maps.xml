@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    tools:context=".MapsActivity">
+
+
+    <LinearLayout
+        android:id="@+id/action_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            tools:context="com.example.homin.test1.MapsActivity">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/floatingActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"
+                android:layout_weight="1"
+                app:fabSize="mini"
+                android:clickable="true"
+                android:src="@drawable/ic_notifications_black_24dp" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/selfLocationIdentifier"
+                android:layout_width="wrap_content"
+                app:fabSize="mini"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|left"
+                android:layout_weight="1"
+                android:background="@color/white"
+                android:clickable="true"
+                android:src="@drawable/location" />
+
+
+        </fragment>
+
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:behavior_peekHeight="60dp"
+        app:layout_behavior="@string/bottom_sheet_behavior">
+
+        <LinearLayout
+            android:id="@+id/dd"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+            <android.support.design.widget.BottomNavigationView
+                android:id="@+id/navigation"
+                android:layout_width="wrap_content"
+                android:layout_height="59dp"
+                android:background="?android:attr/windowBackground"
+                app:menu="@menu/navigation" />
+
+            <FrameLayout
+                android:id="@+id/container_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <include layout="@layout/fragment_friend"></include>
+            </FrameLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+
+</android.support.design.widget.CoordinatorLayout>
