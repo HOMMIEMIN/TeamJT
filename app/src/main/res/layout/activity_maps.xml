@@ -31,7 +31,7 @@
                 android:layout_weight="1"
                 app:fabSize="mini"
                 android:clickable="true"
-                android:src="@drawable/ic_notifications_black_24dp" />
+                android:src="@drawable/jt_logo2" />
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/selfLocationIdentifier"
