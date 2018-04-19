@@ -140,10 +140,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         myFriendContactList = new ArrayList<>();
         setContentView(R.layout.activity_maps);
-        if(DaoImple.getInstance().getPictureList() != null) {
+
             pictureList = DaoImple.getInstance().getPictureList();
             Log.i("qq1","사진리스트 가져옴");
-        }
+
 
         //자기위치찾아주는 버튼 찾기
         selfLocationButton = findViewById(R.id.selfLocationIdentifier);
@@ -495,7 +495,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                     myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-                    Bitmap myPicture = pictureList.get(DaoImple.getInstance().getLoginEmail());
+
+                    Bitmap myPicture = null; //내 사진 url이 없는 경우 bit맵을 읽어오고 그렇지 않은 경우 null처리 된 bitmap를 cluster로 보냄
+
+                        if (pictureList.get(DaoImple.getInstance().getLoginEmail()) != null) {
+                            myPicture = pictureList.get(DaoImple.getInstance().getLoginEmail());
+                        } else {
+                            myPicture = null;
+                        }
+                    
                     myMarker = new ItemPerson(location.getLatitude(),location.getLongitude(),
                             DaoImple.getInstance().getLoginId(),myPicture);
                     clusterManager.addItem(myMarker);

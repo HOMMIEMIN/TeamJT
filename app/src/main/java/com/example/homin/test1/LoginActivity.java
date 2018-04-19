@@ -158,63 +158,72 @@ public class LoginActivity extends AppCompatActivity {
 
 
                                         reference.child("Contact").addChildEventListener(new ChildEventListener() {
+                                            boolean intentNotsent = true; //인텐트가 전달되었는지 안되었는지 체크하기 위한 boolean
+                                            //친구목록이 없는 경우 , 친구목록이 있는데 친구가 url을 가지고 있는 경우 아니면 가지고 있지 않은 경우를 나누기 위해 쓰임
                                             @Override
                                             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                                final Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
                                                 Contact friendsContact = dataSnapshot.getValue(Contact.class);// 친구목록에 있는 list 비교를 위한 Contact설정
-                                                Log.i("hi1","내 친구들 목록 사이즈: "+myContact.getFriendList().size());
+                                                Log.i("hi1", "내 친구들 목록 사이즈: " + myContact.getFriendList().size());
 
-                                                for(int a = 0 ; a < myContact.getFriendList().size() ; a++) {
+                                                for (int a = 0; a < myContact.getFriendList().size(); a++) {
                                                     final int index = a;
-                                                    Log.i("hi1",friendsContact.getUserId());
-                                                    Log.i("hi1","MyContact.list:" + myContact.getFriendList().get(a));
+                                                    Log.i("hi1", friendsContact.getUserId());
+                                                    Log.i("hi1", "MyContact.list:" + myContact.getFriendList().get(a));
 
                                                     if (friendsContact.getUserId().equals(myContact.getFriendList().get(a))) { //친구목록에 있는 친구들의 bitmap들을 다 다운로드
 
-                                                        if(friendsContact.getPictureUrl()!= null){
+                                                        if (friendsContact.getPictureUrl() != null) {
                                                             stringkey.add(friendsContact.getUserId());//친구 아이디 목록 ( HashMap의 Key값들을 List에 넣음)
                                                             Glide.with(LoginActivity.this).load(friendsContact.getPictureUrl())
-                                                                .asBitmap().override(100, 100).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                                    .asBitmap().override(100, 100).fitCenter().into(new SimpleTarget<Bitmap>() {
                                                                 @Override
                                                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                                                     pictureList.put(stringkey.get(index), resource); //HashMap인 PictureList에  Key 값인 친구 아이디와 그에따른 BitMap을 넣음
 
                                                                     count++;
 
-                                                                    Log.i("hi1", "Count: " +count);
+                                                                    Log.i("hi1", "Count: " + count);
                                                                     if (myContact.getFriendList().size() == count) {
 
-                                                                        Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
+
                                                                         DaoImple.getInstance().setPictureList(pictureList);
 
                                                                         count = 0;
 
                                                                         startActivity(intent); //Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
+                                                                        intentNotsent = false;
                                                                     }
 
                                                                 }
                                                             });
-                                                        }else{
+                                                        } else {
                                                             stringkey.add(friendsContact.getUserId());
                                                             pictureList.put(stringkey.get(index), null);
                                                             count++;
                                                         }
 
-                                                        Log.i("hi1", "Count: " +count);
-                                                        Log.i("hi1","getFriendsList.size: " + myContact.getFriendList().size());
+                                                        Log.i("hi1", "Count: " + count);
+                                                        Log.i("hi1", "getFriendsList.size: " + myContact.getFriendList().size());
 
                                                         if (myContact.getFriendList().size() == count) {
 
-                                                            Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
+
                                                             DaoImple.getInstance().setPictureList(pictureList);
 
                                                             count = 0;
 
                                                             startActivity(intent); //Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
+                                                            intentNotsent = false;
                                                         }
                                                     }
                                                 }
+                                                if (intentNotsent) {
+                                                    DaoImple.getInstance().setPictureList(pictureList);
+                                                    intentNotsent = false;
+                                                    startActivity(intent);//포문까지도 안 들어오는 경우 (친구가 없는 경우)
+                                                }
                                             }
-
                                             @Override
                                             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
