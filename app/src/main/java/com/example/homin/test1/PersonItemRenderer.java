@@ -32,15 +32,12 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         this.context = context;
         this.googleMap = map;
     }
-    // 사진 셋팅
-    @Override
-    protected void onClusterRendered(Cluster<ClusterItem> cluster, final Marker marker) {
-        super.onClusterRendered(cluster, marker);
 
-    }
+
 
     @Override
     protected void onBeforeClusterItemRendered(final ClusterItem item, final MarkerOptions markerOptions) {
+        Log.i("fffff","onBeforeClusterItemRendered");
         super.onBeforeClusterItemRendered(item, markerOptions);
 
         if(item instanceof ItemPerson) {
@@ -67,6 +64,7 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
     //직사각형 비트맵을 원형으로 변환하는 메소드
     public static Bitmap getCircleBitmap(Bitmap bitmap) {
+        Log.i("fffff","원모양으로 만듦");
         Bitmap output;
 
         if (bitmap.getWidth() > bitmap.getHeight()) {
@@ -140,31 +138,5 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         }
 
 
-    @Override
-    protected void onBeforeClusterRendered(Cluster<ClusterItem> cluster, final MarkerOptions markerOptions) {
-        super.onBeforeClusterRendered(cluster, markerOptions);
-        Log.i("ggg4","onBeforeClusterRendered");
 
-//        for (final ClusterItem a : cluster.getItems()) {
-//            if (a instanceof ItemPerson) {
-//                Glide.with(context).load(((ItemPerson) a).getImageUrl()).asBitmap().fitCenter()
-//                        .into(new SimpleTarget<Bitmap>() {
-//                            @Override
-//                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-//                                Log.i("ggg4", "사진 다운 완료 : " + ((ItemPerson) a).getTitle());
-//                                Bitmap roundBitmap = getCircleBitmap(resource);
-//                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
-//
-//                            }
-//                        });
-//            }
-//
-//        }
-
-    }
-
-    @Override
-    protected boolean shouldRenderAsCluster(Cluster<ClusterItem> cluster) {
-        return super.shouldRenderAsCluster(cluster);
-    }
 }

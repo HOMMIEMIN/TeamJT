@@ -1,9 +1,5 @@
 package com.example.homin.test1;
 
-import android.util.Log;
-
-import com.google.android.gms.maps.model.LatLng;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +43,6 @@ public class Contact implements Serializable{
         UserName = userName;
     }
 
-    public String getPictureUrl() {
-        return pictureUrl;
-    }
-
     public void setPictureUrl(String pictureUrl) {
         this.pictureUrl = pictureUrl;
     }
@@ -70,6 +62,10 @@ public class Contact implements Serializable{
             return friendList;
 
 
+    }
+
+    public String getPictureUrl() {
+        return pictureUrl;
     }
 
     public void setFriendList(List<String> friendList) {
