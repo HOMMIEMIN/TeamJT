@@ -34,10 +34,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -75,7 +80,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int RESULT_CODE = 20;
     private LatLng addMakerLocation;
     private String email;
-    private LinearLayout actionLayout;
+    private FrameLayout actionLayout;
     private BottomSheetBehavior bottomSheetBehavior;
     private View bottomview;
     private Menu mMenu;
@@ -193,6 +198,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
+        search(); //검색창 이벤트 헨들러 처리리
+
+
+    }
+    //검색창 이벤트 핸들러 처리
+    private void search() {
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // TODO: Get info about the selected place.
+                Log.i("hi", "Place: " + place.getName());
+
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+                Log.i("hi", "An error occurred: " + status);
+            }
+        });
     }
 
 
@@ -500,6 +528,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+
 
 
     @Override

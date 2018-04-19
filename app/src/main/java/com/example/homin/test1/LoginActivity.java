@@ -50,9 +50,9 @@ public class LoginActivity extends AppCompatActivity {
     private Thread loginThread;
     private DatabaseReference reference;
     private String key;
-    private Map<String,Bitmap> pictureList;
+    private Map<String,Bitmap> pictureList;//친구 아이디를 key값으로 받고 그의따른 bitMap을 저장하는 Map
     private int count;
-    private List<String> stringkey;
+    private List<String> stringkey;//map의 key값들인 친구 아이디를 넣음
 
 
     @Override
@@ -127,60 +127,90 @@ public class LoginActivity extends AppCompatActivity {
                             String key3 = etEmail.getText().toString().substring(b + 1,etEmail.getText().toString().length());
                             key = key1+key2+key3;
                             DaoImple.getInstance().setKey(key);
-                            Log.i("vv",key);
 
-                            Log.i("ggg3", "들어옴111");
+
+
 
 
                             reference.child("Contact").addChildEventListener(new ChildEventListener() {
                                 @Override
                                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                    Contact aa = dataSnapshot.getValue(Contact.class);
-                                    Log.i("ggg3", aa.getUserId());
-                                    if(aa.getUserId().equals(etEmail.getText().toString())) {
+                                    Contact contactInOrder = dataSnapshot.getValue(Contact.class); //차례대로 들어오는 Contact들
+
+                                    if(contactInOrder.getUserId().equals(etEmail.getText().toString())) {// 내 컨텍트를 찾는 if문
                                         // 내 사진 다운로드
-                                        Glide.with(getApplicationContext()).load(aa.getPictureUrl())
-                                                .asBitmap().override(100,100).fitCenter().into(new SimpleTarget<Bitmap>() {
-                                            @Override
-                                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                                pictureList.put(etEmail.getText().toString(),resource);
-                                            }
-                                        });
-                                        Log.i("ggg3", "들어옴33333");
-                                        final Contact c = dataSnapshot.getValue(Contact.class);
-                                        DaoImple.getInstance().setLoginEmail(c.getUserId());
-                                        DaoImple.getInstance().setLoginId(c.getUserName());
-                                        DaoImple.getInstance().setContact(c);
-                                        Log.i("ggg3","dd : " + c.getUserName());
+                                            if(contactInOrder.getPictureUrl()!= null) // 내 Contact에 url 에 들어가있는지 체크
+                                            Glide.with(getApplicationContext()).load(contactInOrder.getPictureUrl())
+                                                    .asBitmap().override(100, 100).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                @Override
+                                                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                                    pictureList.put(etEmail.getText().toString(), resource);
+                                                }
+                                            });
+
+                                            final Contact myContact = dataSnapshot.getValue(Contact.class); //내 컨텍트 설정
+
+                                            DaoImple.getInstance().setLoginEmail(myContact.getUserId());
+                                            DaoImple.getInstance().setLoginId(myContact.getUserName());
+                                            DaoImple.getInstance().setContact(myContact);
+
+
+
+
                                         reference.child("Contact").addChildEventListener(new ChildEventListener() {
                                             @Override
                                             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                                Contact con = dataSnapshot.getValue(Contact.class);
-                                                for(int a = 0 ; a < c.getFriendList().size() ; a++) {
-                                                    if (con.getUserId().equals(c.getFriendList().get(a))){
-                                                        stringkey.add(con.getUserId());
-                                                        Glide.with(LoginActivity.this).load(con.getPictureUrl())
-                                                        .asBitmap().override(100,100).fitCenter().into(new SimpleTarget<Bitmap>() {
-                                                            @Override
-                                                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                                                pictureList.put(stringkey.get(count),resource);
-                                                                Log.i("qq1","다운로드 완료");
-                                                                Log.i("qq1","count : " + count);
-                                                                Log.i("qq2","download key : " + stringkey.get(count));
+                                                Contact friendsContact = dataSnapshot.getValue(Contact.class);// 친구목록에 있는 list 비교를 위한 Contact설정
+                                                Log.i("hi1","내 친구들 목록 사이즈: "+myContact.getFriendList().size());
 
-                                                                Log.i("qq1",c.getFriendList().size()-1+"");
-                                                                count++;
+                                                for(int a = 0 ; a < myContact.getFriendList().size() ; a++) {
+                                                    final int index = a;
+                                                    Log.i("hi1",friendsContact.getUserId());
+                                                    Log.i("hi1","MyContact.list:" + myContact.getFriendList().get(a));
 
-                                                                if(c.getFriendList().size() == count){
-                                                                    Intent intent = new Intent(LoginActivity.this,MapsActivity.class);
-                                                                    DaoImple.getInstance().setPictureList(pictureList);
-                                                                    Log.i("qq1","startActivity");
-                                                                    count = 0;
-                                                                    Log.i("qq1","사진 리스트 : " + pictureList.size()+"");
-                                                                    startActivity(intent);
+                                                    if (friendsContact.getUserId().equals(myContact.getFriendList().get(a))) { //친구목록에 있는 친구들의 bitmap들을 다 다운로드
+
+                                                        if(friendsContact.getPictureUrl()!= null){
+                                                            stringkey.add(friendsContact.getUserId());//친구 아이디 목록 ( HashMap의 Key값들을 List에 넣음)
+                                                            Glide.with(LoginActivity.this).load(friendsContact.getPictureUrl())
+                                                                .asBitmap().override(100, 100).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                                @Override
+                                                                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                                                                    pictureList.put(stringkey.get(index), resource); //HashMap인 PictureList에  Key 값인 친구 아이디와 그에따른 BitMap을 넣음
+
+                                                                    count++;
+
+                                                                    Log.i("hi1", "Count: " +count);
+                                                                    if (myContact.getFriendList().size() == count) {
+
+                                                                        Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
+                                                                        DaoImple.getInstance().setPictureList(pictureList);
+
+                                                                        count = 0;
+
+                                                                        startActivity(intent); //Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
+                                                                    }
+
                                                                 }
-                                                            }
-                                                        });
+                                                            });
+                                                        }else{
+                                                            stringkey.add(friendsContact.getUserId());
+                                                            pictureList.put(stringkey.get(index), null);
+                                                            count++;
+                                                        }
+
+                                                        Log.i("hi1", "Count: " +count);
+                                                        Log.i("hi1","getFriendsList.size: " + myContact.getFriendList().size());
+
+                                                        if (myContact.getFriendList().size() == count) {
+
+                                                            Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
+                                                            DaoImple.getInstance().setPictureList(pictureList);
+
+                                                            count = 0;
+
+                                                            startActivity(intent); //Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
+                                                        }
                                                     }
                                                 }
                                             }

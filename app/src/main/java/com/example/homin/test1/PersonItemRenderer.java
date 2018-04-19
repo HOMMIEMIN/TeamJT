@@ -45,11 +45,18 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
         if(item instanceof ItemPerson) {
 
-            Log.i("qq1","이름 : " + ((ItemPerson) item).getTitle());
-            Bitmap roundBitmap = getCircleBitmap(((ItemPerson) item).getImage());
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
-            markerOptions.title(((ItemPerson) item).getTitle());
-
+            if(((ItemPerson) item).getImage()!= null) {
+                Log.i("hi", "이름 : " + ((ItemPerson) item).getTitle());
+                Bitmap roundBitmap = getCircleBitmap(((ItemPerson) item).getImage());
+                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+                markerOptions.title(((ItemPerson) item).getTitle());
+            }else{
+                Log.i("hi", "이름 : " + ((ItemPerson) item).getTitle());
+                Bitmap rectBitmap = decodeSampledBitmapFromResource(context.getResources(),R.drawable.what,35,35);
+                Bitmap roundBitmap = getCircleBitmap(rectBitmap);
+                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+                markerOptions.title(((ItemPerson) item).getTitle());
+            }
 
 
         }

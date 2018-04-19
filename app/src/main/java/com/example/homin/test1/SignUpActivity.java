@@ -90,7 +90,7 @@ public class SignUpActivity extends AppCompatActivity {
                             location.add(111.111);
                             location.add(222.222);
 
-                            Contact c = new Contact(etSignUpEmail.getText().toString(),etSignUpName.getText().toString(),"dddd",location,list,list2,true);
+                            Contact c = new Contact(etSignUpEmail.getText().toString(),etSignUpName.getText().toString(),null,location,list,list2,true);
 
                             reference.child("Contact").child(key).setValue(c);
 
