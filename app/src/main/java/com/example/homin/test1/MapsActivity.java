@@ -2,6 +2,7 @@ package com.example.homin.test1;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -56,11 +58,17 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
@@ -81,7 +89,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int RESULT_CODE = 20;
     private LatLng addMakerLocation;
     private String email;
-    private FrameLayout actionLayout;
+//    private LinearLayout actionLayout;
+     private FrameLayout actionLayout;
     private BottomSheetBehavior bottomSheetBehavior;
     private View bottomview;
     private Menu mMenu;
@@ -100,6 +109,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location location;
     private String provider;
     private boolean zoomCheck;
+
+    // MyPage에 이용
+    private final int GALLERY_CODE = 1000;
+    private Uri filePath;
+    private String key;
+    public static final String TAG = "mini";
 
     //자기위치로 되돌리는 버튼
     private FloatingActionButton selfLocationButton;
@@ -576,7 +591,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         } else {
                             myPicture = null;
                         }
-                    
+
                     myMarker = new ItemPerson(location.getLatitude(),location.getLongitude(),
                             DaoImple.getInstance().getLoginId(),myPicture);
                     clusterManager.addItem(myMarker);
@@ -632,31 +647,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return super.onContextItemSelected(item);
     }
 
+    // 갤러리에서 사진 선택하는 메소드
+    public void clickedProImgBotton() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        //TODO: ACTION_PICK(이미지가 저장되어있는 폴더를 선택) ACTION_GET_CONTENT(전체 이미지를 폴더 구분없이 최신 이미지 순)랑 둘 비교
+        intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, GALLERY_CODE);
+        Log.i(TAG, "갤러리 코드: " + intent);
+    } // end clickedProImgBotton()
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i("gg", requestCode + " " + resultCode);
-        if (requestCode == RESULT_CODE && resultCode == RESULT_OK) {
-            String title = data.getStringExtra(TITLE_KEY);
-            String body = data.getStringExtra(BODY_KEY);
-            Log.i("gg", title + body);
-            if (!(title.equals("")) && !(body.equals(""))) {
-                mMap.addMarker(new MarkerOptions().position(addMakerLocation).title(title).snippet(body)).showInfoWindow();
-            }
-        }
-        if(requestCode == 400 && requestCode == RESULT_OK){
-            boolean check = data.getBooleanExtra("check",false);
-            if(check){
-                actionButton.setImageResource(R.drawable.ddww);
-            }else{
-                actionButton.setImageResource(R.drawable.ic_notifications_black_24dp);
-            }
-        }
 
-    }
+        if (resultCode == RESULT_OK) {
+            Log.i(TAG, "RESULT_OK");
+            switch (requestCode) {
+                case RESULT_CODE:
 
+                    String title = data.getStringExtra(TITLE_KEY);
+                    String body = data.getStringExtra(BODY_KEY);
+                    Log.i("gg", title + body);
+                    if (!(title.equals("")) && !(body.equals(""))) {
+                        mMap.addMarker(new MarkerOptions().position(addMakerLocation).title(title).snippet(body)).showInfoWindow();
+                    }
 
+                    break;
 
+                case GALLERY_CODE: // 갤러리에서 선택한 사진처리
 
+                    filePath = data.getData(); // 선택한 사진 Uri 정보
+                    Log.i(TAG, "filePath: " + filePath);
+
+                    MypageFragment.uploadFile(filePath); // 프로필 적용 & Storage 업로드
+//                    uploadFile();
+
+                    break;
+
+//                case CAMERA_CODE: //TODO: 카메라로 찍은 사진 프로필로 설정
+//                    break;
+
+                case 400:
+
+                    boolean check = data.getBooleanExtra("check",false);
+                    if(check){
+                        actionButton.setImageResource(R.drawable.ddww);
+                    }else{
+                        actionButton.setImageResource(R.drawable.ic_notifications_black_24dp);
+                    }
+
+                    break;
+
+            } // end switch
+
+        } // end if
+
+    } // onActivityResult()
 
 }
