@@ -2,32 +2,68 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     >
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#AA000000"
-            android:gravity="center"
-            android:orientation="horizontal">
+ -->
 
-            <Button
-                android:id="@+id/btn_popCamera"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:text="카메라"
-                android:textColor="@color/colorAccent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#AA000000"
+        android:gravity="center"
+        android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btn_popGallery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:text="갤러리"
-                android:textColor="@color/colorPrimary" />
-        </LinearLayout>
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:drawableEnd="@color/colorPrimary"
+            android:text="   프로필"/>
+
+
+        <Button
+            android:id="@+id/btn_popCamera"
+            android:gravity="center|start"
+
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:text="      사진 촬영"
+/>
+
+        <Button
+            android:id="@+id/btn_popGallery"
+            android:gravity="center|start"
+
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:text="      앨범에서 사진 선택"
+/>
+
+        <Button
+
+            android:id="@+id/btn_popMyImage"
+            android:gravity="center|start"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:text="      확대해서 보기"
+/>
+
+        <Button
+
+            android:id="@+id/btn_simple"
+            android:gravity="center|start"
+
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:text="      기본이미지 "
+/>
+
+    </LinearLayout>
+
 
 </LinearLayout>
