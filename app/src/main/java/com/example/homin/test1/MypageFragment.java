@@ -81,6 +81,7 @@ public class MypageFragment extends Fragment {
         return view;
     }
 
+    // 프로필 이미지 가져오는 메소드
     private void getProImg() {
         key = DaoImple.getInstance().getKey();
         Log.i(TAG, "key: " + key);
@@ -151,6 +152,8 @@ public class MypageFragment extends Fragment {
 
                             // 변경된 프로필 이미지 ImageView에 바로 적용
                             Glide.with(context).load(downUri).into(imageView);
+
+                            
 
                         }
                     })
