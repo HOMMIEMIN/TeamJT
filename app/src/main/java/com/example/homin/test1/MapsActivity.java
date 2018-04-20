@@ -38,6 +38,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -145,7 +146,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     FragmentManager manager2 = getSupportFragmentManager();
                     FragmentTransaction transaction2 = manager2.beginTransaction();
                     MypageFragment mypageFragment = new MypageFragment();
-                    transaction2.replace(R.id.container_main, mypageFragment);
+                    transaction2.replace(R.id.container_main, mypageFragment,"Mypage");
                     transaction2.commit();
                     return true;
             }
@@ -186,8 +187,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         FriendFragment friendFragment = new FriendFragment();
-        transaction.replace(R.id.container_main, friendFragment);
-        transaction.commit();
+
 
         registerForContextMenu(findViewById(R.id.map));
 
@@ -268,6 +268,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myLocationUpdate(); // 내 위치 업데이트
 
         getFriendList(); // 친구 목록 가져오기
+
 
 
 
