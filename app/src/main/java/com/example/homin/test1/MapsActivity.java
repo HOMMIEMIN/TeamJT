@@ -14,7 +14,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.PersistableBundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
@@ -91,6 +93,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng addMakerLocation;
     private String email;
 //    private LinearLayout actionLayout;
+    private StorageReference firebaseStorage;
      private FrameLayout actionLayout;
     private BottomSheetBehavior bottomSheetBehavior;
     private View bottomview;
@@ -112,6 +115,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean zoomCheck;
 
     // MyPage에 이용
+    public static final int CAMERA_CODE = 100;
     private final int GALLERY_CODE = 1000;
     private Uri filePath;
     private String key;
@@ -146,7 +150,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     FragmentManager manager2 = getSupportFragmentManager();
                     FragmentTransaction transaction2 = manager2.beginTransaction();
                     MypageFragment mypageFragment = new MypageFragment();
-                    transaction2.replace(R.id.container_main, mypageFragment,"Mypage");
+                    transaction2.replace(R.id.container_main, mypageFragment);
                     transaction2.commit();
                     return true;
             }
@@ -187,7 +191,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         FriendFragment friendFragment = new FriendFragment();
-
+        transaction.replace(R.id.container_main, friendFragment);
+        transaction.commit();
 
         registerForContextMenu(findViewById(R.id.map));
 
@@ -268,7 +273,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myLocationUpdate(); // 내 위치 업데이트
 
         getFriendList(); // 친구 목록 가져오기
-
 
 
 
@@ -658,6 +662,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.i(TAG, "갤러리 코드: " + intent);
     } // end clickedProImgBotton()
 
+
+    // 팝업뜰때 카메라 눌렀을때 발생하는 메소드  속에 내부메소드!
+    public void popupCameraInCameraMethod() {
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            Log.i(TAG, "intent.getData(): " + intent.getData());
+//            Bitmap bitmap = BitmapFactory.d
+            startActivityForResult(intent, CAMERA_CODE);
+
+            Log.i(TAG, "팝업창에서 카메라 눌른후");
+        }
+    }
+
+
+
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -687,8 +709,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     break;
 
-//                case CAMERA_CODE: //TODO: 카메라로 찍은 사진 프로필로 설정
-//                    break;
+                case CAMERA_CODE: // 팝업창에서 카메라 버튼 클릭
+                    Log.i(TAG, "온액티비티리절트 카메라1 ");
+                    if (true) {
+                        Log.i(TAG, "온액티비티리절트 카메라2 ");
+
+                        Bundle bundle = data.getExtras();
+
+                        if (bundle != null) {
+                            Bitmap bitmap = (Bitmap) bundle.get("data");
+
+                            ImageView iv = findViewById(R.id.imageView);
+                            iv.setImageBitmap(bitmap);
+
+
+//                            getPictureForPhoto();
+
+                        }
+                        Toast.makeText(this, "저장 완료.", Toast.LENGTH_SHORT).show();
+                        break;
+
+                    } else {
+                        Toast.makeText(this, "저장 취소", Toast.LENGTH_SHORT).show();
+
+                    }
+                    break;
+
+
 
                 case 400:
 
@@ -706,5 +753,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } // end if
 
     } // onActivityResult()
+
+
 
 }
