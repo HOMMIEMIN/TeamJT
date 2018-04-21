@@ -828,9 +828,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         ItemMemo myMemo = new ItemMemo(memoLocation.latitude,memoLocation.longitude,
                                 DaoImple.getInstance().getLoginEmail(),DaoImple.getInstance().getLoginId(),title,body,
                                 time,imageUrl,BitmapFactory.decodeResource(context.getResources(),R.drawable.letter));
-                        memoManager.addItem(myMemo);
-                        memoManager.cluster();
-                        Log.i("ggv","onActivityResult 메모 add");
+//                        memoManager.addItem(myMemo);
+//                        memoManager.cluster();
+                        Log.i("bb","onActivityResult 내 메모 add");
                         // 파이어베이스에 메모 업로드
                         List<Double> tableLocation = new ArrayList<>();
                         tableLocation.add(memoLocation.latitude);
