@@ -7,6 +7,14 @@
     android:layout_height="match_parent"
     tools:context=".WriteActivity">
 
+    <ImageView
+        android:id="@+id/open_imageView"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:onClick="clickOpenGallery"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/sample_image" />
+
     <EditText
         android:id="@+id/editText3"
         android:layout_width="match_parent"
@@ -19,8 +27,8 @@
     <EditText
         android:id="@+id/editText4"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="10"
+        android:layout_height="400dp"
+        android:layout_weight="8"
         android:ems="10"
         android:inputType="textPersonName"
         android:hint="내용 입력" />

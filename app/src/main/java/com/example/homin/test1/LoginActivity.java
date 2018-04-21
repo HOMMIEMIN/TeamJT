@@ -143,6 +143,10 @@ public class LoginActivity extends AppCompatActivity {
                             key = key1 + key2 + key3;
                             DaoImple.getInstance().setKey(key);
 
+
+
+
+
                             reference.child("Contact").addChildEventListener(new ChildEventListener() {
                                 @Override
                                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {

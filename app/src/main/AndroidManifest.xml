@@ -39,6 +39,7 @@
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -51,6 +52,7 @@
             android:name=".ChattingActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".WatingActivity" />
+        <activity android:name=".ReadMemoActivity" android:theme="@android:style/Theme.Dialog"></activity>
     </application>
 
 </manifest>

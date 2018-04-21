@@ -58,7 +58,11 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
         }
 
-
+        if(item instanceof ItemMemo){
+            Bitmap roundBitmap = getCircleBitmap(((ItemMemo) item).getIcon());
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+//            markerOptions.title(((ItemMemo) item).getTitle());
+        }
 
     }
 
@@ -136,7 +140,6 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
             return inSampleSize;
         }
-
 
 
 }
