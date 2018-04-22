@@ -103,15 +103,17 @@ public class MypageFragment extends Fragment {
                     }
                 });
 
-                // 외부영역 선택시 종료
-                mPopupWindow.setFocusable(true);
+                mPopupWindow.setFocusable(true); // 외부영역 선택시 종료
                 mPopupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+
                 Button popCamera = popupView.findViewById(R.id.btn_popCamera);
                 Button popGallery = popupView.findViewById(R.id.btn_popGallery);
+                Button popPlusImg = popupView.findViewById(R.id.btn_popPlusImg);
+                Button popupBaseImg = popupView.findViewById(R.id.btn_baseImg);
                 Log.i(TAG, "팝업버튼 투개 나옴. ");
 
 
-                //팝업중에 카메라 버튼 선택시
+                //팝업버튼중에  "사진촬영" 버튼 선택시
                 popCamera.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -122,7 +124,7 @@ public class MypageFragment extends Fragment {
                 });
 
 
-                //팝업 버튼중 갤러리 선택시
+                //팝업버튼중에  "앨범에서 사진선택" 버튼 선택시
                 popGallery.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -130,7 +132,59 @@ public class MypageFragment extends Fragment {
                         mPopupWindow.dismiss();
                         Log.i(TAG, "intent: ");
                     }
-                });
+                });// end popGallery
+
+                //팝업버튼중에  "확대해서보기" 버튼 선택시
+                popPlusImg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //TODO: 이미지 확대보기 클릭시 사진이 크게 나와야함
+                        View popupView = getLayoutInflater().inflate(R.layout.popup_plusimage, null);
+                        //popupView 에서 (LinearLayout 을 사용) 레이아웃이 둘러싸고 있는 컨텐츠의 크기 만큼 팝업 크기를 지정
+                        mPopupWindow= new PopupWindow(
+                                popupView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                        mPopupWindow.getContentView().setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                mPopupWindow.dismiss();
+                            }
+                        }); // click
+                        mPopupWindow.setFocusable(true); // 외부영역 선택시 종료
+                        mPopupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+
+                        ImageView plusImage = popupView.findViewById(R.id.popup_PlusImageVeiw);
+                        key = DaoImple.getInstance().getKey();
+                        Log.i(TAG, "key: " + key);
+                        String curProImgUrl = DaoImple.getInstance().getContact().getPictureUrl();
+                        Log.i(TAG, "curProImgUrl: " + curProImgUrl);
+                        Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
+
+                        //TODO:
+                        if (curProImgUrl != null) { // Firebase에 저장된 파일이 있을 때
+                            Glide.with(MypageFragment.context).load(curProImgUrl).into(plusImage);
+
+                        } else { // 없을 때
+                            //TODO: 아이콘이 없을때는 아직 보류...
+
+                        }
+
+
+
+                    }
+                }); //end  popPlusImg
+
+
+
+                //팝업버튼중에  "기본이미지" 버튼 선택시
+                popupBaseImg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //TODO: 기본이미지로 돌아가게 만들어야함.
+
+
+                    }
+                }); // popupbaseImg
+
             }
         });
 
