@@ -412,7 +412,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         clusterManager.clearItems();
                                         Log.i("fffff", "체인지 : 모든 마커 삭제");
                                         check = true;
-                                        Log.i("fffff", "체인지 : 내 마커 생성");
                                     }
 
                                     // 친구들 위치정보 받아와서 구글맵에 갱신
