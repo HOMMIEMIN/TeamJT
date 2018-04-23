@@ -45,6 +45,11 @@ public class ItemMemo implements ClusterItem {
         return title;
     }
 
+    @Override
+    public String getSnippet() {
+        return null;
+    }
+
     public String getContent() {
         return content;
     }
