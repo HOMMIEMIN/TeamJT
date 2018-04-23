@@ -178,6 +178,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
+
                 case R.id.navigation_home:
                     FragmentManager manager = getSupportFragmentManager();
                     FragmentTransaction transaction = manager.beginTransaction();
@@ -185,6 +186,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction.replace(R.id.container_main, friendFragment);
                     transaction.commit();
                     return true;
+
                 case R.id.navigation_dashboard:
                     FragmentManager manager1 = getSupportFragmentManager();
                     FragmentTransaction transaction1 = manager1.beginTransaction();
@@ -192,6 +194,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction1.replace(R.id.container_main, chatListFragment);
                     transaction1.commit();
                     return true;
+
                 case R.id.navigation_notifications:
                     FragmentManager manager2 = getSupportFragmentManager();
                     FragmentTransaction transaction2 = manager2.beginTransaction();

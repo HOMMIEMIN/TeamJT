@@ -15,20 +15,21 @@
 
         <TextView
             android:layout_width="300dp"
-            android:layout_height="wrap_content"
+            android:layout_height="80px"
+            android:gravity="center|start"
             android:background="@android:color/white"
             android:drawableEnd="@color/colorPrimary"
-            android:text="   프로필                      "
+            android:text="   프로필 변경                      "
             android:textColorHint="#000000"
             android:textColorLink="@android:color/black"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <!--이게 프로필 노란밑줄 보이는게 하는팁-->
         <View
             android:layout_width="300dp"
             android:layout_height="3dp"
-            android:background="#fac209" />
+            android:background="@android:color/darker_gray" />
 
 
         <Button

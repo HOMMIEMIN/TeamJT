@@ -141,21 +141,10 @@ public class MypageFragment extends Fragment {
                 popPlusImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //TODO: 이미지 확대보기 클릭시 사진이 크게 나와야함
-                        View popupView = getLayoutInflater().inflate(R.layout.popup_plusimage, null);
-                        //popupView 에서 (LinearLayout 을 사용) 레이아웃이 둘러싸고 있는 컨텐츠의 크기 만큼 팝업 크기를 지정
-                        mPopupWindow= new PopupWindow(
-                                popupView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-                        mPopupWindow.getContentView().setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                mPopupWindow.dismiss();
-                            }
-                        }); // click
-                        mPopupWindow.setFocusable(true); // 외부영역 선택시 종료
-                        mPopupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
 
-                        ImageView plusImage = popupView.findViewById(R.id.popup_PlusImageVeiw);
+                        //TODO: 이미지 확대보기 클릭시 사진이 크게 나와야함
+
+
                         key = DaoImple.getInstance().getKey();
                         Log.i(TAG, "key: " + key);
                         String curProImgUrl = DaoImple.getInstance().getContact().getPictureUrl();
@@ -163,11 +152,28 @@ public class MypageFragment extends Fragment {
                         Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
 
                         //TODO:
-                        if (curProImgUrl != null) { // Firebase에 저장된 파일이 있을 때
-                            Glide.with(MypageFragment.context).load(curProImgUrl).into(plusImage);
+                        if (curProImgUrl == null) { // Firebase에 저장된 파일이 있을 때
+                            mPopupWindow.dismiss();
+                            Toast.makeText(MypageFragment.context, "저장된 이미지가 없습니다.", Toast.LENGTH_SHORT).show();
+
 
                         } else { // 없을 때
-                            //TODO: 아이콘이 없을때는 아직 보류...
+                            View popupView = getLayoutInflater().inflate(R.layout.popup_plusimage, null);
+                            //popupView 에서 (LinearLayout 을 사용) 레이아웃이 둘러싸고 있는 컨텐츠의 크기 만큼 팝업 크기를 지정
+                            mPopupWindow= new PopupWindow(
+                                    popupView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                            mPopupWindow.getContentView().setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    mPopupWindow.dismiss();
+                                }
+                            }); // click
+
+                            ImageView plusImage = popupView.findViewById(R.id.popup_PlusImageVeiw);
+                            mPopupWindow.setFocusable(true); // 외부영역 선택시 종료
+                            mPopupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+
+                            Glide.with(MypageFragment.context).load(curProImgUrl).into(plusImage);
 
                         }
 

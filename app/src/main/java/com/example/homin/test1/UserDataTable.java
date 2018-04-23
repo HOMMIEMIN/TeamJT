@@ -14,13 +14,13 @@ public class UserDataTable {
     public UserDataTable(){}
 
     public UserDataTable(String userId, String name, String imageUrl, List<Double> location, String title, String content, String data) {
-        this.userId = userId;
-        this.name = name;
-        this.imageUrl = imageUrl;
-        this.location = location;
-        Title = title;
-        this.content = content;
-        this.data = data;
+        this.userId = userId; // 유저 아이디
+        this.name = name; // 이름
+        this.imageUrl = imageUrl; // 글에 올리는 사진
+        this.location = location; // 글쓰는 지역 위치
+        Title = title; // 제목
+        this.content = content; // 글내용
+        this.data = data; //
     }
 
     public String getUserId() {
