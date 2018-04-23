@@ -27,6 +27,11 @@ import com.google.maps.android.clustering.ClusterItem;
         }
 
         @Override
+        public String getSnippet() {
+            return null;
+        }
+
+        @Override
         public LatLng getPosition() {
             return mPosition;
         }

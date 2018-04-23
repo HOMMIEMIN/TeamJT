@@ -1,6 +1,11 @@
 package com.example.homin.test1;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +25,19 @@ public class DaoImple {
     private String key;
     private Contact contact;
     private Map<String,Bitmap> pictureList;
+    private LatLng WriteLocation;
+
+    public static void setInstance(DaoImple instance) {
+        DaoImple.instance = instance;
+    }
+
+    public LatLng getWriteLocation() {
+        return WriteLocation;
+    }
+
+    public void setWriteLocation(LatLng writeLocation) {
+        WriteLocation = writeLocation;
+    }
 
     public Contact getContact() {
         return contact;
@@ -91,6 +109,7 @@ public class DaoImple {
         this.pictureList = pictureList;
     }
 
+
     // 이메일에서 특수문자 뺀 key값 구하기
     public String getFirebaseKey(String id){
         int b = id.indexOf("@");
@@ -102,6 +121,8 @@ public class DaoImple {
 
         return key;
     }
+
+
 
 
 }

@@ -37,7 +37,6 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
     @Override
     protected void onBeforeClusterItemRendered(final ClusterItem item, final MarkerOptions markerOptions) {
-        Log.i("fffff","onBeforeClusterItemRendered");
         super.onBeforeClusterItemRendered(item, markerOptions);
 
         if(item instanceof ItemPerson) {
@@ -58,13 +57,16 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
         }
 
-
+        if(item instanceof ItemMemo){
+            Bitmap roundBitmap = getCircleBitmap(((ItemMemo) item).getIcon());
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+//            markerOptions.title(((ItemMemo) item).getTitle());
+        }
 
     }
 
     //직사각형 비트맵을 원형으로 변환하는 메소드
     public static Bitmap getCircleBitmap(Bitmap bitmap) {
-        Log.i("fffff","원모양으로 만듦");
         Bitmap output;
 
         if (bitmap.getWidth() > bitmap.getHeight()) {
@@ -136,7 +138,6 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
             return inSampleSize;
         }
-
 
 
 }
