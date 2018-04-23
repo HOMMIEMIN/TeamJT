@@ -77,6 +77,11 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.algo.GridBasedAlgorithm;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -849,7 +854,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     filePath = data.getData(); // 선택한 사진 Uri 정보
                     Log.i(TAG, "filePath: " + filePath);
 
-                    MypageFragment.uploadFile(filePath); // 프로필 적용 & Storage 업로드
+                    MypageFragment.uploadFile(filePath, null); // 프로필 적용 & Storage 업로드
 //                    uploadFile();
 
                     break;
@@ -860,15 +865,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.i(TAG, "온액티비티리절트 카메라2 ");
 
                         Bundle bundle = data.getExtras();
+//                        InputStream is = getContentResolver().openInputStream(data.getData());
 
-                        if (bundle != null) {
-                            Bitmap bitmap = (Bitmap) bundle.get("data");
+                        if (bundle != null) { // 카메라 정보가 들어오면
+                            Bitmap bitmap = (Bitmap) bundle.get("data"); // 비트맵으로 변환
 
                             ImageView iv = findViewById(R.id.imageView);
-                            iv.setImageBitmap(bitmap);
+                            iv.setImageBitmap(bitmap); // imageView에 띄우기
 
+                            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                            String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Title", null);
+                            Uri bitmapUri = Uri.parse(path);
 
-//                            getPictureForPhoto();
+                            MypageFragment.uploadFile(null, bitmapUri);
 
                         }
                         Toast.makeText(this, "저장 완료.", Toast.LENGTH_SHORT).show();
@@ -879,6 +889,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
                     break;
+
 
                 case 400:
 
