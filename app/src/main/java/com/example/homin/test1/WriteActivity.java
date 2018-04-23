@@ -80,10 +80,7 @@ public class WriteActivity extends Activity {
                     String time = createTime();
                     String title = et1.getText().toString();
                     String body = et2.getText().toString();
-//                    list.add(title);
-//                    list.add(body);
-//                    list.add(imageUrl);
-//                    list.add(time);
+//
                     Intent intent = new Intent();
                     intent.putExtra(TIME_KEY,time);
                     intent.putExtra(TITLE_KEY,title);
@@ -136,7 +133,6 @@ public class WriteActivity extends Activity {
                 uri = data.getData();
                 image = MediaStore.Images.Media.getBitmap(getContentResolver(),data.getData());
                 imageView.setImageBitmap(image);
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
