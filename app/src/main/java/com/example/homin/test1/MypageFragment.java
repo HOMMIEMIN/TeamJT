@@ -4,6 +4,7 @@ package com.example.homin.test1;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -15,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.PermissionChecker;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,6 +40,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
+import java.io.InputStream;
 
 import static com.example.homin.test1.MapsActivity.TAG;
 
@@ -179,8 +182,9 @@ public class MypageFragment extends Fragment {
                 popupBaseImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //TODO: 기본이미지로 돌아가게 만들어야함.
 
+                        mPopupWindow.dismiss();
+                        deleteProImgAlert();
 
                     }
                 }); // popupbaseImg
@@ -189,6 +193,48 @@ public class MypageFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void deleteProImgAlert() {
+        String urlCheck = DaoImple.getInstance().getContact().getPictureUrl();
+        if (urlCheck != null) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(context);
+            alert.setTitle("프로필 이미지 삭제");
+            alert.setMessage("기본 이미지로 변경하시겠습니까?");
+
+            alert.setNegativeButton("확인",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // storage
+                            FirebaseStorage storage = FirebaseStorage.getInstance();
+
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference dataRef = database.getReference();
+
+                            StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/");
+                            StorageReference pathRef = storageRef.child(key + "/").child("profileImage/curProImg.jpg");
+
+                            pathRef.delete();
+                            DaoImple.getInstance().getContact().setPictureUrl(null);
+
+                            Contact contact = DaoImple.getInstance().getContact();
+
+                            dataRef.child("Contact").child(key).setValue(contact);
+                            imageView.setImageResource(R.drawable.what);
+                        }
+                    });
+
+            alert.setPositiveButton("취소",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+            alert.show();
+        } else {
+            Toast.makeText(context, "이미 기본 이미지로 설정되어 있습니다", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void getProImg() {
@@ -206,9 +252,8 @@ public class MypageFragment extends Fragment {
         if (curProImgUrl != null) { // Firebase에 저장된 파일이 있을 때
             Glide.with(this).load(curProImgUrl).into(imageView);
 
-        } else { // 없을 때
-            //TODO: 아이콘 뭘로..
-
+        } else {
+            imageView.setImageResource(R.drawable.what);
         }
 
     }
@@ -221,24 +266,37 @@ public class MypageFragment extends Fragment {
     }
 
     // Firebase에 사진 업로드하는 메소드
-    public static void uploadFile(Uri filePath) {
-        if (filePath != null) {
+    public static void uploadFile(Uri filePath, Uri bitmapUri) {
+
+        // storage
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference dataRef = database.getReference();
+
+        UploadTask upload;
+
+        if (filePath != null || bitmapUri != null) {
+
             final ProgressDialog progressDialog = new ProgressDialog(context);
             progressDialog.setTitle("프로필 사진 업데이트 중...");
             progressDialog.show();
 
-            // storage
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            final DatabaseReference dataRef = database.getReference();
-
-                    // 파일명 지정
+            // 파일명 지정
             String filename = "curProImg.jpg";
             key = DaoImple.getInstance().getKey();
 
             StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/").child(key + "/").child("profileImage/" + filename);
-            storageRef.putFile(filePath)
+
+            if (filePath != null) { // 갤러리에서 프로필 사진 선택했을 때
+                upload = storageRef.putFile(filePath);
+            } else { // 카메라로 찍었을 때
+//                upload = storageRef.putStream(inputStream);
+                upload = storageRef.putFile(bitmapUri);
+            }
+//            storageRef.putFile(filePath)
+            upload
+
                     // 성공했을 때
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
