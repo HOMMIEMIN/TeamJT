@@ -642,39 +642,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                         }
 
-//                                    if(!(check)){
-//                                        clusterManager.clearItems();
-//                                        Log.i("fffff", "체인지 : 모든 마커 삭제");
-//                                        check = true;
-//                                    }
-//
-//                                    // 친구들 위치정보 받아와서 구글맵에 갱신
-//                                    List<Double> friendLocation = contact.getUserLocation();
-//                                    if(pictureList.get(contact.getUserId()) != null) {
-//                                        Bitmap picture = pictureList.get(contact.getUserId());
-//
-//                                        ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-//                                                friendLocation.get(1), contact.getUserName(), picture);
-//                                        Log.i("fffff", "체인지 : " + myFriendList.get(a));
-//                                        clusterManager.addItem(friendMarker);
-//                                        clusterManager.cluster();
-//                                        memoManager.cluster();
-//                                        Log.i("fffff", "체인지 : 친구위치 마커생성");
-//                                    }else{
-//                                        BitmapFactory.Options options = new BitmapFactory.Options();
-//                                        options.inSampleSize = 1;
-//                                        Bitmap otherPicture = BitmapFactory.decodeResource(getResources(),R.drawable.what,options);
-//                                        Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
-//                                        ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-//                                                friendLocation.get(1), contact.getUserName(), picture);
-//                                        clusterManager.addItem(friendMarker);
-//                                        clusterManager.cluster();
-//                                        memoManager.cluster();
-//                                        Log.i("fffff", "체인지 : else 친구위치 마커생성");
-//
-//
-//                                    }
-
                                 }
 
                             }
@@ -789,21 +756,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.i("fffff", "들어옴");
-//                if(!(memoCheck)){
-//                    memoManager.clearItems();
-//                    Log.i("fffff","친구 메모 삭제");
-//                    memoCheck = true;
-//                }
                 UserDataTable data = dataSnapshot.getValue(UserDataTable.class);
                 List<Double> friendLocation = data.getLocation();
                 ItemMemo friendMemo = new ItemMemo(friendLocation.get(0),friendLocation.get(1),
                         data.getUserId(),data.getName(),data.getTitle(),data.getContent(),
                         data.getData(),data.getImageUrl(),BitmapFactory.decodeResource(context.getResources(),R.drawable.letter));
                 memoList.add(friendMemo);
-                // 내 거리와 메모의 거리 차이를 계산하기 위해 Location 객체 2개 생성
+                // 메모의 거리를 계산 해주는 메소드
                 memoDistanceAdd(friendMemo);
-//                memoManager.cluster();
-//                clusterManager.cluster();
+                Log.i("fffff", "메모 생성");
+                memoManager.cluster();
+                clusterManager.cluster();
             }
 
             @Override
