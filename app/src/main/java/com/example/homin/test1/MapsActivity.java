@@ -279,6 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    /********************************검색창을 위한 메소드들****************************************/
 //목적지 설정후 목적지로 카메라 돌리기
     private void moveCamera(LatLng latLng,float zoom, String title){
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
@@ -432,6 +433,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         hideSoftKeyboard();
     }
+
+    /********************************End of 검색창을 위한 메소드들****************************************/
 
     /**
      * Manipulates the map once available.
