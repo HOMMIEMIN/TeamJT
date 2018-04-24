@@ -12,13 +12,15 @@ import com.google.maps.android.clustering.ClusterItem;
 
         private final LatLng mPosition;
         private String userId;
+        private String userName;
         private Bitmap image;
 
 
-        public ItemPerson(double lat, double lng, String id, Bitmap image) {
+        public ItemPerson(double lat, double lng, String id,String name , Bitmap image) {
             mPosition = new LatLng(lat, lng);
             this.userId = id;
             this.image = image;
+            userName = name;
 
         }
 
@@ -29,6 +31,14 @@ import com.google.maps.android.clustering.ClusterItem;
         @Override
         public String getSnippet() {
             return null;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public String getUserName() {
+            return userName;
         }
 
         @Override
