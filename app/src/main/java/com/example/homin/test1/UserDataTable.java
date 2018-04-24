@@ -7,18 +7,18 @@ public class UserDataTable {
     private String name;
     private String imageUrl;
     private List<Double> location;
-    private String Title;
+    private String title;
     private String content;
     private String data;
 
     public UserDataTable(){}
 
-    public UserDataTable(String userId, String name, String imageUrl, List<Double> location, String title, String content, String data) {
+    public UserDataTable(String data, String imageUrl, String name, List<Double> location, String title, String userId,String content) {
         this.userId = userId; // 유저 아이디
         this.name = name; // 이름
         this.imageUrl = imageUrl; // 글에 올리는 사진
         this.location = location; // 글쓰는 지역 위치
-        Title = title; // 제목
+        this.title = title; // 제목
         this.content = content; // 글내용
         this.data = data; //
     }
@@ -56,11 +56,11 @@ public class UserDataTable {
     }
 
     public String getTitle() {
-        return Title;
+        return title;
     }
 
     public void setTitle(String title) {
-        Title = title;
+        this.title = title;
     }
 
     public String getContent() {

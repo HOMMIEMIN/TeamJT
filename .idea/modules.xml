@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TeamJT.iml" filepath="$PROJECT_DIR$/TeamJT.iml" />
-      <module fileurl="file://$PROJECT_DIR$/TeamJob.iml" filepath="$PROJECT_DIR$/TeamJob.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
