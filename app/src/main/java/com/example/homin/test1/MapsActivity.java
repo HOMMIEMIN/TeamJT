@@ -224,7 +224,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             pictureList = DaoImple.getInstance().getPictureList();
 
         //검색창 editText
-        mSearchText = findViewById(R.id.);
+        mSearchText = findViewById(R.id.input_search);
 
         //자기위치찾아주는 버튼 찾기
         selfLocationButton = findViewById(R.id.selfLocationIdentifier);
@@ -301,7 +301,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void moveCamera(LatLng latLng,float zoom, PlaceInfo placeInfo){
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
 
-        mMap.clear();
+
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -843,7 +843,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i("fffff11", "distance : " + distance);
                 if(distance < 300) {
                     memoManager.addItem(friendMemo);
-                    Log.i("fffff", data.getTitle());
+//                    Log.i("fffff", data.getTitle());
                     Log.i("fffff", "친구 메모 에드");
                 }
 //
