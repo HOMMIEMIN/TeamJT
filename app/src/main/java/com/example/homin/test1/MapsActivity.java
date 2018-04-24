@@ -164,13 +164,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FloatingActionButton selfLocationButton;
 
     //검색창
-    private AutoCompleteTextView mSearchText;
+    private AutoCompleteTextView mSearchText;//검색창 뷰
     private PlaceAutoCompleteAdapter placeAutoCompleteAdapter;
     private GoogleApiClient mGoogleApiClient;
 //    private GeoDataClient geoDataClient;
-    private PlaceInfo mPlace;
-    private Marker mMarker;
-    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40,-168),new LatLng(71,136));
+    private PlaceInfo mPlace; // 자동검색창 각 리스트아이템 대한 정보
+    private Marker mMarker; //목적지 마커
+    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40,-168),new LatLng(71,136));//지구전체 범위
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -278,27 +278,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
-//    // 검색창 이벤트 핸들러 처리
-//    private void search() {
-//        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-//                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-//
-//        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-//            @Override
-//            public void onPlaceSelected(Place place) {
-//                // TODO: Get info about the selected place.
-//                Log.i("hi", "Place: " + place.getName());
-//
-//            }
-//
-//            @Override
-//            public void onError(Status status) {
-//                // TODO: Handle the error.
-//                Log.i("hi", "An error occurred: " + status);
-//            }
-//        });
-//    }
 
+//목적지 설정후 목적지로 카메라 돌리기
     private void moveCamera(LatLng latLng,float zoom, String title){
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
 
