@@ -6,10 +6,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Picture;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.PermissionChecker;
@@ -42,6 +47,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +58,7 @@ import java.util.List;
  */
 public class MypageFragment extends Fragment {
 
-    private static final String TAG = "test";
+    private static final String TAG = "mini";
 
     public static userDataTableAdapter adapter;
 
@@ -151,7 +159,6 @@ public class MypageFragment extends Fragment {
                     public void onClick(View v) {
 
                         //TODO: 이미지 확대보기 클릭시 사진이 크게 나와야함
-
 
                         key = DaoImple.getInstance().getKey();
                         Log.i(TAG, "line157) key: " + key);
@@ -383,20 +390,139 @@ public class MypageFragment extends Fragment {
         }
     }
 
+//    public static void resizeImg(String filePathToString) {
+//        FirebaseStorage storage = FirebaseStorage.getInstance();
+//        String filename = "curProImg_resize.jpg";
+//        key = DaoImple.getInstance().getKey();
+//        StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/").child(key + "/").child("profileImage/" + filename);
+//
+//        BitmapFactory.Options options = new BitmapFactory.Options();
+//        options.inJustDecodeBounds = true;
+//        BitmapFactory.decodeFile(filePathToString, options);
+//
+//        int imgHeight = options.outHeight;
+//        int imgWidth = options.outWidth;
+//        float ratio = imgWidth / (float) imgHeight;
+//        int scaleFactor;
+//        Bitmap orgImage;
+//
+//        if (imgHeight >= imgWidth) {
+//            imgWidth = 100;
+//            imgHeight = Math.round(imgWidth / ratio);
+//            scaleFactor = Math.min(imgWidth, imgHeight);
+//
+//            options.inJustDecodeBounds = false;
+//            options.inSampleSize = scaleFactor;
+//
+//            orgImage = BitmapFactory.decodeFile(filePathToString, options);
+//
+//            Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
+//
+//            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+//            resizeImg.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+//            String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizeImg, "Title", null);
+//            Uri bitmapUri = Uri.parse(path);
+//
+//            storageRef.putFile(bitmapUri);
+//
+//        } else {
+//            imgHeight = 100;
+//            imgWidth = Math.round(imgHeight * ratio);
+//
+//            scaleFactor = Math.min(imgWidth, imgHeight);
+//
+//            options.inJustDecodeBounds = false;
+//            options.inSampleSize = scaleFactor;
+//
+//            orgImage = BitmapFactory.decodeFile(filePathToString, options);
+//            Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
+//
+//            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+//            resizeImg.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+//            String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizeImg, "Title", null);
+//            Uri bitmapUri = Uri.parse(path);
+//
+//            storageRef.putFile(bitmapUri);
+//
+//        }
+//
+////        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+////        orgImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+////        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), orgImage, "Title", null);
+////        Uri bitmapUri = Uri.parse(path);
+//
+//
+////        int imgHeight = bitmap.getHeight();
+////        int imgWidth = bitmap.getWidth();
+////        float aspectRatio = bitmap.getWidth() / (float) bitmap.getHeight();
+////        if (imgHeight >= imgWidth) {
+////            imgWidth = 100;
+////            imgHeight = Math.round(imgWidth / aspectRatio);
+////            Bitmap resizeImg = Bitmap.createScaledBitmap(bitmap, imgWidth, imgHeight, false);
+////
+////        } else {
+////            imgHeight = 100;
+////            imgWidth = Math.round(imgHeight * aspectRatio);
+////            Bitmap resizeImg = Bitmap.createScaledBitmap(bitmap, imgWidth, imgHeight, false);
+////
+////        }
+//
+//    }
+
+    public static void resizeImg(Uri getUri) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        String filename = "curProImg_resize.jpg";
+        key = DaoImple.getInstance().getKey();
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/").child(key + "/").child("profileImage/" + filename);
+
+        try {
+            Bitmap orgImage = MediaStore.Images.Media.getBitmap(context.getContentResolver(), getUri);
+
+            int imgHeight = orgImage.getHeight();
+            int imgWidth = orgImage.getWidth();
+            float aspectRatio = orgImage.getWidth() / (float) orgImage.getHeight();
+            if (imgHeight >= imgWidth) {
+                imgWidth = 100;
+                imgHeight = Math.round(imgWidth / aspectRatio);
+                Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
+
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                resizeImg.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizeImg, "Title", null);
+                Uri bitmapUri = Uri.parse(path);
+
+                storageRef.putFile(bitmapUri);
+
+            } else {
+                imgHeight = 100;
+                imgWidth = Math.round(imgHeight * aspectRatio);
+                Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
+
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                resizeImg.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizeImg, "Title", null);
+                Uri bitmapUri = Uri.parse(path);
+                storageRef.putFile(bitmapUri);
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
 
     // Firebase에 사진 업로드하는 메소드
-    public static void uploadFile(Uri filePath, Uri bitmapUri) {
+    public static void uploadFile(Uri filePath) {
 
         // storage
         FirebaseStorage storage = FirebaseStorage.getInstance();
-
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference dataRef = database.getReference();
 
-        UploadTask upload;
-
-        if (filePath != null || bitmapUri != null) {
+        if (filePath != null) {
 
             final ProgressDialog progressDialog = new ProgressDialog(context);
             progressDialog.setTitle("프로필 사진 업데이트 중...");
@@ -405,18 +531,9 @@ public class MypageFragment extends Fragment {
             // 파일명 지정
             String filename = "curProImg.jpg";
             key = DaoImple.getInstance().getKey();
-
             StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/").child(key + "/").child("profileImage/" + filename);
 
-            if (filePath != null) { // 갤러리에서 프로필 사진 선택했을 때
-                upload = storageRef.putFile(filePath);
-            } else { // 카메라로 찍었을 때
-//                upload = storageRef.putStream(inputStream);
-                upload = storageRef.putFile(bitmapUri);
-            }
-//            storageRef.putFile(filePath)
-            upload
-
+            storageRef.putFile(filePath)
                     // 성공했을 때
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
