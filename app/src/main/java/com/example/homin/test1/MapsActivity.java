@@ -3,6 +3,7 @@ package com.example.homin.test1;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -94,6 +96,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.maps.android.MarkerManager;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
@@ -104,6 +107,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -155,6 +159,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean memoCheck;
     private List<ItemMemo> memoList;
     private ClusterManager<ClusterItem> memoManager;
+    private int pressedTime;
+
 
     // MyPage에 이용
     public static final int CAMERA_CODE = 100;
@@ -162,6 +168,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Uri filePath;
     private String key;
     public static final String TAG = "mini";
+    public static final String MEMOLIST = "memolistkeys";
 
     //자기위치로 되돌리는 버튼
     private FloatingActionButton selfLocationButton;
@@ -213,7 +220,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Intent intent = new Intent(this,ClosingServics.class);
+        startService(intent);
         context = getApplicationContext();
         Log.i("qq23q","onCreate");
         memoList = new ArrayList<>();
@@ -270,6 +278,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (newState == BottomSheetBehavior.STATE_DRAGGING) {
                     actionLayout.setVisibility(View.VISIBLE);
                 }
+
+
             }
 
             @Override
@@ -278,8 +288,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
-//        search(); //검색창 이벤트 헨들러 처리
 
 
     }
@@ -421,8 +429,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         List<Address> list = new ArrayList<>();
 
-//            PlaceBufferResponse placeBufferResponse = geoDataClient.getPlaceById(mSearchText.getText().toString()).getResult();
-//            placeBufferResponse.get
 
             try {
             list = geocoder.getFromLocationName(searchString,1);
@@ -458,20 +464,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         reference = FirebaseDatabase.getInstance().getReference();
+
+
         if(memoManager == null){
             memoManager = new ClusterManager<>(MapsActivity.this, mMap);
             mMap.setOnCameraIdleListener(memoManager);
             memoManager.setRenderer(new PersonItemRenderer(MapsActivity.this,mMap,memoManager));
             memoManager.setAlgorithm(new GridBasedAlgorithm<ClusterItem>());
-            mMap.setOnMarkerClickListener(memoManager);
+
         }
+
         if(clusterManager == null){
             clusterManager = new ClusterManager<>(MapsActivity.this,mMap);
             mMap.setOnCameraIdleListener(clusterManager);
             clusterManager.setRenderer(new PersonItemRenderer(MapsActivity.this,mMap,clusterManager));
             clusterManager.setAlgorithm(new GridBasedAlgorithm<ClusterItem>());
-            mMap.setOnCameraIdleListener(clusterManager);
+//            mMap.setOnMarkerClickListener(clusterManager);
+
         }
+
+
+        clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<ClusterItem> cluster) {
+                Toast.makeText(context, "사람 클릭1", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
+
         Log.i("gg6","클러스터 설정");
         Log.i("asd123","onMapReady");
         myLocationUpdate(); // 내 위치 업데이트
@@ -480,6 +501,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         Log.i("fffff","체인지 끝남3");
+
+
+
+//         메모 클러스터 클릭 시, 새 Activity에서 목록 보여주기
+//        memoManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
+//            @Override
+//            public boolean onClusterClick(Cluster<ClusterItem> cluster) {
+//                Log.i("ggqs", "메모 클릭");
+//                Collection<ClusterItem> clusters = cluster.getItems();
+//                List<ItemMemo> itemMemos = new ArrayList<>();
+//                for(ClusterItem m : clusters){
+//                    if(m instanceof ItemMemo){
+//                        itemMemos.add((ItemMemo)m);
+//                    }
+//                }
+//                Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
+//                DaoImple.getInstance().setItemMemoList(itemMemos);
+//                startActivity(intent);
+//                return true;
+//            }
+//        });
+
+
+
+
+        // 사람 클러스터 클릭 시, 새 Activity에서 목록 보여주기
+//        clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
+//            @Override
+//            public boolean onClusterClick(Cluster<ClusterItem> cluster) {
+//                Toast.makeText(context, "클릭", Toast.LENGTH_SHORT).show();
+//                Log.i("ggqs", "메모 클릭");
+//                Collection<ClusterItem> clusters = cluster.getItems();
+//                List<ItemMemo> itemMemos = new ArrayList<>();
+//                for(ClusterItem m : clusters){
+//                    if(m instanceof ItemMemo){
+//                        itemMemos.add((ItemMemo)m);
+//                    }
+//                }
+//                Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
+//                DaoImple.getInstance().setItemMemoList(itemMemos);
+//                startActivity(intent);
+//                return true;
+//            }
+//        });
+
+
         // 친구 요청 Activity 실행
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -544,6 +611,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                         friendLocation.get(1), contact.getUserId(),contact.getUserName(), picture);
                                 clusterManager.addItem(friendMarker);
+                                // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
+                                if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                                    myMarker = friendMarker;
+                                    Log.i("ggg","내 마커 저장 : " + contact.getUserId());
+                                }
                                 personList.put(contact.getUserId(),friendMarker);
                                 clusterManager.cluster();
                                 memoManager.cluster();
@@ -554,10 +626,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 BitmapFactory.Options options = new BitmapFactory.Options();
                                 options.inSampleSize = 1;
                                 Bitmap otherPicture = BitmapFactory.decodeResource(getResources(),R.drawable.what,options);
-
                                 Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
                                 ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                         friendLocation.get(1), contact.getUserId(),contact.getUserName(), picture);
+                                // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
+                                if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                                    myMarker = friendMarker;
+                                    Log.i("ggg","내 마커 저장 : " + contact.getUserId());
+                                }
                                 clusterManager.addItem(friendMarker);
                                 personList.put(contact.getUserId(),friendMarker);
                                 clusterManager.cluster();
@@ -592,6 +668,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 ItemPerson ip = personList.get(contact.getUserId());
                                                 // 저장 되있는 Location 정보와 firebase에 저장된 Location 비교
                                                 LatLng saveLatLng = ip.getPosition();
+                                                if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                                                    myMarker = ip;
+                                                }
+                                                Log.i("fffff", "리스트 크기 : " + personList.size());
                                                 Log.i("fffff", "저장 : " + ip.getUserName());
                                                 LatLng newLatLng = new LatLng(contact.getUserLocation().get(0),
                                                         contact.getUserLocation().get(1));
@@ -836,54 +916,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }
-        // 사용 가능한 gps 장치가 없다면, 마지막 수신 위치를 받아옴
-        if(!locationManager.isProviderEnabled(provider)) {
-            if(clusterManager == null) {
-                clusterManager = new ClusterManager<>(MapsActivity.this, mMap);
-                mMap.setOnCameraIdleListener(clusterManager);
 
-            }
-            Location myLocation = locationManager.getLastKnownLocation(provider);
-            if(myLocation == null){
-                Toast.makeText(context, "수신 가능한 위치 장치가 없습니다.", Toast.LENGTH_SHORT).show();
-                finishAffinity();
-            }
-
-                myLatLng = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-
-
-            Bitmap myPicture = null; //내 사진 url이 없는 경우 bit맵을 읽어오고 그렇지 않은 경우 null처리 된 bitmap를 cluster로 보냄
-            if (pictureList.get(DaoImple.getInstance().getLoginEmail()) != null) {
-                myPicture = pictureList.get(DaoImple.getInstance().getLoginEmail());
-            } else {
-                myPicture = null;
-            }
-
-            // 파이어베이스에 내 gps 정보 업데이트
-            if(DaoImple.getInstance().getContact() != null) {
-                Contact myContact = DaoImple.getInstance().getContact();
-                List<Double> myLocationList = new ArrayList<>();
-                myLocationList.add(myLocation.getLatitude());
-                myLocationList.add(myLocation.getLongitude());
-                myContact.setUserLocation(myLocationList);
-                reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
-
-            }
-            if(myMarker != null) {
-                clusterManager.removeItem(myMarker);
-                Log.i("fffff","내 마커 지움:수신장치 없음");
-            }
-
-            myMarker = new ItemPerson(myLocation.getLatitude(),myLocation.getLongitude(),
-                    DaoImple.getInstance().getLoginEmail(),DaoImple.getInstance().getLoginId(),myPicture);
-            Log.i("fffff","내 마커 생성:수신장치 없음");
-            clusterManager.addItem(myMarker);
-            if(!zoomCheck) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));
-                zoomCheck = true;
-            }
+        Bitmap myPicture = null; //내 사진 url이 없는 경우 bit맵을 읽어오고 그렇지 않은 경우 null처리 된 bitmap를 cluster로 보냄
+        if (pictureList.get(DaoImple.getInstance().getLoginEmail()) != null) {
+            myPicture = pictureList.get(DaoImple.getInstance().getLoginEmail());
+        } else {
+            myPicture = null;
         }
-
 
             // 내 GPS 위치가 바뀔 때 마다, 내 마커 생성
             locationListener = new LocationListener() {
@@ -903,15 +942,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
                     }
                     // ClusterManagerItmes 이미지 추가/사이즈 줄이기
-
                     clusterManager.setRenderer(new PersonItemRenderer(MapsActivity.this,mMap,clusterManager));
                     clusterManager.setAlgorithm(new GridBasedAlgorithm<ClusterItem>());
 
-                    // 내 위치로 내 마커 생성
+                    // 내 위치를 myLatLng로 생성
                     myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
                     Log.i("fffff","myLatLng 변경");
                     Bitmap myPicture = null; //내 사진 url이 없는 경우 bit맵을 읽어오고 그렇지 않은 경우 null처리 된 bitmap를 cluster로 보냄
-
                         if (pictureList.get(DaoImple.getInstance().getLoginEmail()) != null) {
                             myPicture = pictureList.get(DaoImple.getInstance().getLoginEmail());
                         } else {
@@ -1010,13 +1047,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-
     @SuppressLint("MissingPermission")
     void writeMyLocation(){
         // 현재 내 위치 가져오기
         reference.child("Contact").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                for(DataSnapshot data : dataSnapshot.getChildren()){
+
+                }
                 Contact con = dataSnapshot.getValue(Contact.class);
                 if(con.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                     List<Double> location = con.getUserLocation();
@@ -1144,5 +1183,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } // end if
 
     } // onActivityResult()
+    
+
+
+    @Override
+    public void onBackPressed() {
+        // 메신저창이 올라와 있는 상태에서 백키 누르면 메신저창은 내려감.
+        if(bottomSheetBehavior.getState() == 3){
+            bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED);
+            pressedTime = 0;
+        }else{
+            // 백키를 두번 눌렀을때, 그 간격이 2초 이하면 어플 종료
+            if(pressedTime == 0){
+                Toast.makeText(context, "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
+                pressedTime = (int) System.currentTimeMillis();
+            }else{
+                int second = (int)(System.currentTimeMillis() - pressedTime);
+                if(second > 2000){
+                    Toast.makeText(context, "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
+                    pressedTime = 0;
+                }else{
+                    Contact myContact = DaoImple.getInstance().getContact();
+                    reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+                    finishAffinity();
+
+                }
+            }
+        }
+
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        // 접속이 종료 되면 로그인 상태 변경
+        Contact myContact = DaoImple.getInstance().getContact();
+        myContact.setLoginCheck(false);
+        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+        Log.i("ggqs","디스트로이 액티비티");
+        super.onDestroy();
+    }
+
+//    @Override
+//    public boolean onClusterClick(Cluster<ClusterItem> cluster) {
+//        Log.i("ggqs", "메모 클릭");
+//        Collection<ClusterItem> clusters = cluster.getItems();
+//        List<ItemMemo> itemMemos = new ArrayList<>();
+//        for(ClusterItem m : clusters){
+//            if(m instanceof ItemMemo){
+//                itemMemos.add((ItemMemo)m);
+//            }
+//        }
+//        Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
+//        DaoImple.getInstance().setItemMemoList(itemMemos);
+//        startActivity(intent);
+//        return true;
+//    }
+
+
 
 }

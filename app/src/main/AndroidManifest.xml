@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.homin.test1">
 
     <!--
@@ -10,10 +11,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -34,7 +34,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_maps">
@@ -47,13 +46,19 @@
         <activity android:name=".WriteActivity" />
         <activity
             android:name=".MapsActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait" >
+        </activity>
         <activity android:name=".SignUpActivity" />
         <activity
             android:name=".ChattingActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".WatingActivity" />
-        <activity android:name=".ReadMemoActivity" android:theme="@android:style/Theme.Dialog"></activity>
+        <activity
+            android:name=".ReadMemoActivity"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity android:name=".ItemDetailActivity" android:theme="@android:style/Theme.Dialog"></activity>
+        <service android:name=".ClosingServics"
+            android:stopWithTask="false" />
     </application>
 
 </manifest>

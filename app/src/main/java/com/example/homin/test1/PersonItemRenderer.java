@@ -33,7 +33,10 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         this.googleMap = map;
     }
 
-
+    @Override
+    public void setOnClusterInfoWindowClickListener(ClusterManager.OnClusterInfoWindowClickListener<ClusterItem> listener) {
+        super.setOnClusterInfoWindowClickListener(listener);
+    }
 
     @Override
     protected void onBeforeClusterItemRendered(final ClusterItem item, final MarkerOptions markerOptions) {
