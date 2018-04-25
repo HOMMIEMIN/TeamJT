@@ -104,6 +104,9 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference();
 
+        // 저장한 로그인정보 가져오기
+        loginIdLoad();
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET};
@@ -133,6 +136,17 @@ public class LoginActivity extends AppCompatActivity {
                 clickLogin();
             }
         });
+    }
+
+    // 저장한 로그인 정보 가져오기기
+   private void loginIdLoad() {
+        SharedPreferences preferences = getSharedPreferences("save", MODE_PRIVATE);
+        if(preferences.getString("id","") != null) {
+            etEmail.setText(preferences.getString("id", ""));
+            etPwd.setText(preferences.getString("pw", ""));
+            checkBox.setChecked(true);
+        }
+
     }
 
     @Override
@@ -165,12 +179,14 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             DaoImple.getInstance().setLoginEmail(etEmail.getText().toString());
                             int a = etEmail.getText().toString().indexOf("@");
-                            String name = etEmail.getText().toString().substring(0, a);
-                            DaoImple.getInstance().setLoginId(name);
+                            id = etEmail.getText().toString();
+                            pw = etPwd.getText().toString();
+
                             DaoImple.getInstance().setLoginEmail(etEmail.getText().toString());
 
                             key = DaoImple.getInstance().getFirebaseKey(etEmail.getText().toString());
                             DaoImple.getInstance().setKey(key);
+                            Log.i("ggqs",key);
 
 
 
@@ -185,7 +201,7 @@ public class LoginActivity extends AppCompatActivity {
                                         // 내 사진 다운로드
                                         if (contactInOrder.getPictureUrl() != null) { // 내 Contact에 url 에 들어가있는지 체크
                                             Glide.with(getApplicationContext()).load(contactInOrder.getPictureUrl())
-                                                    .asBitmap().priority(Priority.IMMEDIATE).override(100, 100).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                    .asBitmap().priority(Priority.IMMEDIATE).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).fitCenter().into(new SimpleTarget<Bitmap>() {
                                                 @Override
                                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                                     pictureList.put(etEmail.getText().toString(), resource);
@@ -219,7 +235,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         if (friendsContact.getPictureUrl() != null) {
                                                             stringkey.add(friendsContact.getUserId());//친구 아이디 목록 ( HashMap의 Key값들을 List에 넣음)
                                                             Glide.with(LoginActivity.this).load(friendsContact.getPictureUrl())
-                                                                    .asBitmap().override(100, 100).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                                    .asBitmap().fitCenter().into(new SimpleTarget<Bitmap>() {
                                                                 @Override
                                                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                                                     pictureList.put(stringkey.get(index), resource); //HashMap인 PictureList에 Key 값인 친구 아이디와 그에따른 BitMap을 넣음
@@ -242,6 +258,7 @@ public class LoginActivity extends AppCompatActivity {
                                                                             Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
                                                                             progressDialog.dismiss();
                                                                         }else {
+                                                                            idSaveCheck(id,pw); // 아이디와 패스워드 저장
                                                                             myContact.setLoginCheck(true);
                                                                             reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
                                                                             startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
@@ -268,6 +285,7 @@ public class LoginActivity extends AppCompatActivity {
                                                                     progressDialog.dismiss();
                                                                 }else {
                                                                     Log.i("qq23q", DaoImple.getInstance().getKey());
+                                                                    idSaveCheck(id,pw); // 아이디와 패스워드 저장
                                                                     // 로그인 전에 다중 로그인을 막기 위해 contact 객체를 firebase에 업데이트
                                                                     myContact.setLoginCheck(true);
                                                                     reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
@@ -302,6 +320,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         progressDialog.dismiss();
                                                     }else {
                                                         // 로그인 전에 다중 로그인을 막기 위해 contact 객체를 firebase에 업데이트
+                                                        idSaveCheck(id,pw); // 아이디와 패스워드 저장
                                                         myContact.setLoginCheck(true);
                                                         reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
                                                         startActivity(intent);//포문까지도 안 들어오는 경우 (친구가 없는 경우)
@@ -364,13 +383,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private void idSaveCheck(String email, String pw){
         if(checkBox.isChecked()) {
-            SharedPreferences preferences = getSharedPreferences(email, MODE_PRIVATE);
+            SharedPreferences preferences = getSharedPreferences("save", MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("id", email);
             editor.putString("pw", pw);
             editor.commit();
         }else{
-            SharedPreferences preferences = getSharedPreferences(email, MODE_PRIVATE);
+            SharedPreferences preferences = getSharedPreferences("save", MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("id", null);
             editor.putString("pw", null);
@@ -378,13 +397,4 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        // 접속이 종료 되면 로그인 상태 변경
-//        Contact myContact = DaoImple.getInstance().getContact();
-//        myContact.setLoginCheck(false);
-//        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
-        Log.i("ggqs","디스트로이 로그인 액티비티");
-        super.onDestroy();
-    }
 }

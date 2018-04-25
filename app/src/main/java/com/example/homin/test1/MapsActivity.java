@@ -163,8 +163,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean zoomCheck;
     private boolean memoCheck;
     private List<ItemMemo> memoList;
-    private ClusterManager<ClusterItem> memoManager;
+    private List<ItemPerson> personMarkerList;
     private int pressedTime;
+    public static String MARKER_LIST = "markerList";
+
 
 
     // MyPage에 이용
@@ -231,6 +233,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
         Intent intent = new Intent(this,ClosingServics.class);
         startService(intent);
         context = getApplicationContext();
@@ -238,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         memoList = new ArrayList<>();
         myFriendContactList = new ArrayList<>();
         personList = new HashMap<>();
-        setContentView(R.layout.activity_maps);
+
 
             pictureList = DaoImple.getInstance().getPictureList();
 
@@ -473,28 +476,85 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         reference = FirebaseDatabase.getInstance().getReference();
-        if(memoManager == null){
-            memoManager = new ClusterManager<>(MapsActivity.this, mMap);
-            mMap.setOnCameraIdleListener(memoManager);
-            memoManager.setRenderer(new PersonItemRenderer(MapsActivity.this,mMap,memoManager));
-            memoManager.setAlgorithm(new GridBasedAlgorithm<ClusterItem>());
 
-        }
+
+//        if(memoManager == null){
+//            memoManager = new ClusterManager(MapsActivity.this, mMap);
+//            mMap.setOnCameraIdleListener(memoManager);
+//            memoManager.setRenderer(new PersonItemRenderer(MapsActivity.this,mMap,memoManager));
+//            memoManager.setAlgorithm(new CustomAlgorithm<ClusterItem>());
+//
+//        }
 
         if(clusterManager == null){
             clusterManager = new ClusterManager<>(MapsActivity.this,mMap);
-            mMap.setOnCameraIdleListener(clusterManager);
             clusterManager.setRenderer(new PersonItemRenderer(MapsActivity.this,mMap,clusterManager));
-            clusterManager.setAlgorithm(new GridBasedAlgorithm<ClusterItem>());
-//            mMap.setOnMarkerClickListener(clusterManager);
+            clusterManager.setAlgorithm(new CustomAlgorithm<ClusterItem>());
+            mMap.setOnCameraIdleListener(clusterManager);
+            mMap.setOnMarkerClickListener(clusterManager);
 
         }
+
+
 
 
         clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
             @Override
             public boolean onClusterClick(Cluster<ClusterItem> cluster) {
-                Toast.makeText(context, "사람 클릭1", Toast.LENGTH_SHORT).show();
+
+                Collection<ClusterItem> clusters = cluster.getItems();
+                List<ItemMemo> itemMemos = new ArrayList<>();
+                List<ItemPerson> itemPeople = new ArrayList<>();
+                for(ClusterItem m : clusters){
+                    if(m instanceof ItemMemo){
+                        itemMemos.add((ItemMemo)m);
+                        Log.i("ggqs", "메모 클릭");
+                    }else{
+                        itemPeople.add((ItemPerson)m);
+                        Log.i("ggqs", "사람 클릭");
+                    }
+                }
+                if(itemMemos.size() != 0) {
+                    Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
+                    intent.putExtra(MARKER_LIST,"memo");
+                    DaoImple.getInstance().setItemMemoList(itemMemos);
+                    Log.i("ggqs", itemMemos.size()+"");
+                    startActivity(intent);
+                }else{
+                    Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
+                    DaoImple.getInstance().setItemPersonList(itemPeople);
+                    intent.putExtra(MARKER_LIST,"person");
+                    Log.i("ggqs", itemPeople.size()+"");
+                    startActivity(intent);
+                }
+
+
+
+
+
+                return true;
+            }
+        });
+
+        // 사람이나 메모 클릭시, 메모 마커는 메모 상세보기, 사람마커는 아직 미설정
+        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterItem>() {
+            @Override
+            public boolean onClusterItemClick(ClusterItem clusterItem) {
+                if(clusterItem instanceof ItemMemo){
+                    Toast.makeText(context, "메모 클릭", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(MapsActivity.this,ReadMemoActivity.class);
+                    intent.putExtra(MEMO_NAME,((ItemMemo)clusterItem).getUserName());
+                    intent.putExtra(MEMO_ID,((ItemMemo)clusterItem).getUserId());
+                    intent.putExtra(MEMO_TITLE,((ItemMemo)clusterItem).getTitle());
+                    intent.putExtra(MEMO_CONTENT,((ItemMemo)clusterItem).getContent());
+                    intent.putExtra(MEMO_URL,((ItemMemo)clusterItem).getImageUrl());
+                    intent.putExtra(MEMO_TIME,((ItemMemo)clusterItem).getTime());
+                    startActivity(intent);
+
+                }else{
+
+                    Toast.makeText(context, "사람 클릭", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
         });
@@ -537,8 +597,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
 //            @Override
 //            public boolean onClusterClick(Cluster<ClusterItem> cluster) {
-//                Toast.makeText(context, "클릭", Toast.LENGTH_SHORT).show();
-//                Log.i("ggqs", "메모 클릭");
+//                Toast.makeText(context, "메모 클릭", Toast.LENGTH_SHORT).show();
+//
 //                Collection<ClusterItem> clusters = cluster.getItems();
 //                List<ItemMemo> itemMemos = new ArrayList<>();
 //                for(ClusterItem m : clusters){
@@ -563,26 +623,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
-        mMap.setOnMarkerClickListener(memoManager);
 
 
         // 메모 마커라면 메모 ReadMemoActivity로 상세보기
-        memoManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterItem>() {
-            @Override
-            public boolean onClusterItemClick(ClusterItem clusterItem) {
-                if(clusterItem instanceof ItemMemo){
-                    Intent intent = new Intent(MapsActivity.this,ReadMemoActivity.class);
-                    intent.putExtra(MEMO_NAME,((ItemMemo)clusterItem).getUserName());
-                    intent.putExtra(MEMO_ID,((ItemMemo)clusterItem).getUserId());
-                    intent.putExtra(MEMO_TITLE,((ItemMemo)clusterItem).getTitle());
-                    intent.putExtra(MEMO_CONTENT,((ItemMemo)clusterItem).getContent());
-                    intent.putExtra(MEMO_URL,((ItemMemo)clusterItem).getImageUrl());
-                    intent.putExtra(MEMO_TIME,((ItemMemo)clusterItem).getTime());
-                    startActivity(intent);
-                }
-                return true;
-            }
-        });
+//        memoManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterItem>() {
+//            @Override
+//            public boolean onClusterItemClick(ClusterItem clusterItem) {
+//                if(clusterItem instanceof ItemMemo){
+//                    Intent intent = new Intent(MapsActivity.this,ReadMemoActivity.class);
+//                    intent.putExtra(MEMO_NAME,((ItemMemo)clusterItem).getUserName());
+//                    intent.putExtra(MEMO_ID,((ItemMemo)clusterItem).getUserId());
+//                    intent.putExtra(MEMO_TITLE,((ItemMemo)clusterItem).getTitle());
+//                    intent.putExtra(MEMO_CONTENT,((ItemMemo)clusterItem).getContent());
+//                    intent.putExtra(MEMO_URL,((ItemMemo)clusterItem).getImageUrl());
+//                    intent.putExtra(MEMO_TIME,((ItemMemo)clusterItem).getTime());
+//                    startActivity(intent);
+//                }
+//                return true;
+//            }
+//        });
 
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
@@ -625,7 +684,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
                                 personList.put(contact.getUserId(),friendMarker);
                                 clusterManager.cluster();
-                                memoManager.cluster();
+//                                memoManager.cluster();
                                 Log.i("fffff", "저장된 친구 : " +contact.getUserId());
                                 Log.i("fffff", "친구위치 마커생성");
 
@@ -644,7 +703,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 clusterManager.addItem(friendMarker);
                                 personList.put(contact.getUserId(),friendMarker);
                                 clusterManager.cluster();
-                                memoManager.cluster();
+//                                memoManager.cluster();
                                 Log.i("fffff", "저장된 친구 : " +contact.getUserId());
                                 Log.i("fffff", "친구위치 마커생성");
                             }
@@ -670,7 +729,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     Collection<ClusterItem> markers = clusterManager.getAlgorithm().getItems();
                                     // 저장 된 이름 정보와 firebase에 저장 된 이름 비교
                                         for (int b = 0 ; b < personList.size() ; b++) {
-                                            ItemPerson m = personList.get(contact.getUserId());
+                                            ClusterItem m = personList.get(contact.getUserId());
+                                            if(m instanceof ItemPerson){
+                                                Log.i("ff111","사람임");
+                                                Log.i("ff111",((ItemPerson)m).getUserId());
                                             if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
                                                 ItemPerson ip = personList.get(contact.getUserId());
                                                 // 저장 되있는 Location 정보와 firebase에 저장된 Location 비교
@@ -702,7 +764,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         clusterManager.addItem(friendMarker);
                                                         personList.put(contact.getUserId(), friendMarker);
                                                         clusterManager.cluster();
-                                                        memoManager.cluster();
+//                                                        memoManager.cluster();
                                                         Log.i("fffff", contact.getUserId());
                                                         Log.i("fffff", "체인지 : 친구위치 마커생성");
                                                     } else {
@@ -715,13 +777,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         clusterManager.addItem(friendMarker);
                                                         personList.put(contact.getUserId(), friendMarker);
                                                         clusterManager.cluster();
-                                                        memoManager.cluster();
+//                                                        memoManager.cluster();
                                                         Log.i("fffff", "체인지 : else 친구위치 마커생성");
                                                         Log.i("fffff", "체인지 else : " + contact.getUserId());
 
 
                                                     }
-
+                                                }
 
                                                 }
 
@@ -798,7 +860,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         memoFriendList = contact.getFriendList();
                         memoFriendList.add(DaoImple.getInstance().getLoginEmail());
                         Log.i("fffff","친구 목록 저장");
-                        memoManager.clearItems();
+//                        memoManager.clearItems();
                         Log.i("fffff","친구 메모 삭제");
                         for(int a = 0 ; a < memoFriendList.size() ; a++){ //  친구 목록으로 메모 가져오기
                             Log.i("fffff","메모 반복문 들어옴");
@@ -852,7 +914,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // 메모의 거리를 계산 해주는 메소드
                 memoDistanceAdd(friendMemo);
                 Log.i("fffff", "메모 생성");
-                memoManager.cluster();
+//                memoManager.cluster();
                 clusterManager.cluster();
             }
 
@@ -892,7 +954,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i("fffff11", "myLocation : " + myLatLng.latitude + " " +myLatLng.longitude);
                 Log.i("fffff11", "distance : " + distance);
                 if(distance < 300) {
-                    memoManager.addItem(friendMemo);
+                    clusterManager.addItem(friendMemo);
 //                    Log.i("fffff", data.getTitle());
                     Log.i("fffff", "친구 메모 에드");
                 }
@@ -948,10 +1010,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         myContact.setUserLocation(myLocation);
                         reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
                     }
-                    // ClusterManagerItmes 이미지 추가/사이즈 줄이기
-
-                    clusterManager.setRenderer(new PersonItemRenderer(MapsActivity.this,mMap,clusterManager));
-                    clusterManager.setAlgorithm(new GridBasedAlgorithm<ClusterItem>());
 
                     // 내 위치를 myLatLng로 생성
                     myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
@@ -969,7 +1027,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         clusterManager.cluster();
                     }
 
-                        memoManager.clearItems();
+//                        memoManager.clearItems();
                         Log.i("fffff","메모 삭제");
                         if(memoList != null) {
                             for (int a = 0; a < memoList.size(); a++) {

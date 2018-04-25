@@ -9,12 +9,19 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.util.Log;
+import android.util.SparseArray;
+import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -23,10 +30,19 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
+import com.google.maps.android.ui.SquareTextView;
+
+import java.util.Set;
 
 public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     Context context;
     GoogleMap googleMap;
+
+    @Override
+    protected void onClusterRendered(Cluster<ClusterItem> cluster, Marker marker) {
+        super.onClusterRendered(cluster, marker);
+    }
+
     public PersonItemRenderer(Context context, GoogleMap map, ClusterManager<ClusterItem> clusterManager) {
         super(context, map, clusterManager);
         this.context = context;
@@ -141,6 +157,5 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
             return inSampleSize;
         }
-
 
 }
