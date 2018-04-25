@@ -11,12 +11,11 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,17 +31,19 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 
-import java.io.File;
-import java.io.InputStream;
-
-import static com.example.homin.test1.MapsActivity.TAG;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -51,11 +52,18 @@ public class MypageFragment extends Fragment {
 
     private static final String TAG = "test";
 
+    public static userDataTableAdapter adapter;
+
     private static Context context;
     private static String key;
     private static DatabaseReference reference;
     private static ImageView imageView;
     private TextView textView;
+
+    private RecyclerView recycler;
+    private List<UserDataTable> userDataTList;
+    private Gson gson = new Gson();
+    private String userName;
 
     // 카메라 권한 필요한 것
     private static final int REQ_CODE_PERMISSION = 1;
@@ -146,7 +154,7 @@ public class MypageFragment extends Fragment {
 
 
                         key = DaoImple.getInstance().getKey();
-                        Log.i(TAG, "key: " + key);
+                        Log.i(TAG, "line157) key: " + key);
                         String curProImgUrl = DaoImple.getInstance().getContact().getPictureUrl();
                         Log.i(TAG, "curProImgUrl: " + curProImgUrl);
                         Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
@@ -189,16 +197,25 @@ public class MypageFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
 
-                        mPopupWindow.dismiss();
                         deleteProImgAlert();
-
+                        mPopupWindow.dismiss();
                     }
                 }); // popupbaseImg
 
             }
         });
+        userDataTList = new ArrayList<>();
+
+        recycler = view.findViewById(R.id.essay_listview);
+        recycler.setHasFixedSize(true);
+
+        recycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new userDataTableAdapter();
+        recycler.setAdapter(adapter);
 
         return view;
+
+
     }
 
     private void deleteProImgAlert() {
@@ -245,14 +262,14 @@ public class MypageFragment extends Fragment {
 
     private void getProImg() {
         key = DaoImple.getInstance().getKey();
-        Log.i(TAG, "key: " + key);
+//        Log.i(TAG, "key: " + key);
 //        FirebaseStorage storage = FirebaseStorage.getInstance();
 //        StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/");
 //        StorageReference pathRef = storageRef.child(key + "/").child("profileImage/curProImg.jpg");
 
         String curProImgUrl = DaoImple.getInstance().getContact().getPictureUrl();
-        Log.i(TAG, "curProImgUrl: " + curProImgUrl);
-        Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
+//        Log.i(TAG, "curProImgUrl: " + curProImgUrl);
+//        Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
 
         //TODO: 프로필 이미지 이슈 해결되면 아래 주석 풀기
         if (curProImgUrl != null) { // Firebase에 저장된 파일이 있을 때
@@ -269,7 +286,104 @@ public class MypageFragment extends Fragment {
         super.onStart();
         //TODO: 리사이클러 뷰
 
+        if (userDataTList.size()== 0) {
+            key = DaoImple.getInstance().getKey();
+            Log.i(TAG, "Key값 : " + key);
+
+            reference = FirebaseDatabase.getInstance().getReference();
+            reference.child("userData").child(key).addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Object obj = dataSnapshot.getValue();
+                    Log.i(TAG, "온차일드에디드 안 속 obj :" + obj);
+//                Log.i(TAG, "dataSnapshot.getValue(): " + dataSnapshot.getValue());
+//                UserData data = dataSnapshot.getValue(UserData.class);
+                    String snapshot = String.valueOf(obj);
+                    Log.i(TAG, "온스타트_온차이드 String snapshot" + snapshot);
+                    UserDataTable data = dataSnapshot.getValue(UserDataTable.class);
+                    Log.i(TAG, "온스타트_온차이드 UserDtaTable data" + data);
+//                Log.i(TAG, "line302) userDtaTlist.add(data) :" + userDataTList.add(data));
+                    userDataTList.add(data);
+                    Log.i(TAG, "온스타트_온차이드....여기까지만 나와도 행복하것다...");
+//                Log.i(TAG, "data.getName(): " + data.getTitle());
+                    int size = userDataTList.size();
+                    Log.i(TAG, "온차일드 userDataTList.size() " + size);
+//                Log.i(TAG, "userDataTList.size(): " + size);
+//                Log.i("ggg","데이터 받아옴");
+                    adapter.notifyDataSetChanged();
+
+
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
+
+    //TODO: Adapter 클래스
+    class userDataTableAdapter extends RecyclerView.Adapter<userDataTableAdapter.ViewHolder> {
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Log.i(TAG, "onCreateViewHolder");
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            View itemView = inflater.inflate(R.layout.essay, parent, false);
+            ViewHolder holder = new ViewHolder(itemView);
+
+            return holder;
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            Log.i(TAG, "onBindViewHolder");
+            UserDataTable userData = userDataTList.get(position);
+            holder.textTitle.setText(userData.getTitle());  // 글제목
+            holder.textLocation.setText(userData.getContent()); // 글 내용
+            holder.textDate.setText(userData.getData()); // 글 날짜
+            // TODO: onClick - 클릭했을 때 글 하나 읽어오기
+        }
+
+        @Override
+        public int getItemCount() {
+            int size = userDataTList.size();
+            Log.i(TAG, "userDataTList.size(): " + size);
+            return userDataTList.size();
+
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            TextView textTitle;
+            TextView textLocation;
+            TextView textDate;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                Log.i(TAG, "ViewHolder");
+                textTitle = itemView.findViewById(R.id.textTitle);
+                textLocation = itemView.findViewById(R.id.textLocation);
+                textDate = itemView.findViewById(R.id.textDate);
+            }
+        }
+    }
+
+
 
     // Firebase에 사진 업로드하는 메소드
     public static void uploadFile(Uri filePath, Uri bitmapUri) {

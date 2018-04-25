@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MypageFragment">
+    tools:context=".MypageFragment"
+    >
 
     <ImageView
         android:id="@+id/imageView"
@@ -13,7 +14,7 @@
         android:layout_height="80dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="160dp"
+        android:layout_marginTop="96dp"
         android:src="@mipmap/ic_launcher_round"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -48,9 +49,9 @@
 
     <FrameLayout
         android:id="@+id/frameLayout"
-        android:layout_width="300dp"
+        android:layout_width="329dp"
         android:layout_height="220dp"
-        android:layout_marginBottom="0dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
@@ -60,12 +61,10 @@
         app:layout_constraintTop_toBottomOf="@+id/textView">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/essay_list"
+            android:id="@+id/essay_listview"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </FrameLayout>
-
-
 
 
 </android.support.constraint.ConstraintLayout>
