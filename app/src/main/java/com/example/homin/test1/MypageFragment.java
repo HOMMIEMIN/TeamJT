@@ -62,7 +62,6 @@ public class MypageFragment extends Fragment {
 
     private RecyclerView recycler;
     private List<UserDataTable> userDataTList;
-    private Gson gson = new Gson();
     private String userName;
 
     // 카메라 권한 필요한 것
