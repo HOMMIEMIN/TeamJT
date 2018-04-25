@@ -1355,21 +1355,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onDestroy();
     }
 
-//    @Override
-//    public boolean onClusterClick(Cluster<ClusterItem> cluster) {
-//        Log.i("ggqs", "메모 클릭");
-//        Collection<ClusterItem> clusters = cluster.getItems();
-//        List<ItemMemo> itemMemos = new ArrayList<>();
-//        for(ClusterItem m : clusters){
-//            if(m instanceof ItemMemo){
-//                itemMemos.add((ItemMemo)m);
-//            }
-//        }
-//        Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
-//        DaoImple.getInstance().setItemMemoList(itemMemos);
-//        startActivity(intent);
-//        return true;
-//    }
 
 
 
