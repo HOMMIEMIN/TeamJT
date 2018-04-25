@@ -392,7 +392,7 @@ public class MypageFragment extends Fragment {
 
     public static void resizeImg(Uri getUri) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        String filename = "curProImg_resize.jpg";
+        String filename = "curProImg_resize.png";
         key = DaoImple.getInstance().getKey();
         StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/").child(key + "/").child("profileImage/" + filename);
 
@@ -407,9 +407,11 @@ public class MypageFragment extends Fragment {
                 imgHeight = Math.round(imgWidth / aspectRatio);
                 Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
 
+                Bitmap makeCircle = PersonItemRenderer.getCircleBitmap(resizeImg);
+
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                resizeImg.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizeImg, "Title", null);
+                makeCircle.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), makeCircle, "Title", null);
                 Uri bitmapUri = Uri.parse(path);
 
                 storageRef.putFile(bitmapUri);
@@ -419,9 +421,11 @@ public class MypageFragment extends Fragment {
                 imgWidth = Math.round(imgHeight * aspectRatio);
                 Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
 
+                Bitmap makeCircle = PersonItemRenderer.getCircleBitmap(resizeImg);
+
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                resizeImg.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizeImg, "Title", null);
+                makeCircle.compress(Bitmap.CompressFormat.PNG, 100, bytes);
+                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), makeCircle, "Title", null);
                 Uri bitmapUri = Uri.parse(path);
                 storageRef.putFile(bitmapUri);
 

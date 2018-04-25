@@ -1205,11 +1205,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         albumUri = FileProvider.getUriForFile(this, getPackageName(), albumFile);
                     }
 
-                    photoUri = data.getData(); // 선택한 사진 Uri 정보
+                    albumUri = data.getData(); // 선택한 사진 Uri 정보
                     ProgressDialog progressDialog = new ProgressDialog(this);
                     progressDialog.setTitle("프로필 사진 업데이트 중...");
                     progressDialog.show();
-                    cropImage(photoUri);
+                    cropImage(albumUri);
                     progressDialog.dismiss();
 
 //                    MypageFragment.uploadFile(filePath, null); // 프로필 적용 & Storage 업로드
