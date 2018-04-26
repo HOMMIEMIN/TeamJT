@@ -53,7 +53,9 @@ import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -80,6 +82,9 @@ public class MypageFragment extends Fragment {
     private static final int REQ_CODE_PERMISSION = 1;
     // 프로필 눌르면 팝업
     private PopupWindow mPopupWindow;
+
+    private static Bitmap resizeImg;
+    private static String curPhotoPath;
 
     // 리싸이클러뷰 디테일프래그먼트
     interface EssaySetlectedCallback {
@@ -293,6 +298,7 @@ public class MypageFragment extends Fragment {
 //        Log.i(TAG, "curProImgUrl: " + curProImgUrl);
 //        Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
 
+        //TODO: 프로필 이미지 이슈 해결되면 아래 주석 풀기
         if (curProImgUrl != null) { // Firebase에 저장된 파일이 있을 때
             Glide.with(this).load(curProImgUrl).into(imageView);
 
@@ -455,9 +461,30 @@ public static String getAddress(Context context,double lat, double lng) {
     }
     return nowAddress;
 }
+
+    // 프로필 이미지 '사진촬영'했을 때 찍은 사진 저장되는 폴더 및 파일명 세팅
+    public static File createImageFile() throws IOException {
+        File dir = new File(Environment.getExternalStorageDirectory() + "/MyApp/");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imgName = timeStamp + ".jpg";
+
+        File storageDir = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/MyApp/" + imgName);
+        curPhotoPath = storageDir.getAbsolutePath();
+
+        return storageDir;
+
+    } // end createImageFile()
+
+    // 프로필 사진 선택시 리사이즈해서 storage에 업로드
     public static void resizeImg(Uri getUri) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        String filename = "curProImg_resize.png";
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference dataRef = database.getReference();
+
+        String filename = "curProImg_resize.jpg";
         key = DaoImple.getInstance().getKey();
         StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/").child(key + "/").child("profileImage/" + filename);
 
@@ -470,37 +497,59 @@ public static String getAddress(Context context,double lat, double lng) {
             if (imgHeight >= imgWidth) {
                 imgWidth = 100;
                 imgHeight = Math.round(imgWidth / aspectRatio);
-                Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
-
-                Bitmap makeCircle = PersonItemRenderer.getCircleBitmap(resizeImg);
-
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                makeCircle.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), makeCircle, "Title", null);
-                Uri bitmapUri = Uri.parse(path);
-
-                storageRef.putFile(bitmapUri);
-
+                resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
             } else {
                 imgHeight = 100;
                 imgWidth = Math.round(imgHeight * aspectRatio);
-                Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
-
-                Bitmap makeCircle = PersonItemRenderer.getCircleBitmap(resizeImg);
-
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                makeCircle.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), makeCircle, "Title", null);
-                Uri bitmapUri = Uri.parse(path);
-                storageRef.putFile(bitmapUri);
-
+                resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
             }
+
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            resizeImg.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizeImg, "Title", null);
+            Uri bitmapUri = Uri.parse(path);
+
+            storageRef.putFile(bitmapUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Uri downThisUri = taskSnapshot.getDownloadUrl();
+                    String downUriToStr = downThisUri.toString();
+
+                    DaoImple.getInstance().getContact().setResizePictureUrl(downUriToStr);
+
+                    Contact contact = DaoImple.getInstance().getContact();
+
+                    dataRef.child("Contact").child(key).setValue(contact);
+
+                    String str = "Pictures";
+                    setDirEmpty(str);
+                }
+            });
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
+
+    // 리사이즈하면서 기기에 저장된 100x100 이미지 삭제
+    public static void setDirEmpty(String dirName) {
+        String path = Environment.getExternalStorageDirectory() + File.separator + dirName;
+
+        File dir = new File(path);
+        File[] childFileList = dir.listFiles();
+
+        if (dir.exists()) {
+            for (File childFile : childFileList) {
+                if (childFile.isDirectory()) {
+                    setDirEmpty(childFile.getAbsolutePath());    //하위 디렉토리
+                } else {
+                    childFile.delete();    //하위 파일
+                }
+            }
+            dir.delete();
+        }
+    } // end setDirEmpty()
 
 
 
@@ -515,7 +564,7 @@ public static String getAddress(Context context,double lat, double lng) {
         if (filePath != null) {
 
             final ProgressDialog progressDialog = new ProgressDialog(context);
-            progressDialog.setTitle("프로필 사진 업데이트 중...");
+            progressDialog.setMessage("프로필 사진 업데이트 중...");
             progressDialog.show();
 
             // 파일명 지정
@@ -529,7 +578,7 @@ public static String getAddress(Context context,double lat, double lng) {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
-                            Toast.makeText(context, "업데이트 완료!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "프로필 업데이트 완료!", Toast.LENGTH_SHORT).show();
 
                             Uri downUri = taskSnapshot.getDownloadUrl();
                             Log.i(TAG, "다운로드uri: " + downUri);
