@@ -124,7 +124,8 @@ import java.util.Map;
 import static com.example.homin.test1.WriteActivity.*;
 import static com.example.homin.test1.ReadMemoActivity.*;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleApiClient.OnConnectionFailedListener, MypageFragment.EssaySetlectedCallback {
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
@@ -1021,7 +1022,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             myPicture = null;
                         }
 
-                    if(!zoomCheck) {
+                    if(!zoomCheck) { /** 매개변수 위치에 줌을 잡아줌*/
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));
                         zoomCheck = true;
                         clusterManager.cluster();
@@ -1315,6 +1316,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } // end if
     } // onActivityResult()
 
+    //EssayDetaliActivity의 인덱스갑 가져오는것
+    @Override
+    public void onessaySetlected(int position) {
+        Intent intent = EssayDetailActivity.newIntent(this,position);
+        startActivity(intent);
+    }
 
 
     @Override

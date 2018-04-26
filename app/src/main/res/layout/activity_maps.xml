@@ -29,37 +29,34 @@
             android:orientation="vertical">
 
             <RelativeLayout
-                android:layout_width="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/floatingActionButton"
-                android:layout_height="45dp"
-                android:elevation="10dp"
-                android:background="@drawable/white_border"
                 android:id="@+id/relLayout1"
-                >
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:background="@drawable/white_border"
+                android:elevation="10dp"
+                app:layout_constraintEnd_toStartOf="@id/floatingActionButton"
+                app:layout_constraintStart_toStartOf="parent">
+
                 <ImageView
+                    android:id="@+id/ic_magnify"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
-                    android:id="@+id/ic_magnify"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
-                    android:src="@drawable/ic_magnify"
-                    />
+                    android:src="@drawable/ic_magnify" />
 
                 <AutoCompleteTextView
+                    android:id="@+id/input_search"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_toRightOf="@id/ic_magnify"
                     android:layout_centerVertical="true"
-                    android:textSize="15sp"
-                    android:textColor="#000"
-                    android:id="@+id/input_search"
+                    android:layout_toRightOf="@id/ic_magnify"
                     android:hint="가고 싶은 곳을 입력하세요"
-                    android:imeOptions="actionSearch"/>
+                    android:imeOptions="actionSearch"
+                    android:textColor="#000"
+                    android:textSize="15sp" />
 
             </RelativeLayout>
-
-
 
 
             <android.support.design.widget.FloatingActionButton

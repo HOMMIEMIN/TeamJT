@@ -11,6 +11,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Picture;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -47,11 +49,13 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -77,6 +81,13 @@ public class MypageFragment extends Fragment {
     // 프로필 눌르면 팝업
     private PopupWindow mPopupWindow;
 
+    // 리싸이클러뷰 디테일프래그먼트
+    interface EssaySetlectedCallback {
+        void onessaySetlected(int position);
+    }
+
+    private EssaySetlectedCallback callback;
+
 
     public MypageFragment() {
         // Required empty public constructor
@@ -85,7 +96,12 @@ public class MypageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.context = context;
+//        this.context = context;
+        if (context instanceof EssaySetlectedCallback) {
+            callback = (EssaySetlectedCallback) context;
+        } else {
+            new  RuntimeException ("반드시 ProductSelectedCallback를 구현해야함.");
+        }
     }
 
     @Override
@@ -277,7 +293,6 @@ public class MypageFragment extends Fragment {
 //        Log.i(TAG, "curProImgUrl: " + curProImgUrl);
 //        Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
 
-        //TODO: 프로필 이미지 이슈 해결되면 아래 주석 풀기
         if (curProImgUrl != null) { // Firebase에 저장된 파일이 있을 때
             Glide.with(this).load(curProImgUrl).into(imageView);
 
@@ -357,13 +372,36 @@ public class MypageFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(ViewHolder holder, final int position) {
             Log.i(TAG, "onBindViewHolder");
             UserDataTable userData = userDataTList.get(position);
             holder.textTitle.setText(userData.getTitle());  // 글제목
-            holder.textLocation.setText(userData.getContent()); // 글 내용
+            //TODO: 글 내용살짝 보기
+            String content = userData.getContent();
+            Log.i(TAG, "onBindViewHolder: " + userData.getContent());
+            String cutcontent = "";
+            if(userData.getContent().length()>30){
+                cutcontent = content.substring(0,28);
+                cutcontent += "...";
+            }else {
+                cutcontent = userData.getContent();
+            }
+            holder.tectContent.setText(cutcontent); // 저장 글 짤라서 보이기!
+
+            /**위도,경도를 주고값으로 가져오는 코드 */
+            Double lat = userData.getLocation().get(0);
+            Double lng = userData.getLocation().get(1);
+            String address = getAddress(getContext(), lat, lng);
+            holder.textLocation.setText(address);
             holder.textDate.setText(userData.getData()); // 글 날짜
-            // TODO: onClick - 클릭했을 때 글 하나 읽어오기
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DaoImple.getInstance().setMyPageUserData(userDataTList.get(position));
+                    callback.onessaySetlected(position);
+                }
+            });
         }
 
         @Override
@@ -377,19 +415,46 @@ public class MypageFragment extends Fragment {
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView textTitle;
             TextView textLocation;
+            TextView tectContent;
             TextView textDate;
 
             public ViewHolder(View itemView) {
                 super(itemView);
                 Log.i(TAG, "ViewHolder");
                 textTitle = itemView.findViewById(R.id.textTitle);
+                tectContent = itemView.findViewById(R.id.textContent);
                 textLocation = itemView.findViewById(R.id.textLocation);
                 textDate = itemView.findViewById(R.id.textDate);
             }
         }
     }
-    
 
+//  TODO: 위도, 경도를 주소값으로 가져오는 메소드!!!!
+public static String getAddress(Context context,double lat, double lng) {
+    String nowAddress ="현재 위치를 확인 할 수 없습니다.";
+    Geocoder geocoder = new Geocoder(context,Locale.KOREA);
+    List <Address> address;
+    try {
+        if (geocoder != null) {
+            //세번째 파라미터는 좌표에 대해 주소를 리턴 받는 갯수로
+            //한좌표에 대해 두개이상의 이름이 존재할수있기에 주소배열을 리턴받기 위해 최대갯수 설정
+            address = geocoder.getFromLocation(lat, lng, 1);
+
+            if (address != null && address.size() > 0) {
+                // 주소 받아오기
+                String currentLocationAddress = address.get(0).getAddressLine(0).toString();
+                nowAddress  = currentLocationAddress;
+
+            }
+        }
+
+    } catch (IOException e) {
+        Toast.makeText(context, "주소를 가져 올 수 없습니다.", Toast.LENGTH_LONG).show();
+
+        e.printStackTrace();
+    }
+    return nowAddress;
+}
     public static void resizeImg(Uri getUri) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         String filename = "curProImg_resize.png";

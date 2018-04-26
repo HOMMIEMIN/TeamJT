@@ -5,11 +5,12 @@
     android:layout_height="match_parent"
     android:background="#AA000000">
 
+
     <ImageView
         android:id="@+id/popup_PlusImageVeiw"
-        android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="380dp"
-        app:srcCompat="@drawable/sample_image" />
+        android:layout_height="400dp"
+        android:layout_gravity="center"
+        app:srcCompat="@android:drawable/ic_menu_report_image" />
 
 </LinearLayout>
