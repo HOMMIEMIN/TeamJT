@@ -31,6 +31,7 @@ public class Contact implements Serializable{
         this.loginCheck = loginCheck;
     }
 
+
     public String getUserId() {
         return UserId;
     }
