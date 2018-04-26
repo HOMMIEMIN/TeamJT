@@ -64,7 +64,7 @@ import java.util.Locale;
  */
 public class MypageFragment extends Fragment {
 
-    private static final String TAG = "mini";
+    private static final String TAG = "changeImage";
 
     public static userDataTableAdapter adapter;
 
@@ -101,7 +101,7 @@ public class MypageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        this.context = context;
+        this.context = context;
         if (context instanceof EssaySetlectedCallback) {
             callback = (EssaySetlectedCallback) context;
         } else {
@@ -130,7 +130,7 @@ public class MypageFragment extends Fragment {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Log.i(TAG, "마이 페이지 프로팔 클릭");
                 View popupView = getLayoutInflater().inflate(R.layout.popup_permission, null);
                 //popupView 에서 (LinearLayout 을 사용) 레이아웃이 둘러싸고 있는 컨텐츠의 크기 만큼 팝업 크기를 지정
                 mPopupWindow= new PopupWindow(
@@ -143,20 +143,23 @@ public class MypageFragment extends Fragment {
                 });
 
                 mPopupWindow.setFocusable(true); // 외부영역 선택시 종료
+
                 mPopupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
 
                 Button popCamera = popupView.findViewById(R.id.btn_popCamera);
                 Button popGallery = popupView.findViewById(R.id.btn_popGallery);
                 Button popPlusImg = popupView.findViewById(R.id.btn_popPlusImg);
                 Button popupBaseImg = popupView.findViewById(R.id.btn_baseImg);
-                Log.i(TAG, "팝업버튼 투개 나옴. ");
+                Log.i(TAG, "팝업버튼 네개 나옴. ");
 
 
                 //팝업버튼중에  "사진촬영" 버튼 선택시
                 popCamera.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Log.i(TAG, "사진촬영 선택");
                         popupclickedCamera();
+                        Log.i(TAG, "사진촬영메소드 실행 후");
 //                        ((MainActivity)getActivity()).selectPhoto();
                         mPopupWindow.dismiss();
                     }
@@ -167,9 +170,11 @@ public class MypageFragment extends Fragment {
                 popGallery.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Log.i(TAG, "앨범에서 사진선택 클릭");
                         ((MapsActivity)getActivity()).clickedProImgBotton();
+                        Log.i(TAG, "앨범 메소드 실행 후");
                         mPopupWindow.dismiss();
-                        Log.i(TAG, "intent: ");
+
                     }
                 });// end popGallery
 
@@ -177,22 +182,24 @@ public class MypageFragment extends Fragment {
                 popPlusImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        Log.i(TAG, "확대해서보기 클릭");
                         //TODO: 이미지 확대보기 클릭시 사진이 크게 나와야함
-
+                        mPopupWindow.dismiss();
                         key = DaoImple.getInstance().getKey();
-                        Log.i(TAG, "line157) key: " + key);
+                        Log.i(TAG, "누구 key: " + key);
                         String curProImgUrl = DaoImple.getInstance().getContact().getPictureUrl();
                         Log.i(TAG, "curProImgUrl: " + curProImgUrl);
                         Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
 
                         //TODO:
                         if (curProImgUrl == null) { // Firebase에 저장된 파일이 있을 때
-                            mPopupWindow.dismiss();
-                            Toast.makeText(MypageFragment.context, "저장된 이미지가 없습니다.", Toast.LENGTH_SHORT).show();
+                            Log.i(TAG, "if문 안속 curProImgUrl값 :"+curProImgUrl);
 
+                            Toast.makeText(getContext(), "저장된 이미지가 없습니다.", Toast.LENGTH_SHORT).show();
+                            mPopupWindow.dismiss();
 
                         } else { // 없을 때
+                            Log.i(TAG, "else 안속 curProImgUrl값 :"+curProImgUrl);
                             View popupView = getLayoutInflater().inflate(R.layout.popup_plusimage, null);
                             //popupView 에서 (LinearLayout 을 사용) 레이아웃이 둘러싸고 있는 컨텐츠의 크기 만큼 팝업 크기를 지정
                             mPopupWindow= new PopupWindow(
@@ -203,12 +210,12 @@ public class MypageFragment extends Fragment {
                                     mPopupWindow.dismiss();
                                 }
                             }); // click
-
+                            Log.i(TAG, "if값에서 나옴 :");
                             ImageView plusImage = popupView.findViewById(R.id.popup_PlusImageVeiw);
                             mPopupWindow.setFocusable(true); // 외부영역 선택시 종료
                             mPopupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
-
-                            Glide.with(MypageFragment.context).load(curProImgUrl).into(plusImage);
+                            Log.i(TAG, "마지막줄 curProImgUrl , plusImage:"+ curProImgUrl +", "+plusImage);
+                            Glide.with(getContext()).load(curProImgUrl).into(plusImage);
 
                         }
 
@@ -658,7 +665,7 @@ public static String getAddress(Context context,double lat, double lng) {
         for (String p : permissions) {
 
             //TODO 권한 획득하기 전 권한 유효성 체크 - 현재 앱이 특정 권한을 갖고 있는지 확인 가능
-            if (PermissionChecker.checkSelfPermission(context, p) != PackageManager.PERMISSION_GRANTED) {
+            if (PermissionChecker.checkSelfPermission(getContext(), p) != PackageManager.PERMISSION_GRANTED) {
                 result = false;
                 break;
             }

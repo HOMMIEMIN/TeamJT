@@ -84,7 +84,8 @@ public class EssayDetailActivity extends AppCompatActivity {
                 //TODO: 이미지 확대보기 클릭시 사진이 크게 나와야함  !!!! 내일 확인해야할껏!!!!!!
                 key = DaoImple.getInstance().getKey();
                 Log.i(TAG, "line157) key: " + key);
-                String curProImgUrl = DaoImple.getInstance().getContact().getPictureUrl();
+                String curProImgUrl =  userDataTable.getImageUrl(); //TODO: 현재 널값나옴..
+                Log.i(TAG,"curProImgUrl: " + curProImgUrl);
                 //TODO:
                 if (curProImgUrl == null) { // Firebase에 저장된 파일이 있을 때
                     popupWindow.dismiss();
