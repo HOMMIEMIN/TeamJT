@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
-    tools:context=".MapsActivity">
+    tools:context=".MapsActivity"
+    >
 
 
     <FrameLayout
@@ -38,13 +39,19 @@
                 android:id="@+id/relLayout1"
                 >
                 <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:id="@+id/ic_magnify"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
                     android:src="@drawable/ic_magnify"
                     />
+
+
+                <!--app:layout_constraintTop_toBottomOf="@+id/relLayout1" -->
+                />
+
+
 
                 <AutoCompleteTextView
                     android:layout_width="match_parent"
@@ -57,7 +64,11 @@
                     android:hint="가고 싶은 곳을 입력하세요"
                     android:imeOptions="actionSearch"/>
 
+
+
             </RelativeLayout>
+
+
 
 
 
@@ -89,6 +100,20 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.848" />
+
+
+            <TextView
+                android:id="@+id/distanceIndicator"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@id/relLayout1"
+                app:layout_constraintEnd_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:background="@color/white"
+                android:visibility="invisible"
+                />
+
         </android.support.constraint.ConstraintLayout>
 
     </FrameLayout>
@@ -124,6 +149,8 @@
         </LinearLayout>
 
     </LinearLayout>
+
+
 
 
 </android.support.design.widget.CoordinatorLayout>

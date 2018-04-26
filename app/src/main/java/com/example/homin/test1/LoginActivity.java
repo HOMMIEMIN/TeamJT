@@ -201,7 +201,7 @@ public class LoginActivity extends AppCompatActivity {
                                         // 내 사진 다운로드
                                         if (contactInOrder.getPictureUrl() != null) { // 내 Contact에 url 에 들어가있는지 체크
                                             Glide.with(getApplicationContext()).load(contactInOrder.getPictureUrl())
-                                                    .asBitmap().priority(Priority.IMMEDIATE).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                    .asBitmap().priority(Priority.IMMEDIATE).skipMemoryCache(true).override(100,100).diskCacheStrategy(DiskCacheStrategy.NONE).fitCenter().into(new SimpleTarget<Bitmap>() {
                                                 @Override
                                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                                     pictureList.put(etEmail.getText().toString(), resource);
@@ -235,7 +235,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         if (friendsContact.getPictureUrl() != null) {
                                                             stringkey.add(friendsContact.getUserId());//친구 아이디 목록 ( HashMap의 Key값들을 List에 넣음)
                                                             Glide.with(LoginActivity.this).load(friendsContact.getPictureUrl())
-                                                                    .asBitmap().fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                                    .asBitmap().override(100,100).fitCenter().into(new SimpleTarget<Bitmap>() {
                                                                 @Override
                                                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                                                     pictureList.put(stringkey.get(index), resource); //HashMap인 PictureList에 Key 값인 친구 아이디와 그에따른 BitMap을 넣음

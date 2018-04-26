@@ -55,22 +55,36 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     }
 
     @Override
+    protected void onClusterItemRendered(ClusterItem clusterItem, Marker marker) {
+        super.onClusterItemRendered(clusterItem, marker);
+
+        if(clusterItem instanceof ItemDestination){
+
+
+            marker.setTag(3);
+
+        }
+    }
+
+    @Override
     protected void onBeforeClusterItemRendered(final ClusterItem item, final MarkerOptions markerOptions) {
         super.onBeforeClusterItemRendered(item, markerOptions);
 
         if(item instanceof ItemPerson) {
 
             if(((ItemPerson) item).getImage()!= null) {
-                Log.i("hi", "이름 : " + ((ItemPerson) item).getTitle());
+
                 Bitmap roundBitmap = getCircleBitmap(((ItemPerson) item).getImage());
                 markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
                 markerOptions.title(((ItemPerson) item).getTitle());
+                markerOptions.snippet(((ItemPerson) item).getUserName());
             }else{
-                Log.i("hi", "이름 : " + ((ItemPerson) item).getTitle());
+
                 Bitmap rectBitmap = decodeSampledBitmapFromResource(context.getResources(),R.drawable.what,35,35);
                 Bitmap roundBitmap = getCircleBitmap(rectBitmap);
                 markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
                 markerOptions.title(((ItemPerson) item).getTitle());
+                markerOptions.snippet(((ItemPerson) item).getUserName());
             }
 
 
@@ -79,7 +93,8 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         if(item instanceof ItemMemo){
             Bitmap roundBitmap = getCircleBitmap(((ItemMemo) item).getIcon());
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
-//            markerOptions.title(((ItemMemo) item).getTitle());
+            markerOptions.title(((ItemMemo) item).getTitle());
+            markerOptions.snippet(((ItemMemo)item).getUserName());
         }
 
     }
