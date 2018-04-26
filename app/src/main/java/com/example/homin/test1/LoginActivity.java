@@ -1,20 +1,27 @@
 package com.example.homin.test1;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -26,6 +33,8 @@ import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -40,10 +49,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
+
+    private CheckBox checkBox;
     private EditText etEmail;
     private EditText etPwd;
     private Button btnLogin;
@@ -53,6 +65,8 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private Thread loginThread;
     private DatabaseReference reference;
+    private String id;
+    private String pw;
     private String key;
     private Map<String, Bitmap> pictureList;//친구 아이디를 key값으로 받고 그의따른 bitMap을 저장하는 Map
     private int count;
@@ -65,13 +79,17 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        super.onResume();
+        Log.i("ggqs","리즘");
+        if(progressDialog != null){
+            progressDialog.dismiss();
+        }
         intentNotsent = true;
+        super.onResume();
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         intent = new Intent(LoginActivity.this, MapsActivity.class);
         pictureList = new HashMap();
@@ -82,8 +100,12 @@ public class LoginActivity extends AppCompatActivity {
         etPwd = findViewById(R.id.editText2);
         btnLogin = findViewById(R.id.button_login);
         btnSignUp = findViewById(R.id.button_signUp);
+        checkBox = findViewById(R.id.checkBox);
         mAuth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference();
+
+        // 저장한 로그인정보 가져오기
+        loginIdLoad();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -116,6 +138,36 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    // 저장한 로그인 정보 가져오기기
+   private void loginIdLoad() {
+        SharedPreferences preferences = getSharedPreferences("save", MODE_PRIVATE);
+        if(preferences.getString("id","") != null) {
+            etEmail.setText(preferences.getString("id", ""));
+            etPwd.setText(preferences.getString("pw", ""));
+            checkBox.setChecked(true);
+        }
+
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus){
+            checkGps();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void checkGps() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if(!locationManager.isProviderEnabled(locationManager.GPS_PROVIDER)) {
+            Toast.makeText(this, "GPS 서비스가 꺼져 있습니다. 설정 화면으로 이동 합니다.", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            startActivity(intent);
+        }
+    }
+
     private void clickLogin() {
         mAuth.signInWithEmailAndPassword(etEmail.getText().toString(), etPwd.getText().toString())
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -127,21 +179,14 @@ public class LoginActivity extends AppCompatActivity {
                         } else {
                             DaoImple.getInstance().setLoginEmail(etEmail.getText().toString());
                             int a = etEmail.getText().toString().indexOf("@");
-                            String name = etEmail.getText().toString().substring(0, a);
-                            DaoImple.getInstance().setLoginId(name);
+                            id = etEmail.getText().toString();
+                            pw = etPwd.getText().toString();
+
                             DaoImple.getInstance().setLoginEmail(etEmail.getText().toString());
 
-
-                            int c = etEmail.getText().toString().indexOf("@");
-                            String key1 = etEmail.getText().toString().substring(0, c);
-
-                            int b = etEmail.getText().toString().indexOf(".");
-                            String key2 = etEmail.getText().toString().substring(c + 1, b);
-
-
-                            String key3 = etEmail.getText().toString().substring(b + 1, etEmail.getText().toString().length());
-                            key = key1 + key2 + key3;
+                            key = DaoImple.getInstance().getFirebaseKey(etEmail.getText().toString());
                             DaoImple.getInstance().setKey(key);
+                            Log.i("ggqs",key);
 
 
 
@@ -156,7 +201,7 @@ public class LoginActivity extends AppCompatActivity {
                                         // 내 사진 다운로드
                                         if (contactInOrder.getPictureUrl() != null) { // 내 Contact에 url 에 들어가있는지 체크
                                             Glide.with(getApplicationContext()).load(contactInOrder.getPictureUrl())
-                                                    .asBitmap().priority(Priority.IMMEDIATE).override(100, 100).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                    .asBitmap().priority(Priority.IMMEDIATE).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).fitCenter().into(new SimpleTarget<Bitmap>() {
                                                 @Override
                                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                                     pictureList.put(etEmail.getText().toString(), resource);
@@ -166,6 +211,7 @@ public class LoginActivity extends AppCompatActivity {
                                             pictureList.put(etEmail.getText().toString(), null);
                                         }
                                         final Contact myContact = dataSnapshot.getValue(Contact.class); //내 컨텍트 설정
+
 
                                         DaoImple.getInstance().setLoginEmail(myContact.getUserId());
                                         DaoImple.getInstance().setLoginId(myContact.getUserName());
@@ -189,19 +235,35 @@ public class LoginActivity extends AppCompatActivity {
                                                         if (friendsContact.getPictureUrl() != null) {
                                                             stringkey.add(friendsContact.getUserId());//친구 아이디 목록 ( HashMap의 Key값들을 List에 넣음)
                                                             Glide.with(LoginActivity.this).load(friendsContact.getPictureUrl())
-                                                                    .asBitmap().override(100, 100).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                                    .asBitmap().fitCenter().into(new SimpleTarget<Bitmap>() {
                                                                 @Override
                                                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                                                     pictureList.put(stringkey.get(index), resource); //HashMap인 PictureList에 Key 값인 친구 아이디와 그에따른 BitMap을 넣음
                                                                     count++;
                                                                     Log.i("hi1", "Count: " + count);
                                                                     if (myContact.getFriendList().size() == count) {
+                                                                        // 로그인 전에 다중 로그인을 막기 위해 contact 객체를 firebase에 업데이트
+
                                                                         DaoImple.getInstance().setPictureList(pictureList);
                                                                         count = 0;
                                                                         Log.i("qq1", "사진리스트 가져옴");
                                                                         intentNotsent = false;
                                                                         Log.i("qq23q", "startActivity1");
-                                                                        startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
+
+                                                                        Log.i("qq23q", DaoImple.getInstance().getKey());
+                                                                        boolean loginCheck = myContact.isLoginCheck();
+
+                                                                        // 이미 로그인 되어 있는 대상이라면 로그인 할 수 없음
+                                                                        if(loginCheck){
+                                                                            Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
+                                                                            progressDialog.dismiss();
+                                                                        }else {
+                                                                            idSaveCheck(id,pw); // 아이디와 패스워드 저장
+                                                                            myContact.setLoginCheck(true);
+                                                                            reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+                                                                            startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
+                                                                            finish();
+                                                                        }
 
 
                                                                     }
@@ -217,9 +279,19 @@ public class LoginActivity extends AppCompatActivity {
                                                                 DaoImple.getInstance().setPictureList(pictureList);
                                                                 count = 0;
                                                                 intentNotsent = false;
-                                                                Log.i("qq23q", "startActivity2");
-                                                                startActivity(intent); //Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
-                                                                finish();
+                                                                boolean loginCheck = myContact.isLoginCheck();
+                                                                if(loginCheck){
+                                                                    Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
+                                                                    progressDialog.dismiss();
+                                                                }else {
+                                                                    Log.i("qq23q", DaoImple.getInstance().getKey());
+                                                                    idSaveCheck(id,pw); // 아이디와 패스워드 저장
+                                                                    // 로그인 전에 다중 로그인을 막기 위해 contact 객체를 firebase에 업데이트
+                                                                    myContact.setLoginCheck(true);
+                                                                    reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+                                                                    startActivity(intent); //Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
+                                                                    finish();
+                                                                }
 
 
                                                             }
@@ -235,10 +307,25 @@ public class LoginActivity extends AppCompatActivity {
 
                                                 Log.i("qq23q", "친구수: "+myContact.getFriendList().size()+ "count:" + count + "intentNotsent:" + intentNotsent );
                                                 if (intentNotsent && myContact.getFriendList().size() == count) {
+
                                                     intentNotsent = false;
                                                     DaoImple.getInstance().setPictureList(pictureList);
                                                     Log.i("qq23q", "startActivity3");
-                                                    startActivity(intent);//포문까지도 안 들어오는 경우 (친구가 없는 경우)
+                                                    Log.i("qq23q", DaoImple.getInstance().getKey());
+                                                    boolean loginCheck = myContact.isLoginCheck();
+
+                                                    // 이미 로그인 되어 있는 대상이라면 로그인 할 수 없음
+                                                    if(loginCheck){
+                                                        Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
+                                                        progressDialog.dismiss();
+                                                    }else {
+                                                        // 로그인 전에 다중 로그인을 막기 위해 contact 객체를 firebase에 업데이트
+                                                        idSaveCheck(id,pw); // 아이디와 패스워드 저장
+                                                        myContact.setLoginCheck(true);
+                                                        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+                                                        startActivity(intent);//포문까지도 안 들어오는 경우 (친구가 없는 경우)
+                                                        finish();
+                                                    }
                                                 }
 
                                             }
@@ -287,18 +374,27 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             });
 
-//                            if (intentNotsent ) {
-//
-//                                DaoImple.getInstance().setPictureList(pictureList);
-//                                Log.i("qq23q","startActivity3");
-//                                startActivity(intent);//포문까지도 안 들어오는 경우 (친구가 없는 경우)
-//                            }
 
                         }
                     }
                 });
 
+    }
 
+    private void idSaveCheck(String email, String pw){
+        if(checkBox.isChecked()) {
+            SharedPreferences preferences = getSharedPreferences("save", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("id", email);
+            editor.putString("pw", pw);
+            editor.commit();
+        }else{
+            SharedPreferences preferences = getSharedPreferences("save", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("id", null);
+            editor.putString("pw", null);
+            editor.commit();
+        }
     }
 
 }

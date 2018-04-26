@@ -8,7 +8,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
-public class ItemMemo implements ClusterItem {
+import java.io.Serializable;
+
+public class ItemMemo implements ClusterItem, Serializable {
     private final LatLng mPosition;
     private String userId;
     private String userName;

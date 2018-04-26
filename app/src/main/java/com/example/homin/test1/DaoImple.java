@@ -26,6 +26,24 @@ public class DaoImple {
     private Contact contact;
     private Map<String,Bitmap> pictureList;
     private LatLng WriteLocation;
+    private List<ItemMemo> itemMemoList;
+    private List<ItemPerson> itemPersonList;
+
+    public List<ItemMemo> getItemMemoList() {
+        return itemMemoList;
+    }
+
+    public List<ItemPerson> getItemPersonList() {
+        return itemPersonList;
+    }
+
+    public void setItemPersonList(List<ItemPerson> itemPersonList) {
+        this.itemPersonList = itemPersonList;
+    }
+
+    public void setItemMemoList(List<ItemMemo> itemMemoList) {
+        this.itemMemoList = itemMemoList;
+    }
 
     public static void setInstance(DaoImple instance) {
         DaoImple.instance = instance;

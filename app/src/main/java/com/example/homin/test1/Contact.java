@@ -13,11 +13,12 @@ public class Contact implements Serializable{
     private List<String> friendList;
     private List<String> wattingList;
     private boolean isPublic;
+    private boolean loginCheck;
 
 
     public Contact(){}
 
-    public Contact(String userId, String userName, String pictureUrl, List<Double> userLocation, List<String> friendList, List<String> wattingList, boolean isPublic) {
+    public Contact(String userId, String userName, String pictureUrl, List<Double> userLocation, List<String> friendList, List<String> wattingList, boolean isPublic, boolean loginCheck) {
         UserId = userId;
         UserName = userName;
         this.pictureUrl = pictureUrl;
@@ -25,6 +26,7 @@ public class Contact implements Serializable{
         this.friendList = friendList;
         this.wattingList = wattingList;
         this.isPublic = isPublic;
+        this.loginCheck = loginCheck;
     }
 
     public String getUserId() {
@@ -62,6 +64,14 @@ public class Contact implements Serializable{
             return friendList;
 
 
+    }
+
+    public void setLoginCheck(boolean loginCheck) {
+        this.loginCheck = loginCheck;
+    }
+
+    public boolean isLoginCheck() {
+        return loginCheck;
     }
 
     public String getPictureUrl() {
