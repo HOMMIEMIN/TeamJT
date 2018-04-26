@@ -2,11 +2,13 @@ package com.example.homin.test1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -43,6 +45,11 @@ public class EssayDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_essay_detail);
+
+        // 어플 위에 뜨는 액션바 숨기는 코드!
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
 
         userDataTable = DaoImple.getInstance().getMyPageUserData();
 
