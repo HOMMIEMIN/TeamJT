@@ -538,47 +538,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-//         메모 클러스터 클릭 시, 새 Activity에서 목록 보여주기
-//        memoManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
-//            @Override
-//            public boolean onClusterClick(Cluster<ClusterItem> cluster) {
-//                Log.i("ggqs", "메모 클릭");
-//                Collection<ClusterItem> clusters = cluster.getItems();
-//                List<ItemMemo> itemMemos = new ArrayList<>();
-//                for(ClusterItem m : clusters){
-//                    if(m instanceof ItemMemo){
-//                        itemMemos.add((ItemMemo)m);
-//                    }
-//                }
-//                Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
-//                DaoImple.getInstance().setItemMemoList(itemMemos);
-//                startActivity(intent);
-//                return true;
-//            }
-//        });
 
-
-
-
-        // 사람 클러스터 클릭 시, 새 Activity에서 목록 보여주기
-//        clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
-//            @Override
-//            public boolean onClusterClick(Cluster<ClusterItem> cluster) {
-//                Toast.makeText(context, "메모 클릭", Toast.LENGTH_SHORT).show();
-//
-//                Collection<ClusterItem> clusters = cluster.getItems();
-//                List<ItemMemo> itemMemos = new ArrayList<>();
-//                for(ClusterItem m : clusters){
-//                    if(m instanceof ItemMemo){
-//                        itemMemos.add((ItemMemo)m);
-//                    }
-//                }
-//                Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
-//                DaoImple.getInstance().setItemMemoList(itemMemos);
-//                startActivity(intent);
-//                return true;
-//            }
-//        });
 
 
         // 친구 요청 Activity 실행
@@ -618,7 +578,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 if (pictureList.get(contact.getUserId()) != null) {
                                     Bitmap picture = pictureList.get(contact.getUserId());
                                     ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(), picture);
+                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(),contact.getResizePictureUrl());
                                     if (contact.isLoginCheck()) {
                                         clusterManager.addItem(friendMarker);
                                     }
@@ -639,7 +599,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
                                     Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
                                     ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(), picture);
+                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(),contact.getResizePictureUrl());
                                     // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
                                     if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                                         myMarker = friendMarker;
@@ -694,7 +654,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         Bitmap picture = pictureList.get(contact.getUserId());
 
                                                         ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                friendLocation.get(1), contact.getUserId(), contact.getUserName(), picture);
+                                                                friendLocation.get(1), contact.getUserId(), contact.getUserName(),contact.getResizePictureUrl());
 
                                                         Log.i("fffff", "체인지 : 바뀐위치 저장");
                                                         clusterManager.addItem(friendMarker);
@@ -712,7 +672,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
                                                         Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
                                                         ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                friendLocation.get(1), contact.getUserId(), contact.getUserName(), picture);
+                                                                friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
                                                         clusterManager.addItem(friendMarker);
                                                         personList.put(contact.getUserId(), friendMarker);
                                                         clusterManager.cluster();
@@ -753,7 +713,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 Bitmap picture = pictureList.get(contact.getUserId());
 
                                                                 ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), picture);
+                                                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
 
                                                                 Log.i("fffff", "체인지 : 바뀐위치 저장");
                                                                 clusterManager.addItem(friendMarker);
@@ -771,7 +731,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
                                                                 Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
                                                                 ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), picture);
+                                                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
                                                                 clusterManager.addItem(friendMarker);
                                                                 personList.put(contact.getUserId(), friendMarker);
                                                                 clusterManager.cluster();
