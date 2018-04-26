@@ -7,7 +7,10 @@ import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +32,7 @@ public class DaoImple {
     private List<ItemMemo> itemMemoList;
     private List<ItemPerson> itemPersonList;
     private UserDataTable myPageUserData;
+    private String newDate;
 
     public UserDataTable getMyPageUserData() {
         return myPageUserData;
@@ -149,6 +153,28 @@ public class DaoImple {
         String key = key1+key2+key3;
 
         return key;
+    }
+
+    public String getDateFormat(String getDate) {
+
+//        getDate = "2012년 7월 11일 (수)"; // 18/04/23, 15시10분
+
+        // SimpleDateFormat의 형식을 선언한다.
+        SimpleDateFormat originalFormat = new SimpleDateFormat("yy/MM/dd, HH시mm분");
+        SimpleDateFormat newFormat = new SimpleDateFormat("yyyy년MM월dd일 a hh시mm분");
+
+        // 날짜 형식 변환시 파싱 오류를 try.. catch..로 체크한다.
+        try {
+            // 문자열 타입을 날짜 타입으로 변환한다.
+            Date originalDate = originalFormat.parse(getDate);
+
+            // 날짜 형식을 원하는 타입으로 변경한다.
+            newDate = newFormat.format(originalDate);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return newDate;
     }
 
 

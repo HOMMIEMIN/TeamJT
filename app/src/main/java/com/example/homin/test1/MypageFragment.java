@@ -491,12 +491,13 @@ public static String getAddress(Context context,double lat, double lng) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference dataRef = database.getReference();
 
-        String filename = "curProImg_resize.jpg";
+        String filename = "curProImg_resize.png";
         key = DaoImple.getInstance().getKey();
         StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/").child(key + "/").child("profileImage/" + filename);
 
         try {
             Bitmap orgImage = MediaStore.Images.Media.getBitmap(context.getContentResolver(), getUri);
+
 
             int imgHeight = orgImage.getHeight();
             int imgWidth = orgImage.getWidth();
@@ -511,8 +512,10 @@ public static String getAddress(Context context,double lat, double lng) {
                 resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
             }
 
+            resizeImg = PersonItemRenderer.getCircleBitmap(resizeImg);
+
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            resizeImg.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            resizeImg.compress(Bitmap.CompressFormat.PNG, 100, bytes);
             String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizeImg, "Title", null);
             Uri bitmapUri = Uri.parse(path);
 
