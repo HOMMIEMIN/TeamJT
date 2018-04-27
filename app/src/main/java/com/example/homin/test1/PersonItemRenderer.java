@@ -39,7 +39,7 @@ import java.util.Set;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
-public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem>  {
+public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     Context context;
     GoogleMap googleMap;
     boolean imageCheck;
@@ -49,24 +49,21 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem>  {
             return null;
         }
         if (context instanceof Activity) {
-            if(!((Activity) context).isFinishing())
-            return (Activity) context;
+            if (!((Activity) context).isFinishing())
+                return (Activity) context;
         } else if (context instanceof ContextWrapper) {
             return getActivity(((ContextWrapper) context).getBaseContext());
         }
         return null;
     }
 
-
-
-
     @Override
     protected void onClusterItemRendered(ClusterItem clusterItem, final Marker marker) {
 
 
         Context get = getActivity(context);
-        if(clusterItem instanceof ItemPerson) {
-            if(get != null) {
+        if (clusterItem instanceof ItemPerson) {
+            if (get != null) {
                 Glide.with(get).load(((ItemPerson) clusterItem).getImage()).asBitmap().fitCenter().into(new SimpleTarget<Bitmap>() {
 
                     @Override
@@ -80,13 +77,14 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem>  {
             imageCheck = true;
             super.onClusterItemRendered(clusterItem, marker);
         }
+
+        if (clusterItem instanceof ItemDestination) {
+
+
+            marker.setTag(3);
+
         }
-
-
-
-
-
-
+    }
 
 
     public PersonItemRenderer(Context context, GoogleMap map, ClusterManager<ClusterItem> clusterManager) {
@@ -97,24 +95,12 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem>  {
 
 
     @Override
-    protected void onClusterItemRendered(ClusterItem clusterItem, Marker marker) {
-        super.onClusterItemRendered(clusterItem, marker);
-
-        if(clusterItem instanceof ItemDestination){
-
-
-            marker.setTag(3);
-
-        }
-    }
-
-    @Override
     protected void onBeforeClusterItemRendered(final ClusterItem item, final MarkerOptions markerOptions) {
         super.onBeforeClusterItemRendered(item, markerOptions);
 
-        if(item instanceof ItemPerson) {
+        if (item instanceof ItemPerson) {
 
-            if(((ItemPerson) item).getImage()!= null) {
+            if (((ItemPerson) item).getImage() != null) {
 
 
                 Log.i("hi", "이름 : " + ((ItemPerson) item).getTitle());
@@ -122,9 +108,9 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem>  {
 //                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
                 markerOptions.title(((ItemPerson) item).getTitle());
                 markerOptions.snippet(((ItemPerson) item).getUserName());
-            }else{
+            } else {
 
-                Bitmap rectBitmap = decodeSampledBitmapFromResource(context.getResources(),R.drawable.what,35,35);
+                Bitmap rectBitmap = decodeSampledBitmapFromResource(context.getResources(), R.drawable.what, 35, 35);
                 Bitmap roundBitmap = getCircleBitmap(rectBitmap);
                 markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
                 markerOptions.title(((ItemPerson) item).getTitle());
@@ -134,11 +120,11 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem>  {
 
         }
 
-        if(item instanceof ItemMemo){
+        if (item instanceof ItemMemo) {
             Bitmap roundBitmap = getCircleBitmap(((ItemMemo) item).getIcon());
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
             markerOptions.title(((ItemMemo) item).getTitle());
-            markerOptions.snippet(((ItemMemo)item).getUserName());
+            markerOptions.snippet(((ItemMemo) item).getUserName());
         }
 
     }
@@ -195,26 +181,26 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem>  {
 
 
     public static int calculateInSampleSize(
-                BitmapFactory.Options options, int reqWidth, int reqHeight) {
-            // Raw height and width of image
-            final int height = options.outHeight;
-            final int width = options.outWidth;
-            int inSampleSize = 1;
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
 
-            if (height > reqHeight || width > reqWidth) {
+        if (height > reqHeight || width > reqWidth) {
 
-                final int halfHeight = height / 2;
-                final int halfWidth = width / 2;
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
 
-                // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-                // height and width larger than the requested height and width.
-                while ((halfHeight / inSampleSize) >= reqHeight
-                        && (halfWidth / inSampleSize) >= reqWidth) {
-                    inSampleSize *= 2;
-                }
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
             }
-
-            return inSampleSize;
         }
+
+        return inSampleSize;
+    }
 
 }
