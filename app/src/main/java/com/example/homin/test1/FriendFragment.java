@@ -1,6 +1,7 @@
 package com.example.homin.test1;
 
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,6 +31,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static android.net.sip.SipErrorCode.TIME_OUT;
 
@@ -103,21 +108,46 @@ public class FriendFragment extends Fragment {
         public void onBindViewHolder(final FriendHolder holder, final int position) {
             friendCheck = false;
             nameCheck = false;
+            FragmentActivity activity = DaoImple.getActivity(getActivity());
+
             Log.i("kaka","뷰타입33 : " + holder.getItemViewType());
+            if(realFriendList.size() != 0){
             if(holder.getItemViewType() == 0) {
-                holder.iv.setImageResource(R.drawable.p1);
-                for(int a = 0 ; a < friendList.size() ; a++){
-                    if(friendList.get(a).getUserId().equals(list.get(position))){
-                        holder.tv1.setText(friendList.get(a).getUserName());
+                if (activity != null) {
+                    if (realFriendList.get(position).getResizePictureUrl() != null) {
+                        Glide.with(activity).load(realFriendList.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
+                                .centerCrop().into(holder.iv);
+                        holder.tv1.setText(realFriendList.get(position).getUserName());
+                    } else {
+                        holder.iv.setImageResource(R.drawable.p1);
+                        holder.tv1.setText(realFriendList.get(position).getUserName());
                     }
                 }
             }else{
-                if(list2.size() != 0) {
-                    holder.iv.setImageResource(R.drawable.p1);
-                    holder.tv1.setText(list2.get(position).getUserName());
+                if (activity != null) {
+                    if (list2.size() != 0) {
+                        if (list2.get(position).getResizePictureUrl() != null) {
+                            Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
+                                    .centerCrop().into(holder.iv);
+                            holder.tv1.setText(list2.get(position).getUserName());
+                            Log.i("zxzxzx",list2.get(position).getUserName());
+                            holder.tv3.setText(list2.get(position).getUserId());
+                            Log.i("zxzxzx",list2.get(position).getUserId());
+                        } else {
+                            holder.iv.setImageResource(R.drawable.p1);
+                            holder.tv1.setText(list2.get(position).getUserName());
+                            Log.i("zxzxzx",list2.get(position).getUserName());
+                            holder.tv3.setText(list2.get(position).getUserId());
+                            Log.i("zxzxzx",list2.get(position).getUserId());
+                        }
+                    }
                 }
 
             }
+
+
+            }
+
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -128,18 +158,23 @@ public class FriendFragment extends Fragment {
                            Log.i("gg1",friendList.get(a).getUserName());
                            Log.i("gg1",list.get(position));
                            if(friendList.get(a).getUserId().equals(list.get(position))){
-                               chatId = friendList.get(a).getUserId();
-                               chatName = friendList.get(a).getUserName();
+                               chatId = realFriendList.get(position).getUserId();
+                               chatName = realFriendList.get(position).getUserName();
                            }
                        }
+
                         Intent intent = new Intent(context, ChattingActivity.class);
                         intent.putExtra(CHAT_YOURID, chatId);
                         intent.putExtra(CHAT_YOURNAME, chatName);
+                        if(realFriendList.get(position).getResizePictureUrl() != null) {
+                            intent.putExtra(CHAT_YOURIMAGE, realFriendList.get(position).getResizePictureUrl());
+                        }
                         size = 0;
                         startActivity(intent);
                     }
                 }
             });
+
             if(holder.btn2 != null) {
                 holder.btn2.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -218,7 +253,7 @@ public class FriendFragment extends Fragment {
         class FriendHolder extends RecyclerView.ViewHolder{
             ImageView iv;
             TextView tv1;
-            TextView tv2;
+            TextView tv2, tv3;
             Button btn2;
 
             public FriendHolder(View itemView) {
@@ -227,16 +262,19 @@ public class FriendFragment extends Fragment {
                 tv1 = itemView.findViewById(R.id.textView_FriendLayout1);
                 tv2 = itemView.findViewById(R.id.textView_FriendLayou2);
                 btn2 = itemView.findViewById(R.id.btn_addFriend);
+                tv3 = itemView.findViewById(R.id.textView_findId);
+
             }
         }
     }
 
-
+    public static final String CHAT_YOURIMAGE = "image_chat";
     private Context context;
     private RecyclerView recyclerView;
     private List<String> list;
     private List<Contact> friendList;
     private List<Contact> list2;
+    private List<Contact> realFriendList;
     private DatabaseReference reference;
     public static final String CHAT_YOURID = "friend_chat_key";
     public static final String CHAT_YOURNAME = "friend_chat_key2";
@@ -277,6 +315,7 @@ public class FriendFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        realFriendList = new ArrayList<>();
         recyclerView = getView().findViewById(R.id.recyclerView);
         btn = getView().findViewById(R.id.button_search);
         et = getView().findViewById(R.id.editText_search);
@@ -385,13 +424,44 @@ public class FriendFragment extends Fragment {
                 if(dataSnapshot.getKey().equals(DaoImple.getInstance().getKey())) {
                     Contact c = dataSnapshot.getValue(Contact.class);
                     list = c.getFriendList();
-                    if (list != null) {
+                    if(list != null) {
                         size = list.size();
-                    } else {
+                    }else{
                         list = new ArrayList<>();
                         size = list.size();
                     }
-                    adapter.notifyDataSetChanged();
+                    reference.child("Contact").addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            Contact c = dataSnapshot.getValue(Contact.class);
+                            for(int a = 0 ; a < list.size() ; a++) {
+                                if (c.getUserId().equals(list.get(a)))
+                                    realFriendList.add(c);
+                                size = realFriendList.size();
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
 
             }
@@ -416,6 +486,9 @@ public class FriendFragment extends Fragment {
 
             }
         });
+
+
+
     }
 
     public String getKey(String id){
