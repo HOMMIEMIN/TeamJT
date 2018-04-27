@@ -568,15 +568,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Contact contact = dataSnapshot.getValue(Contact.class);
                     if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                         myContact = contact;
+                        DaoImple.getInstance().setContact(myContact);
                     }
                     for(int a = 0 ; a < myFriendList.size() ; a++){
                         // 친구들 위치정보 받아와서 구글맵에 갱신
                         if(myFriendList.get(a).equals(contact.getUserId())) {
                             // 로그인 되어있는 상태라면 사용자 마커 표시
-                                Log.i("asdasd","로그인 됨 : "+contact.getUserId());
                                 List<Double> friendLocation = contact.getUserLocation();
-                                if (pictureList.get(contact.getUserId()) != null) {
-                                    Bitmap picture = pictureList.get(contact.getUserId());
+                                if (contact.getResizePictureUrl() != null) {
                                     ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                             friendLocation.get(1), contact.getUserId(), contact.getUserName(),contact.getResizePictureUrl());
                                     if (contact.isLoginCheck()) {
@@ -585,13 +584,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
                                     if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                                         myMarker = friendMarker;
-                                        Log.i("ggg", "내 마커 저장 : " + contact.getUserId());
                                     }
                                     personList.put(contact.getUserId(), friendMarker);
                                     clusterManager.cluster();
-//                                memoManager.cluster();
-                                    Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
-                                    Log.i("fffff", "친구위치 마커생성");
+//
 
                                 } else {
                                     BitmapFactory.Options options = new BitmapFactory.Options();
@@ -603,17 +599,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
                                     if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                                         myMarker = friendMarker;
-                                        Log.i("ggg", "내 마커 저장 : " + contact.getUserId());
                                     }
                                     if (contact.isLoginCheck()) {
                                         clusterManager.addItem(friendMarker);
                                     }
-                                    Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
+
                                     personList.put(contact.getUserId(), friendMarker);
                                     clusterManager.cluster();
-//                                memoManager.cluster();
-                                Log.i("fffff", "저장된 친구 : " +contact.getUserId());
-                                Log.i("fffff", "친구위치 마커생성");
+//
                             }
 
                         }
@@ -632,6 +625,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Contact contact = dataSnapshot.getValue(Contact.class);
                         if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                             myContact = contact;
+
                         }
                         if(myFriendList != null){
                             for(int a = 0 ; a < myFriendList.size() ; a++){
@@ -659,7 +653,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                         Log.i("fffff", "체인지 : 바뀐위치 저장");
                                                         clusterManager.addItem(friendMarker);
                                                         personList.put(contact.getUserId(), friendMarker);
-                                                        clusterManager.cluster();
                                                         Log.i("asdasd", "마커 생성");
                                                         Log.i("asdasd ", contact.getUserId());
 
@@ -675,7 +668,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
                                                         clusterManager.addItem(friendMarker);
                                                         personList.put(contact.getUserId(), friendMarker);
-                                                        clusterManager.cluster();
                                                         Log.i("asdasd", "마커 생성");
                                                         Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
                                                         Log.i("fffff", "체인지 else : " + contact.getUserId());
@@ -709,8 +701,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                             personList.remove(contact.getUserId());
                                                             // 다시 마커 생성 후, clusterManager과 personList에 저장
                                                             List<Double> friendLocation = contact.getUserLocation();
-                                                            if (pictureList.get(contact.getUserId()) != null) {
-                                                                Bitmap picture = pictureList.get(contact.getUserId());
+                                                            if (contact.getResizePictureUrl() != null) {
 
                                                                 ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                                                         friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
@@ -718,7 +709,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 Log.i("fffff", "체인지 : 바뀐위치 저장");
                                                                 clusterManager.addItem(friendMarker);
                                                                 personList.put(contact.getUserId(), friendMarker);
-                                                                clusterManager.cluster();
                                                                 Log.i("asdasd", "마커 생성");
                                                                 Log.i("asdasd ", contact.getUserId());
 
@@ -734,7 +724,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                         friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
                                                                 clusterManager.addItem(friendMarker);
                                                                 personList.put(contact.getUserId(), friendMarker);
-                                                                clusterManager.cluster();
                                                                 Log.i("asdasd", "마커 생성");
                                                                 Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
                                                                 Log.i("fffff", "체인지 else : " + contact.getUserId());
@@ -756,7 +745,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                               if(((ItemPerson)m).getUserId().equals(contact.getUserId())){
                                                   ItemPerson ip = personList.get(contact.getUserId());
                                                   clusterManager.removeItem(ip);
-                                                  clusterManager.cluster();
+
                                               }
                                             }
                                         }
@@ -764,6 +753,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     }
 
                             }
+                            clusterManager.cluster();
                         }
                     }
 
@@ -980,12 +970,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
 
-        Bitmap myPicture = null; //내 사진 url이 없는 경우 bit맵을 읽어오고 그렇지 않은 경우 null처리 된 bitmap를 cluster로 보냄
-        if (pictureList.get(DaoImple.getInstance().getLoginEmail()) != null) {
-            myPicture = pictureList.get(DaoImple.getInstance().getLoginEmail());
-        } else {
-            myPicture = null;
-        }
 
             // 내 GPS 위치가 바뀔 때 마다, 내 마커 생성
             locationListener = new LocationListener() {
@@ -1002,13 +986,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     // 내 위치를 myLatLng로 생성
                     myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-                    Log.i("fffff","myLatLng 변경");
-                    Bitmap myPicture = null; //내 사진 url이 없는 경우 bit맵을 읽어오고 그렇지 않은 경우 null처리 된 bitmap를 cluster로 보냄
-                        if (pictureList.get(DaoImple.getInstance().getLoginEmail()) != null) {
-                            myPicture = pictureList.get(DaoImple.getInstance().getLoginEmail());
-                        } else {
-                            myPicture = null;
-                        }
 
                     if(!zoomCheck) {
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));

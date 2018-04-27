@@ -1,9 +1,12 @@
 package com.example.homin.test1;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -29,6 +32,7 @@ public class DaoImple {
     private List<ItemMemo> itemMemoList;
     private List<ItemPerson> itemPersonList;
     private UserDataTable myPageUserData;
+    private FragmentActivity fragmentActivity;
 
     public UserDataTable getMyPageUserData() {
         return myPageUserData;
@@ -149,6 +153,25 @@ public class DaoImple {
         String key = key1+key2+key3;
 
         return key;
+    }
+
+
+    public static FragmentActivity getActivity(Context context) {
+        if (context instanceof FragmentActivity) {
+            return (FragmentActivity) context;
+        }
+
+        while (context instanceof ContextWrapper) {
+            if (context instanceof FragmentActivity) {
+                if(!((FragmentActivity) context).isFinishing()) {
+                    return (FragmentActivity) context;
+                }else{
+                    return null;
+                }
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+        return null;
     }
 
 

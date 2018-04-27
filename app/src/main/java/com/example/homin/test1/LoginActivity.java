@@ -190,167 +190,37 @@ public class LoginActivity extends AppCompatActivity {
                             Log.i("ggqs",key);
 
 
-
-
-
                             reference.child("Contact").addChildEventListener(new ChildEventListener() {
                                 @Override
                                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                                     Contact contactInOrder = dataSnapshot.getValue(Contact.class); //차례대로 들어오는 Contact들
 
                                     if (contactInOrder.getUserId().equals(etEmail.getText().toString())) {// 내 컨텍트를 찾는 if문
-                                        // 내 사진 다운로드
-                                        if (contactInOrder.getPictureUrl() != null) { // 내 Contact에 url 에 들어가있는지 체크
-                                            Glide.with(getApplicationContext()).load(contactInOrder.getPictureUrl())
-                                                    .asBitmap().override(100,100).priority(Priority.IMMEDIATE).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).fitCenter().into(new SimpleTarget<Bitmap>() {
-                                                @Override
-                                                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                                    pictureList.put(etEmail.getText().toString(), resource);
-                                                }
-                                            });
-                                        } else { //url이 없으면 nul을 넣음
-                                            pictureList.put(etEmail.getText().toString(), null);
-                                        }
+
                                         final Contact myContact = dataSnapshot.getValue(Contact.class); //내 컨텍트 설정
-
-
                                         DaoImple.getInstance().setLoginEmail(myContact.getUserId());
                                         DaoImple.getInstance().setLoginId(myContact.getUserName());
                                         DaoImple.getInstance().setContact(myContact);
 
+                                        intentNotsent = false;
+                                        Log.i("qq23q", "startActivity1");
 
-                                        reference.child("Contact").addChildEventListener(new ChildEventListener() {
+                                        Log.i("qq23q", DaoImple.getInstance().getKey());
+                                        boolean loginCheck = myContact.isLoginCheck();
 
-                                            @Override
-                                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                                                final Contact friendsContact = dataSnapshot.getValue(Contact.class);// 친구목록에 있는 list 비교를 위한 Contact설정
-                                                Log.i("hi1", "내 친구들 목록 사이즈: " + myContact.getFriendList().size());
-                                                //친구목록이 있는 경우 for문으로 들어감
-                                                for (int a = 0; a < myContact.getFriendList().size(); a++) {
-                                                    index = a;
-                                                    Log.i("hi1", friendsContact.getUserId());
-                                                    Log.i("hi1", "MyContact.list:" + myContact.getFriendList().size());
-
-                                                    if (friendsContact.getUserId().equals(myContact.getFriendList().get(a))) { //친구목록에 있는 친구들의 bitmap들을 다 다운로드
-                                                        if (friendsContact.getPictureUrl() != null) {
-                                                            stringkey.add(friendsContact.getUserId());//친구 아이디 목록 ( HashMap의 Key값들을 List에 넣음)
-                                                            Glide.with(LoginActivity.this).load(friendsContact.getPictureUrl())
-                                                                    .asBitmap().fitCenter().override(100,100).into(new SimpleTarget<Bitmap>() {
-                                                                @Override
-                                                                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                                                    pictureList.put(friendsContact.getUserId(), resource); //HashMap인 PictureList에 Key 값인 친구 아이디와 그에따른 BitMap을 넣음
-                                                                    count++;
-                                                                    Log.i("hi1", "Count: " + count);
-                                                                    if (myContact.getFriendList().size() == count) {
-                                                                        // 로그인 전에 다중 로그인을 막기 위해 contact 객체를 firebase에 업데이트
-
-                                                                        DaoImple.getInstance().setPictureList(pictureList);
-                                                                        count = 0;
-                                                                        Log.i("qq1", "사진리스트 가져옴");
-                                                                        intentNotsent = false;
-                                                                        Log.i("qq23q", "startActivity1");
-
-                                                                        Log.i("qq23q", DaoImple.getInstance().getKey());
-                                                                        boolean loginCheck = myContact.isLoginCheck();
-
-                                                                        // 이미 로그인 되어 있는 대상이라면 로그인 할 수 없음
-                                                                        if(loginCheck){
-                                                                            Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
-                                                                            progressDialog.dismiss();
-                                                                        }else {
-                                                                            idSaveCheck(id,pw); // 아이디와 패스워드 저장
-                                                                            myContact.setLoginCheck(true);
-                                                                            Contact contact = missLocation(myContact);
-                                                                            reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(contact);
-                                                                            startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
-                                                                            finish();
-                                                                        }
-
-
-                                                                    }
-
-                                                                }
-                                                            });
-                                                        } else {//친구가 사진설정을 안한 경우
-
-                                                            stringkey.add(friendsContact.getUserId());
-                                                            pictureList.put(friendsContact.getUserId(), null);
-                                                            count++;
-                                                            if (myContact.getFriendList().size() == count) {
-                                                                DaoImple.getInstance().setPictureList(pictureList);
-                                                                count = 0;
-                                                                intentNotsent = false;
-                                                                boolean loginCheck = myContact.isLoginCheck();
-                                                                if(loginCheck){
-                                                                    Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
-                                                                    progressDialog.dismiss();
-                                                                }else {
-                                                                    idSaveCheck(id,pw); // 아이디와 패스워드 저장
-                                                                    myContact.setLoginCheck(true);
-                                                                    Contact contact = missLocation(myContact);
-                                                                    reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(contact);
-                                                                    startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
-                                                                    finish();
-                                                                }
-
-
-                                                            }
-
-                                                        }
-
-                                                        Log.i("hi1", "Count: " + count);
-                                                        Log.i("hi1", "getFriendsList.size: " + myContact.getFriendList().size());
-
-
-                                                    }
-                                                }// end for 친구목록 확인하는 for문
-
-                                                Log.i("qq23q", "친구수: "+myContact.getFriendList().size()+ "count:" + count + "intentNotsent:" + intentNotsent );
-                                                if (intentNotsent && myContact.getFriendList().size() == count) {
-
-                                                    intentNotsent = false;
-                                                    DaoImple.getInstance().setPictureList(pictureList);
-                                                    Log.i("qq23q", "startActivity3");
-                                                    Log.i("qq23q", DaoImple.getInstance().getKey());
-                                                    boolean loginCheck = myContact.isLoginCheck();
-                                                    // 이미 로그인 되어 있는 대상이라면 로그인 할 수 없음
-                                                    if(loginCheck){
-                                                        Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
-                                                        progressDialog.dismiss();
-                                                    }else {
-                                                        // 로그인 전에 다중 로그인을 막기 위해 contact 객체를 firebase에 업데이트
-                                                        idSaveCheck(id,pw); // 아이디와 패스워드 저장
-                                                        myContact.setLoginCheck(true);
-                                                        Contact contact = missLocation(myContact);
-                                                        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(contact);
-                                                        startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
-                                                        finish();
-                                                    }
-                                                }
-
-                                            }
-
-                                            @Override
-                                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                                            }
-
-                                            @Override
-                                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                                            }
-
-                                            @Override
-                                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                                            }
-
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {
-
-                                            }
-                                        });
+                                        // 이미 로그인 되어 있는 대상이라면 로그인 할 수 없음
+                                        if(loginCheck){
+                                            Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
+                                            progressDialog.dismiss();
+                                        }else {
+                                            idSaveCheck(id,pw); // 아이디와 패스워드 저장
+                                            progressDialog.dismiss();
+                                            myContact.setLoginCheck(true);
+                                            Contact contact = missLocation(myContact);
+                                            reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(contact);
+                                            startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
+                                            finish();
+                                        }
                                     }
                                 }
 

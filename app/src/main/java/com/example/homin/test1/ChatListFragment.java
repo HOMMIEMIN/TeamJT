@@ -69,9 +69,16 @@ public class ChatListFragment extends Fragment {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Contact yourContact = null;
+                    for(Contact a : list2){
+                        if(a.getUserId().equals(list.get(position))){
+                            yourContact = a;
+                        }
+                    }
                     Intent intent = new Intent(context,ChattingActivity.class);
                     intent.putExtra(FriendFragment.CHAT_YOURID, list.get(position));
                     intent.putExtra("check",check);
+                    intent.putExtra(FriendFragment.CHAT_YOURIMAGE,yourContact.getResizePictureUrl());
                     startActivity(intent);
                 }
             });
@@ -215,9 +222,6 @@ public class ChatListFragment extends Fragment {
 
             }
         });
-
-
-
 
     }
 
