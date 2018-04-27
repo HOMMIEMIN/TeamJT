@@ -1,12 +1,16 @@
 package com.example.homin.test1;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -44,26 +48,48 @@ public class EssayDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_essay_detail);
 
+        // 어플 위에 뜨는 액션바 숨기는 코드!
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
+
         userDataTable = DaoImple.getInstance().getMyPageUserData();
 
         imageView = findViewById(R.id.imageview_detail);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         ImageView imageView2 = findViewById(R.id.DetailMapview2);
         textView1 = findViewById(R.id.Detali_textGemock);
         textView2 = findViewById(R.id.Detali_textgul);
         textView3 = findViewById(R.id.Detali_textNaljja);
+        TextView textAddress = findViewById(R.id.textAddress);
+        ImageButton closeBtn = findViewById(R.id.closeBtn);
 
         Double lat = userDataTable.getLocation().get(0);
         Double lng = userDataTable.getLocation().get(1);
 
         Glide.with(getApplicationContext()).load(userDataTable.getImageUrl()).override(100,100).into(imageView);
         Glide.with(getApplicationContext())
-                .load("http://maps.googleapis.com/maps/api/staticmap?center=" + lat +","+ lng + "&zoom=14&size=400x220&maptype=roadmap%20&markers=color:blue|label:S|" + lat +","+ lng + "&sensor=false")
+//                .load(
+//                        "http://maps.googleapis.com/maps/api/staticmap?center=" + lat +","+ lng + "&zoom=14&size=400x220&maptype=roadmap%20" +
+//                                "&markers=color:blue|label:A|" + lat +","+ lng + "&sensor=false")
+                .load("http://maps.googleapis.com/maps/api/staticmap?center=" +
+                        (lat + 0.0005) + "," + (lng + 0.004) +
+                        "&zoom=14&size=380x200&scale=2&maptype=roadmap&markers=color:red|label:A|" +
+                        lat + ","+ lng + "&sensor=false")
                 .into(imageView2);
 
         //
+
+        String thisAddress = MypageFragment.getAddress(this, lat, lng);
         textView1.setText(userDataTable.getTitle());
         textView2.setText(userDataTable.getContent());
-        textView3.setText(userDataTable.getData());
+
+        String originDate = userDataTable.getData();
+        String dateFormat = DaoImple.getInstance().getDateFormat(originDate);
+        textView3.setText(dateFormat);
+        textAddress.setText(thisAddress);
+
+
 
 
 //        Double lat = userData.getLocation().get(0);
@@ -165,4 +191,7 @@ public class EssayDetailActivity extends AppCompatActivity {
     }
 
 
+    public void onClickClose(View view) {
+        finish();
+    }
 }
