@@ -406,8 +406,10 @@ public class MypageFragment extends Fragment {
             Double lng = userData.getLocation().get(1);
             String address = getAddress(getContext(), lat, lng);
             holder.textLocation.setText(address);
-            holder.textDate.setText(userData.getData()); // 글 날짜
 
+            String dateFormat = userData.getData();
+            String najjanaom = DaoImple.getInstance().getDateFormat(dateFormat);
+            holder.textDate.setText(najjanaom); // 글 날짜
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
