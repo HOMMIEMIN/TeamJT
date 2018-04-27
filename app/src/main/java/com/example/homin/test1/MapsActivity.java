@@ -135,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location getLocation;
     public static String MARKER_LIST = "markerList";
     private boolean checkLocation;
-    private boolean destoryCheck;
+    private boolean idCheck;
 
 
     // MyPage에 이용
@@ -619,12 +619,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Contact contact = dataSnapshot.getValue(Contact.class);
                         if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                             myContact = contact;
+                            List<String> realFriendList = contact.getFriendList();
+                            myFriendList = new ArrayList<>();
+
+                            for(int a = 0 ; a < realFriendList.size() ; a++){
+                                String name = realFriendList.get(a);
+                                myFriendList.add(name);
+                            }
+                            myFriendList.add(DaoImple.getInstance().getLoginEmail());
                             DaoImple.getInstance().setContact(contact);
                             Log.i("ddd3333","콘텍트 생성");
 
                         }
                         if(myFriendList != null){
                             for(int a = 0 ; a < myFriendList.size() ; a++){
+                                Log.i("asdasd11",myFriendList.get(a));
                                 if(myFriendList.get(a).equals(contact.getUserId())) {
                                     // 로그인 되있는 상태라면 사용자 마커 표시
                                     if (contact.isLoginCheck()) {
@@ -803,21 +812,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 contactList.add(contact);
                 if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                     myContact = contact;
+                    DaoImple.getInstance().setContact(contact);
                     List<Double> lastLocation = contact.getUserLocation();
                     LatLng latLng = new LatLng(lastLocation.get(0),lastLocation.get(1));
                     myLatLng = latLng;
                 }
                 if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                     if(contact.getFriendList() != null) {
-                        myFriendList = contact.getFriendList(); // 친구 목록 저장
-                        memoFriendList = contact.getFriendList();
-                        memoFriendList.add(DaoImple.getInstance().getLoginEmail());
+
+                        List<String> fflist = contact.getFriendList(); // 친구 목록 저장
+                        myFriendList = new ArrayList<>();
+                        for(int a = 0 ; a < fflist.size() ; a++){
+                            String name = fflist.get(a);
+                            myFriendList.add(name);
+
+                        }
+
+                        myFriendList.add(DaoImple.getInstance().getLoginEmail());
                         Log.i("fffff","친구 목록 저장");
 
                         Log.i("fffff","친구 메모 삭제");
-                        for(int a = 0 ; a < memoFriendList.size() ; a++){ //  친구 목록으로 메모 가져오기
+                        for(int a = 0 ; a < myFriendList.size() ; a++){ //  친구 목록으로 메모 가져오기
                             Log.i("fffff","메모 반복문 들어옴");
-                            String key = DaoImple.getInstance().getFirebaseKey(memoFriendList.get(a));
+                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
                             friendMemeList(key); // 친구들 메모 가져오는 메소드
                         }
 
@@ -834,20 +851,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 contactList.add(contact);
                 if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                     if(contact.getFriendList() != null) {
-                        DaoImple.getInstance().setContact(contact);
+                        myFriendList = contact.getFriendList();
                         List<String> fflist = contact.getFriendList(); // 친구 목록 저장
-                        myFriendList = new ArrayList<>();
+                        List<String> realFriendList = new ArrayList<>();
+                        myContact = contact;
+                        DaoImple.getInstance().setContact(contact);
                         for(int a = 0 ; a < fflist.size() ; a++){
                             String name = fflist.get(a);
-                            myFriendList.add(name);
+                            realFriendList.add(name);
                         }
 
-                        myFriendList.add(DaoImple.getInstance().getLoginEmail());
+                        realFriendList.add(DaoImple.getInstance().getLoginEmail());
                         Log.i("zxc","메모 체인지");
                         clusterManager.clearItems();
-                        for(int a = 0 ; a < myFriendList.size() ; a++) { //  친구 목록으로 메모 가져오기
+                        for(int a = 0 ; a < realFriendList.size() ; a++) { //  친구 목록으로 메모 가져오기
                             Log.i("fffff", "메모 반복문 들어옴 체인지");
-                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
+                            String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
                             friendMemeList(key); // 친구들 메모 가져오는 메소드
                         }
                         }
@@ -969,7 +988,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onLocationChanged(Location location) {
                     check = false;
                     memoCheck = false;
-                    myContact = DaoImple.getInstance().getContact();
+                    if(myContact == null) {
+                        myContact = DaoImple.getInstance().getContact();
+                    }
                     Log.i("asdqwe","로케이션 체인지");
 
                     List<Double> myLocation = new ArrayList<>();
