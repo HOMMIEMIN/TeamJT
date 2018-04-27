@@ -32,7 +32,6 @@ public class ClosingServics extends Service {
         closeContact = DaoImple.getInstance().getContact();
         closeContact.setLoginCheck(false);
         reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(closeContact);
-
         stopSelf();
     }
 

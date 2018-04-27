@@ -1021,8 +1021,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 }
             };
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 100, locationListener);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 100, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 100000, 100, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100000, 100, locationListener);
 
 
 
@@ -1258,50 +1258,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onDestroy() {
-        // 접속이 종료 되면 로그인 상태 변경
-//        reference.child("Contact").addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                Contact asd = dataSnapshot.getValue(Contact.class);
-//                if(asd.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
-//                    reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(asd);
-//                    for(int a = 0 ; a < asd.getFriendList().size() ; a++){
-//                        Log.i("dsaewq",asd.getFriendList().get(a));
-//                    }
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
 
         Contact asd = DaoImple.getInstance().getContact();
         asd.setLoginCheck(false);
 
             reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(asd);
-            for(int a = 0 ; a < asd.getFriendList().size() ; a++) {
-                Log.i("dsaewq", "디스트로이 : " +asd.getFriendList().get(a));
+        locationManager.removeUpdates(locationListener);
 
-        }
-        Log.i("ggqs","디스트로이 액티비티");
         super.onDestroy();
     }
 
