@@ -48,9 +48,9 @@ public class CustomAlgorithm<T extends ClusterItem> implements Algorithm<T> {
 
     @Override
     public void clearItems() {
-        friendsAlgorithm.clearItems();
         coworkerAlgorithm.clearItems();
     }
+
 
     @Override
     public void removeItem(T item) {

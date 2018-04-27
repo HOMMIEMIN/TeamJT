@@ -112,8 +112,10 @@ public class FriendFragment extends Fragment {
                     }
                 }
             }else{
-                holder.iv.setImageResource(R.drawable.p1);
-                holder.tv1.setText(list2.get(position).getUserName());
+                if(list2.size() != 0) {
+                    holder.iv.setImageResource(R.drawable.p1);
+                    holder.tv1.setText(list2.get(position).getUserName());
+                }
 
             }
 

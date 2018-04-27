@@ -13,10 +13,10 @@ import com.google.maps.android.clustering.ClusterItem;
         private final LatLng mPosition;
         private String userId;
         private String userName;
-        private Bitmap image;
+        private String image;
 
 
-        public ItemPerson(double lat, double lng, String id,String name , Bitmap image) {
+        public ItemPerson(double lat, double lng, String id,String name,String image) {
             mPosition = new LatLng(lat, lng);
             this.userId = id;
             this.image = image;
@@ -46,7 +46,7 @@ import com.google.maps.android.clustering.ClusterItem;
             return mPosition;
         }
 
-        public Bitmap getImage() {
+        public String getImage() {
             return image;
         }
     }
