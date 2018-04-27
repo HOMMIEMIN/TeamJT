@@ -2,6 +2,7 @@ package com.example.homin.test1;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
 import static com.example.homin.test1.FriendFragment.*;
 
@@ -50,12 +54,12 @@ public class ChattingActivity extends AppCompatActivity {
             switch (viewType) {
                 case 0:
                     LayoutInflater inflater = LayoutInflater.from(ChattingActivity.this);
-                    View itemView = inflater.inflate(R.layout.chat_layout, parent, false);
+                    View itemView = inflater.inflate(R.layout.chat_layout2, parent, false);
                     holder = new ChatHolder(itemView);
                 break;
                 case 1:
                     LayoutInflater inflater2 = LayoutInflater.from(ChattingActivity.this);
-                    View itemView2 = inflater2.inflate(R.layout.chat_layout2, parent, false);
+                    View itemView2 = inflater2.inflate(R.layout.chat_layout, parent, false);
                     holder = new ChatHolder(itemView2);
                 break;
             }
@@ -66,16 +70,36 @@ public class ChattingActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(ChatAdapter.ChatHolder holder, int position) {
+            FragmentActivity activity = DaoImple.getActivity(ChattingActivity.this);
 
-                holder.iv.setImageResource(R.drawable.p1);
                 holder.tv1.setText(cList.get(position).getName());
                 holder.tv2.setText(cList.get(position).getChat());
                 holder.tv3.setText(cList.get(position).getTime());
                 String id = holder.tv1.getText().toString();
+
             if(holder.getItemViewType() == 0) {
+                if (activity != null) {
+                    if(DaoImple.getInstance().getContact().getResizePictureUrl() != null) {
+                        Glide.with(activity).load(DaoImple.getInstance().getContact().getResizePictureUrl())
+                                .bitmapTransform(new CropCircleTransformation(ChattingActivity.this)).centerCrop()
+                                .into(holder.iv);
+                    }else{
+                        holder.iv.setImageResource(R.drawable.p1);
+                    }
+                    holder.tv2.setBackground(getDrawable(R.drawable.ddd1));
+                }
+            }else {
+                if (activity != null) {
+                    if (yourImage != null) {
+                        Glide.with(activity).load(yourImage)
+                                .bitmapTransform(new CropCircleTransformation(ChattingActivity.this)).centerCrop()
+                                .into(holder.iv);
+                        Log.i("zxcasd", yourImage);
+                    } else {
+                        holder.iv.setImageResource(R.drawable.p1);
+                    }
+                }
                 holder.tv2.setBackground(getDrawable(R.drawable.ddd));
-            }else{
-                holder.tv2.setBackground(getDrawable(R.drawable.ddd1));
             }
 
 
@@ -113,6 +137,7 @@ public class ChattingActivity extends AppCompatActivity {
     private String yourName;
     private boolean check;
     private String putKey;
+    private String yourImage;
 
 
     @Override
@@ -138,7 +163,7 @@ public class ChattingActivity extends AppCompatActivity {
         Log.i("gg1",youId);
         yourName = intent.getStringExtra(CHAT_YOURNAME);
         check = intent.getBooleanExtra("check",false);
-
+        yourImage = intent.getStringExtra(CHAT_YOURIMAGE);
         recyclerView.hasFixedSize();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -168,6 +193,7 @@ public class ChattingActivity extends AppCompatActivity {
 
                int a = cList.size();
                recyclerView.scrollToPosition(cList.size()-1);
+
 
             }
 

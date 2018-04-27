@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/popup_PlusDetailImageVeiw"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="440dp"
         android:layout_gravity="center"
         app:srcCompat="@android:drawable/ic_menu_report_image" />
 
