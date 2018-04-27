@@ -11,6 +11,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Picture;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -47,18 +49,22 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
+import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MypageFragment extends Fragment {
 
-    private static final String TAG = "mini";
+    private static final String TAG = "changeImage";
 
     public static userDataTableAdapter adapter;
 
@@ -77,6 +83,16 @@ public class MypageFragment extends Fragment {
     // 프로필 눌르면 팝업
     private PopupWindow mPopupWindow;
 
+    private static Bitmap resizeImg;
+    private static String curPhotoPath;
+
+    // 리싸이클러뷰 디테일프래그먼트
+    interface EssaySetlectedCallback {
+        void onessaySetlected(int position);
+    }
+
+    private EssaySetlectedCallback callback;
+
 
     public MypageFragment() {
         // Required empty public constructor
@@ -86,6 +102,11 @@ public class MypageFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+        if (context instanceof EssaySetlectedCallback) {
+            callback = (EssaySetlectedCallback) context;
+        } else {
+            new  RuntimeException ("반드시 ProductSelectedCallback를 구현해야함.");
+        }
     }
 
     @Override
@@ -109,7 +130,7 @@ public class MypageFragment extends Fragment {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Log.i(TAG, "마이 페이지 프로팔 클릭");
                 View popupView = getLayoutInflater().inflate(R.layout.popup_permission, null);
                 //popupView 에서 (LinearLayout 을 사용) 레이아웃이 둘러싸고 있는 컨텐츠의 크기 만큼 팝업 크기를 지정
                 mPopupWindow= new PopupWindow(
@@ -122,20 +143,23 @@ public class MypageFragment extends Fragment {
                 });
 
                 mPopupWindow.setFocusable(true); // 외부영역 선택시 종료
+
                 mPopupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
 
                 Button popCamera = popupView.findViewById(R.id.btn_popCamera);
                 Button popGallery = popupView.findViewById(R.id.btn_popGallery);
                 Button popPlusImg = popupView.findViewById(R.id.btn_popPlusImg);
                 Button popupBaseImg = popupView.findViewById(R.id.btn_baseImg);
-                Log.i(TAG, "팝업버튼 투개 나옴. ");
+                Log.i(TAG, "팝업버튼 네개 나옴. ");
 
 
                 //팝업버튼중에  "사진촬영" 버튼 선택시
                 popCamera.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Log.i(TAG, "사진촬영 선택");
                         popupclickedCamera();
+                        Log.i(TAG, "사진촬영메소드 실행 후");
 //                        ((MainActivity)getActivity()).selectPhoto();
                         mPopupWindow.dismiss();
                     }
@@ -146,9 +170,11 @@ public class MypageFragment extends Fragment {
                 popGallery.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Log.i(TAG, "앨범에서 사진선택 클릭");
                         ((MapsActivity)getActivity()).clickedProImgBotton();
+                        Log.i(TAG, "앨범 메소드 실행 후");
                         mPopupWindow.dismiss();
-                        Log.i(TAG, "intent: ");
+
                     }
                 });// end popGallery
 
@@ -156,22 +182,24 @@ public class MypageFragment extends Fragment {
                 popPlusImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
+                        Log.i(TAG, "확대해서보기 클릭");
                         //TODO: 이미지 확대보기 클릭시 사진이 크게 나와야함
-
+                        mPopupWindow.dismiss();
                         key = DaoImple.getInstance().getKey();
-                        Log.i(TAG, "line157) key: " + key);
+                        Log.i(TAG, "누구 key: " + key);
                         String curProImgUrl = DaoImple.getInstance().getContact().getPictureUrl();
                         Log.i(TAG, "curProImgUrl: " + curProImgUrl);
                         Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
 
                         //TODO:
                         if (curProImgUrl == null) { // Firebase에 저장된 파일이 있을 때
-                            mPopupWindow.dismiss();
-                            Toast.makeText(MypageFragment.context, "저장된 이미지가 없습니다.", Toast.LENGTH_SHORT).show();
+                            Log.i(TAG, "if문 안속 curProImgUrl값 :"+curProImgUrl);
 
+                            Toast.makeText(getContext(), "저장된 이미지가 없습니다.", Toast.LENGTH_SHORT).show();
+                            mPopupWindow.dismiss();
 
                         } else { // 없을 때
+                            Log.i(TAG, "else 안속 curProImgUrl값 :"+curProImgUrl);
                             View popupView = getLayoutInflater().inflate(R.layout.popup_plusimage, null);
                             //popupView 에서 (LinearLayout 을 사용) 레이아웃이 둘러싸고 있는 컨텐츠의 크기 만큼 팝업 크기를 지정
                             mPopupWindow= new PopupWindow(
@@ -182,12 +210,12 @@ public class MypageFragment extends Fragment {
                                     mPopupWindow.dismiss();
                                 }
                             }); // click
-
+                            Log.i(TAG, "if값에서 나옴 :");
                             ImageView plusImage = popupView.findViewById(R.id.popup_PlusImageVeiw);
                             mPopupWindow.setFocusable(true); // 외부영역 선택시 종료
                             mPopupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
-
-                            Glide.with(MypageFragment.context).load(curProImgUrl).into(plusImage);
+                            Log.i(TAG, "마지막줄 curProImgUrl , plusImage:"+ curProImgUrl +", "+plusImage);
+                            Glide.with(getContext()).load(curProImgUrl).into(plusImage);
 
                         }
 
@@ -357,13 +385,36 @@ public class MypageFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(ViewHolder holder, final int position) {
             Log.i(TAG, "onBindViewHolder");
             UserDataTable userData = userDataTList.get(position);
             holder.textTitle.setText(userData.getTitle());  // 글제목
-            holder.textLocation.setText(userData.getContent()); // 글 내용
+            //TODO: 글 내용살짝 보기
+            String content = userData.getContent();
+            Log.i(TAG, "onBindViewHolder: " + userData.getContent());
+            String cutcontent = "";
+            if(userData.getContent().length()>30){
+                cutcontent = content.substring(0,28);
+                cutcontent += "...";
+            }else {
+                cutcontent = userData.getContent();
+            }
+            holder.tectContent.setText(cutcontent); // 저장 글 짤라서 보이기!
+
+            /**위도,경도를 주고값으로 가져오는 코드 */
+            Double lat = userData.getLocation().get(0);
+            Double lng = userData.getLocation().get(1);
+            String address = getAddress(getContext(), lat, lng);
+            holder.textLocation.setText(address);
             holder.textDate.setText(userData.getData()); // 글 날짜
-            // TODO: onClick - 클릭했을 때 글 하나 읽어오기
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DaoImple.getInstance().setMyPageUserData(userDataTList.get(position));
+                    callback.onessaySetlected(position);
+                }
+            });
         }
 
         @Override
@@ -377,22 +428,70 @@ public class MypageFragment extends Fragment {
         class ViewHolder extends RecyclerView.ViewHolder {
             TextView textTitle;
             TextView textLocation;
+            TextView tectContent;
             TextView textDate;
 
             public ViewHolder(View itemView) {
                 super(itemView);
                 Log.i(TAG, "ViewHolder");
                 textTitle = itemView.findViewById(R.id.textTitle);
+                tectContent = itemView.findViewById(R.id.textContent);
                 textLocation = itemView.findViewById(R.id.textLocation);
                 textDate = itemView.findViewById(R.id.textDate);
             }
         }
     }
-    
 
+//  TODO: 위도, 경도를 주소값으로 가져오는 메소드!!!!
+public static String getAddress(Context context,double lat, double lng) {
+    String nowAddress ="현재 위치를 확인 할 수 없습니다.";
+    Geocoder geocoder = new Geocoder(context,Locale.KOREA);
+    List <Address> address;
+    try {
+        if (geocoder != null) {
+            //세번째 파라미터는 좌표에 대해 주소를 리턴 받는 갯수로
+            //한좌표에 대해 두개이상의 이름이 존재할수있기에 주소배열을 리턴받기 위해 최대갯수 설정
+            address = geocoder.getFromLocation(lat, lng, 1);
+
+            if (address != null && address.size() > 0) {
+                // 주소 받아오기
+                String currentLocationAddress = address.get(0).getAddressLine(0).toString();
+                nowAddress  = currentLocationAddress;
+
+            }
+        }
+
+    } catch (IOException e) {
+        Toast.makeText(context, "주소를 가져 올 수 없습니다.", Toast.LENGTH_LONG).show();
+
+        e.printStackTrace();
+    }
+    return nowAddress;
+}
+
+    // 프로필 이미지 '사진촬영'했을 때 찍은 사진 저장되는 폴더 및 파일명 세팅
+    public static File createImageFile() throws IOException {
+        File dir = new File(Environment.getExternalStorageDirectory() + "/MyApp/");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imgName = timeStamp + ".jpg";
+
+        File storageDir = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + "/MyApp/" + imgName);
+        curPhotoPath = storageDir.getAbsolutePath();
+
+        return storageDir;
+
+    } // end createImageFile()
+
+    // 프로필 사진 선택시 리사이즈해서 storage에 업로드
     public static void resizeImg(Uri getUri) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        String filename = "curProImg_resize.png";
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference dataRef = database.getReference();
+
+        String filename = "curProImg_resize.jpg";
         key = DaoImple.getInstance().getKey();
         StorageReference storageRef = storage.getReferenceFromUrl("gs://test33-32739.appspot.com/").child(key + "/").child("profileImage/" + filename);
 
@@ -405,37 +504,59 @@ public class MypageFragment extends Fragment {
             if (imgHeight >= imgWidth) {
                 imgWidth = 100;
                 imgHeight = Math.round(imgWidth / aspectRatio);
-                Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
-
-                Bitmap makeCircle = PersonItemRenderer.getCircleBitmap(resizeImg);
-
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                makeCircle.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), makeCircle, "Title", null);
-                Uri bitmapUri = Uri.parse(path);
-
-                storageRef.putFile(bitmapUri);
-
+                resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
             } else {
                 imgHeight = 100;
                 imgWidth = Math.round(imgHeight * aspectRatio);
-                Bitmap resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
-
-                Bitmap makeCircle = PersonItemRenderer.getCircleBitmap(resizeImg);
-
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                makeCircle.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-                String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), makeCircle, "Title", null);
-                Uri bitmapUri = Uri.parse(path);
-                storageRef.putFile(bitmapUri);
-
+                resizeImg = Bitmap.createScaledBitmap(orgImage, imgWidth, imgHeight, true);
             }
+
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            resizeImg.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizeImg, "Title", null);
+            Uri bitmapUri = Uri.parse(path);
+
+            storageRef.putFile(bitmapUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Uri downThisUri = taskSnapshot.getDownloadUrl();
+                    String downUriToStr = downThisUri.toString();
+
+                    DaoImple.getInstance().getContact().setResizePictureUrl(downUriToStr);
+
+                    Contact contact = DaoImple.getInstance().getContact();
+
+                    dataRef.child("Contact").child(key).setValue(contact);
+
+                    String str = "Pictures";
+                    setDirEmpty(str);
+                }
+            });
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
+
+    // 리사이즈하면서 기기에 저장된 100x100 이미지 삭제
+    public static void setDirEmpty(String dirName) {
+        String path = Environment.getExternalStorageDirectory() + File.separator + dirName;
+
+        File dir = new File(path);
+        File[] childFileList = dir.listFiles();
+
+        if (dir.exists()) {
+            for (File childFile : childFileList) {
+                if (childFile.isDirectory()) {
+                    setDirEmpty(childFile.getAbsolutePath());    //하위 디렉토리
+                } else {
+                    childFile.delete();    //하위 파일
+                }
+            }
+            dir.delete();
+        }
+    } // end setDirEmpty()
 
 
 
@@ -450,7 +571,7 @@ public class MypageFragment extends Fragment {
         if (filePath != null) {
 
             final ProgressDialog progressDialog = new ProgressDialog(context);
-            progressDialog.setTitle("프로필 사진 업데이트 중...");
+            progressDialog.setMessage("프로필 사진 업데이트 중...");
             progressDialog.show();
 
             // 파일명 지정
@@ -464,7 +585,7 @@ public class MypageFragment extends Fragment {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
-                            Toast.makeText(context, "업데이트 완료!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "프로필 업데이트 완료!", Toast.LENGTH_SHORT).show();
 
                             Uri downUri = taskSnapshot.getDownloadUrl();
                             Log.i(TAG, "다운로드uri: " + downUri);
@@ -544,7 +665,7 @@ public class MypageFragment extends Fragment {
         for (String p : permissions) {
 
             //TODO 권한 획득하기 전 권한 유효성 체크 - 현재 앱이 특정 권한을 갖고 있는지 확인 가능
-            if (PermissionChecker.checkSelfPermission(context, p) != PackageManager.PERMISSION_GRANTED) {
+            if (PermissionChecker.checkSelfPermission(getContext(), p) != PackageManager.PERMISSION_GRANTED) {
                 result = false;
                 break;
             }

@@ -74,8 +74,10 @@
             android:name=".ReadMemoActivity"
             android:theme="@android:style/Theme.Dialog" />
         <activity android:name=".ItemDetailActivity" android:theme="@android:style/Theme.Dialog"></activity>
+        <activity android:name=".EssayDetailActivity"></activity>
         <service android:name=".ClosingServics"
             android:stopWithTask="false" />
+
     </application>
 
 </manifest>

@@ -1,6 +1,8 @@
 package com.example.homin.test1;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.os.Build;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.ViewGroup;
@@ -34,14 +37,57 @@ import com.google.maps.android.ui.SquareTextView;
 
 import java.util.Set;
 
-public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
+
+public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem>  {
     Context context;
     GoogleMap googleMap;
+    boolean imageCheck;
+
+    private static Activity getActivity(Context context) {
+        if (context == null) {
+            return null;
+        }
+        if (context instanceof Activity) {
+            if(!((Activity) context).isFinishing())
+            return (Activity) context;
+        } else if (context instanceof ContextWrapper) {
+            return getActivity(((ContextWrapper) context).getBaseContext());
+        }
+        return null;
+    }
+
+
+
 
     @Override
-    protected void onClusterRendered(Cluster<ClusterItem> cluster, Marker marker) {
-        super.onClusterRendered(cluster, marker);
-    }
+    protected void onClusterItemRendered(ClusterItem clusterItem, final Marker marker) {
+
+
+        Context get = getActivity(context);
+        if(clusterItem instanceof ItemPerson) {
+            if(get != null) {
+                Glide.with(get).load(((ItemPerson) clusterItem).getImage()).asBitmap().fitCenter().into(new SimpleTarget<Bitmap>() {
+
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        Bitmap roundBitmap = getCircleBitmap(resource);
+                        marker.setIcon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+//                Log.i("asdfg","다운로드 완료 : " + ((ItemPerson) clusterItem).getUserId());
+                    }
+                });
+            }
+            imageCheck = true;
+            super.onClusterItemRendered(clusterItem, marker);
+        }
+        }
+
+
+
+
+
+
+
 
     public PersonItemRenderer(Context context, GoogleMap map, ClusterManager<ClusterItem> clusterManager) {
         super(context, map, clusterManager);
@@ -49,10 +95,6 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         this.googleMap = map;
     }
 
-    @Override
-    public void setOnClusterInfoWindowClickListener(ClusterManager.OnClusterInfoWindowClickListener<ClusterItem> listener) {
-        super.setOnClusterInfoWindowClickListener(listener);
-    }
 
     @Override
     protected void onClusterItemRendered(ClusterItem clusterItem, Marker marker) {
@@ -74,8 +116,10 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
             if(((ItemPerson) item).getImage()!= null) {
 
-                Bitmap roundBitmap = getCircleBitmap(((ItemPerson) item).getImage());
-                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+
+                Log.i("hi", "이름 : " + ((ItemPerson) item).getTitle());
+//                Bitmap roundBitmap = getCircleBitmap(((ItemPerson) item).getImage());
+//                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
                 markerOptions.title(((ItemPerson) item).getTitle());
                 markerOptions.snippet(((ItemPerson) item).getUserName());
             }else{

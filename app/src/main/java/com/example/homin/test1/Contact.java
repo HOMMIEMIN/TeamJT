@@ -9,6 +9,7 @@ public class Contact implements Serializable{
     private String UserId;
     private String UserName;
     private String pictureUrl;
+    private String resizePictureUrl;
     private List<Double> userLocation;
     private List<String> friendList;
     private List<String> wattingList;
@@ -18,16 +19,18 @@ public class Contact implements Serializable{
 
     public Contact(){}
 
-    public Contact(String userId, String userName, String pictureUrl, List<Double> userLocation, List<String> friendList, List<String> wattingList, boolean isPublic, boolean loginCheck) {
+    public Contact(String userId, String userName, String pictureUrl, String resizePictureUrl, List<Double> userLocation, List<String> friendList, List<String> wattingList, boolean isPublic, boolean loginCheck) {
         UserId = userId;
         UserName = userName;
         this.pictureUrl = pictureUrl;
+        this.resizePictureUrl = resizePictureUrl;
         this.userLocation = userLocation;
         this.friendList = friendList;
         this.wattingList = wattingList;
         this.isPublic = isPublic;
         this.loginCheck = loginCheck;
     }
+
 
     public String getUserId() {
         return UserId;
@@ -47,6 +50,10 @@ public class Contact implements Serializable{
 
     public void setPictureUrl(String pictureUrl) {
         this.pictureUrl = pictureUrl;
+    }
+
+    public void setResizePictureUrl(String resizePictureUrl) {
+        this.resizePictureUrl = resizePictureUrl;
     }
 
     public List<Double> getUserLocation() {
@@ -76,6 +83,10 @@ public class Contact implements Serializable{
 
     public String getPictureUrl() {
         return pictureUrl;
+    }
+
+    public String getResizePictureUrl() {
+        return resizePictureUrl;
     }
 
     public void setFriendList(List<String> friendList) {

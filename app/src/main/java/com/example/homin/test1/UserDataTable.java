@@ -13,7 +13,7 @@ public class UserDataTable {
 
     public UserDataTable(){}
 
-    public UserDataTable(String data, String imageUrl, String name, List<Double> location, String title, String userId,String content) {
+    public UserDataTable(String userId, String name, String imageUrl, List<Double> location,String title, String content,String data) {
         this.userId = userId; // 유저 아이디
         this.name = name; // 이름
         this.imageUrl = imageUrl; // 글에 올리는 사진

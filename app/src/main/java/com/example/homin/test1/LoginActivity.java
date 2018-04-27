@@ -70,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
     private String key;
     private Map<String, Bitmap> pictureList;//친구 아이디를 key값으로 받고 그의따른 bitMap을 저장하는 Map
     private int count;
+    private int index;
     private List<String> stringkey;//map의 key값들인 친구 아이디를 넣음
     private Priority priority; // 이미지 다운로드 우선 순위 설정
     private boolean intentNotsent = true; //인텐트가 전달되었는지 안되었는지 체크하기 위한 boolean
@@ -201,7 +202,7 @@ public class LoginActivity extends AppCompatActivity {
                                         // 내 사진 다운로드
                                         if (contactInOrder.getPictureUrl() != null) { // 내 Contact에 url 에 들어가있는지 체크
                                             Glide.with(getApplicationContext()).load(contactInOrder.getPictureUrl())
-                                                    .asBitmap().priority(Priority.IMMEDIATE).skipMemoryCache(true).override(100,100).diskCacheStrategy(DiskCacheStrategy.NONE).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                    .asBitmap().override(100,100).priority(Priority.IMMEDIATE).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).fitCenter().into(new SimpleTarget<Bitmap>() {
                                                 @Override
                                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                                                     pictureList.put(etEmail.getText().toString(), resource);
@@ -223,11 +224,11 @@ public class LoginActivity extends AppCompatActivity {
                                             @Override
                                             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                                                Contact friendsContact = dataSnapshot.getValue(Contact.class);// 친구목록에 있는 list 비교를 위한 Contact설정
+                                                final Contact friendsContact = dataSnapshot.getValue(Contact.class);// 친구목록에 있는 list 비교를 위한 Contact설정
                                                 Log.i("hi1", "내 친구들 목록 사이즈: " + myContact.getFriendList().size());
                                                 //친구목록이 있는 경우 for문으로 들어감
                                                 for (int a = 0; a < myContact.getFriendList().size(); a++) {
-                                                    final int index = a;
+                                                    index = a;
                                                     Log.i("hi1", friendsContact.getUserId());
                                                     Log.i("hi1", "MyContact.list:" + myContact.getFriendList().size());
 
@@ -235,10 +236,10 @@ public class LoginActivity extends AppCompatActivity {
                                                         if (friendsContact.getPictureUrl() != null) {
                                                             stringkey.add(friendsContact.getUserId());//친구 아이디 목록 ( HashMap의 Key값들을 List에 넣음)
                                                             Glide.with(LoginActivity.this).load(friendsContact.getPictureUrl())
-                                                                    .asBitmap().override(100,100).fitCenter().into(new SimpleTarget<Bitmap>() {
+                                                                    .asBitmap().fitCenter().override(100,100).into(new SimpleTarget<Bitmap>() {
                                                                 @Override
                                                                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                                                                    pictureList.put(stringkey.get(index), resource); //HashMap인 PictureList에 Key 값인 친구 아이디와 그에따른 BitMap을 넣음
+                                                                    pictureList.put(friendsContact.getUserId(), resource); //HashMap인 PictureList에 Key 값인 친구 아이디와 그에따른 BitMap을 넣음
                                                                     count++;
                                                                     Log.i("hi1", "Count: " + count);
                                                                     if (myContact.getFriendList().size() == count) {
@@ -260,7 +261,8 @@ public class LoginActivity extends AppCompatActivity {
                                                                         }else {
                                                                             idSaveCheck(id,pw); // 아이디와 패스워드 저장
                                                                             myContact.setLoginCheck(true);
-                                                                            reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+                                                                            Contact contact = missLocation(myContact);
+                                                                            reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(contact);
                                                                             startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
                                                                             finish();
                                                                         }
@@ -273,7 +275,7 @@ public class LoginActivity extends AppCompatActivity {
                                                         } else {//친구가 사진설정을 안한 경우
 
                                                             stringkey.add(friendsContact.getUserId());
-                                                            pictureList.put(stringkey.get(index), null);
+                                                            pictureList.put(friendsContact.getUserId(), null);
                                                             count++;
                                                             if (myContact.getFriendList().size() == count) {
                                                                 DaoImple.getInstance().setPictureList(pictureList);
@@ -284,12 +286,11 @@ public class LoginActivity extends AppCompatActivity {
                                                                     Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
                                                                     progressDialog.dismiss();
                                                                 }else {
-                                                                    Log.i("qq23q", DaoImple.getInstance().getKey());
                                                                     idSaveCheck(id,pw); // 아이디와 패스워드 저장
-                                                                    // 로그인 전에 다중 로그인을 막기 위해 contact 객체를 firebase에 업데이트
                                                                     myContact.setLoginCheck(true);
-                                                                    reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
-                                                                    startActivity(intent); //Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
+                                                                    Contact contact = missLocation(myContact);
+                                                                    reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(contact);
+                                                                    startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
                                                                     finish();
                                                                 }
 
@@ -313,7 +314,6 @@ public class LoginActivity extends AppCompatActivity {
                                                     Log.i("qq23q", "startActivity3");
                                                     Log.i("qq23q", DaoImple.getInstance().getKey());
                                                     boolean loginCheck = myContact.isLoginCheck();
-
                                                     // 이미 로그인 되어 있는 대상이라면 로그인 할 수 없음
                                                     if(loginCheck){
                                                         Toast.makeText(LoginActivity.this, "이미 로그인 되어 있습니다.", Toast.LENGTH_SHORT).show();
@@ -322,8 +322,9 @@ public class LoginActivity extends AppCompatActivity {
                                                         // 로그인 전에 다중 로그인을 막기 위해 contact 객체를 firebase에 업데이트
                                                         idSaveCheck(id,pw); // 아이디와 패스워드 저장
                                                         myContact.setLoginCheck(true);
-                                                        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
-                                                        startActivity(intent);//포문까지도 안 들어오는 경우 (친구가 없는 경우)
+                                                        Contact contact = missLocation(myContact);
+                                                        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(contact);
+                                                        startActivity(intent); // Bitmap 다운로드 완료후 맵으로 넘어가는 intent 설정
                                                         finish();
                                                     }
                                                 }
@@ -379,6 +380,18 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    private Contact missLocation(Contact myContact) {
+        List<Double> myLocation = myContact.getUserLocation();
+        double lat = myLocation.get(0);
+        double lon = myLocation.get(1);
+        lat+=0.01;
+        lon+=0.01;
+        myLocation.clear();
+        myLocation.add(lat);
+        myLocation.add(lon);
+        return myContact;
     }
 
     private void idSaveCheck(String email, String pw){

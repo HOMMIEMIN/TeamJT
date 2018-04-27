@@ -33,6 +33,10 @@ public class WatingActivity extends AppCompatActivity {
         private List<String> myWattingList;
         private List<Contact> contactList;
         private String yourKey;
+        private int listPosition;
+        private boolean add;
+        private boolean cancle;
+
 
 
         @Override
@@ -47,9 +51,18 @@ public class WatingActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(CustomHolder holder, final int position) {
+            listPosition = position;
+            final List<String> listReset = list;
+            Log.i("ggg34","position : " + position);
+            Log.i("ggg34","listPosition : " + listPosition);
+            Log.i("ggg34","listSize : " + list.size());
+            Log.i("ggg34","listResetSize : " + listReset.size());
+            Log.i("ggg34","listSize : " + list.size());
             if(contactList == null){
                 contactList = new ArrayList<>();
             }
+
+
 
             yourKey = getKey(list.get(position));
             Log.i("ggg1", "리스트 : "+yourKey);
@@ -59,14 +72,25 @@ public class WatingActivity extends AppCompatActivity {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Contact contact = dataSnapshot.getValue(Contact.class);
                     contactList.add(contact);
-                    if(dataSnapshot.getKey().equals(yourKey))
-                        Log.i("ggg1", "파이어베이스 getKey" + dataSnapshot.getKey());
-                    yourContact = dataSnapshot.getValue(Contact.class);
-                    Log.i("ggg1", "유저 네임 : "+ yourContact.getUserName());
+
+                    if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                        myContact = dataSnapshot.getValue(Contact.class);
+                    }
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    Contact contact = dataSnapshot.getValue(Contact.class);
+                    contactList.clear();
+                    contactList.add(contact);
+                    if(list.size() == 0) {
+
+                        if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                            myContact = dataSnapshot.getValue(Contact.class);
+                            Log.i("ggg34", "myContact 생성 : " + myContact.getUserName());
+                        }
+                    }
 
                 }
 
@@ -93,72 +117,151 @@ public class WatingActivity extends AppCompatActivity {
             holder.btnAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    add = true;
+                    reference.child("Contact").addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            Contact con = dataSnapshot.getValue(Contact.class);
+                            if(add){
+                            if(con.getUserId().equals(list.get(position))) {
+                                yourContact = con;
+                                Log.i("ggg34", "yourContact 생성 : " + yourContact.getUserName());
+                                if (DaoImple.getInstance().getContact().getWattingList() == null) {
+                                    myWattingList = new ArrayList<>();
+                                } else {
+                                    myWattingList = myContact.getWattingList();
+                                }
 
-                    for(int a = 0; a < contactList.size() ; a++){
-                        if(contactList.get(a).getUserId().equals(list.get(position))){
-                            yourContact = contactList.get(a);
+
+                                if (myContact.getFriendList() == null) {
+                                    myfList = new ArrayList<>();
+                                } else {
+                                    myfList = myContact.getFriendList();
+                                }
+
+                                if (yourContact.getFriendList() == null) {
+                                    yourfList = new ArrayList<>();
+                                } else {
+                                    yourfList = yourContact.getFriendList();
+                                }
+
+                                Log.i("ggg34", "삭제 전 사이즈 : " + myWattingList.size());
+                                for (int a = 0; a < myWattingList.size(); a++) {
+                                    if (myWattingList.get(a).equals(list.get(position))) {
+                                        Log.i("ggg34", "삭제 : " + myWattingList.get(a));
+                                        myWattingList.remove(a);
+
+                                    }
+                                }
+                                yourfList.add(myContact.getUserId());
+                                myfList.add(yourContact.getUserId());
+
+                                myContact.setFriendList(myfList);
+                                myContact.setWattingList(myWattingList);
+                                yourContact.setFriendList(yourfList);
+                                DaoImple.getInstance().setContact(myContact);
+
+                                reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+
+                                String yourKey = getKey(yourContact.getUserId());
+                                reference.child("Contact").child(yourKey).setValue(yourContact);
+
+                                list.remove(position);
+                                adapter.notifyDataSetChanged();
+
+                                Toast.makeText(WatingActivity.this, "친구 등록이 되었습니다.", Toast.LENGTH_SHORT).show();
+                                add = false;
+                            }
+                            }
+
                         }
-                    }
 
-                    if(DaoImple.getInstance().getContact().getWattingList() == null){
-                        myWattingList = new ArrayList<>();
-                    }else{
-                        myWattingList = DaoImple.getInstance().getContact().getWattingList();
-                    }
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                    myContact = DaoImple.getInstance().getContact();
-
-
-                    if(myContact.getFriendList() == null) {
-                        myfList = new ArrayList<>();
-                    }else{
-                        myfList = myContact.getFriendList();
-                    }
-
-                    if(yourContact.getFriendList() == null){
-                        yourfList = new ArrayList<>();
-                    }else{
-                        yourfList = yourContact.getFriendList();
-                    }
-
-
-                    for(int a = 0; a < myWattingList.size() ; a++){
-                        if(myWattingList.get(a).equals(list.get(position))){
-                            myWattingList.remove(a);
                         }
-                    }
-                    yourfList.add(myContact.getUserId());
-                    myfList.add(yourContact.getUserId());
 
-                    myContact.setFriendList(myfList);
-                    myContact.setWattingList(myWattingList);
-                    yourContact.setFriendList(yourfList);
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                    reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+                        }
 
-                    String yourKey = getKey(yourContact.getUserId());
-                    reference.child("Contact").child(yourKey).setValue(yourContact);
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-                    list.remove(position);
-                    adapter.notifyDataSetChanged();
+                        }
 
-                    Toast.makeText(WatingActivity.this, "친구 등록이 되었습니다.", Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
                 }
             });
 
             holder.btnCancle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String myKey = DaoImple.getInstance().getKey();
-                    String deleteKey = keyList.get(position);
-                    list.remove(position);
-//                    keyList.remove(position);
-//                    reference.child(myKey).child("RequestList/"+deleteKey).removeValue();
-                    adapter.notifyDataSetChanged();
-                    Toast.makeText(WatingActivity.this, "친구 요청을 취소 하였습니다", Toast.LENGTH_SHORT).show();
+                    cancle = true;
+
+                    reference.child("Contact").addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            Contact c = dataSnapshot.getValue(Contact.class);
+                            if(cancle) {
+                                if (c.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                    myContact = c;
+
+                                    String myKey = DaoImple.getInstance().getKey();
+
+                                    Contact contact = DaoImple.getInstance().getContact();
+                                    List<String> wattingList = myContact.getWattingList();
+                                    for (int a = 0; a < wattingList.size(); a++) {
+                                        if (list.get(position).equals(wattingList.get(a))) {
+                                            wattingList.remove(a);
+                                            Log.i("ggg34", wattingList.size() + "");
+
+                                        }
+                                    }
+
+                                    list.remove(position);
+                                    myContact.setWattingList(wattingList);
+                                    DaoImple.getInstance().setContact(myContact);
+                                    reference.child("Contact").child(myKey).setValue(myContact);
+                                    adapter.notifyDataSetChanged();
+                                    Toast.makeText(WatingActivity.this, "친구 요청을 취소 하였습니다", Toast.LENGTH_SHORT).show();
+                                    cancle = false;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
 
                 }
             });
+
 
         }
 

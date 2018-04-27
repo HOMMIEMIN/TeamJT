@@ -6,10 +6,18 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.List;
+
 public class ClosingServics extends Service {
+
+    private Contact closeContact;
+    private DatabaseReference reference;
 
 
     @Nullable
@@ -21,11 +29,23 @@ public class ClosingServics extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        Contact myContact = DaoImple.getInstance().getContact();
-        myContact.setLoginCheck(false);
-        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
-        Log.i("ggqs","onTaskRemoved 종료");
+        closeContact = DaoImple.getInstance().getContact();
+        closeContact.setLoginCheck(false);
+        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(closeContact);
+
         stopSelf();
+    }
+
+
+    private Contact missLocation(Contact myContact) {
+        List<Double> myLocation = myContact.getUserLocation();
+        double lat = myLocation.get(0);
+        double lon = myLocation.get(1);
+        lat+=0.01;
+        lon+=0.01;
+        myLocation.clear();
+        myLocation.add(lat);
+        myLocation.add(lon);
+        return myContact;
     }
 }

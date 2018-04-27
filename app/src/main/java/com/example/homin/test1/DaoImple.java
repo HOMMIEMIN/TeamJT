@@ -28,6 +28,17 @@ public class DaoImple {
     private LatLng WriteLocation;
     private List<ItemMemo> itemMemoList;
     private List<ItemPerson> itemPersonList;
+    private UserDataTable myPageUserData;
+
+    public UserDataTable getMyPageUserData() {
+        return myPageUserData;
+    }
+
+    public void setMyPageUserData(UserDataTable myPageUserData) {
+        this.myPageUserData = myPageUserData;
+    }
+
+
 
     public List<ItemMemo> getItemMemoList() {
         return itemMemoList;
