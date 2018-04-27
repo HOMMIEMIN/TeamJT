@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -259,6 +261,8 @@ public class FriendFragment extends Fragment {
             public FriendHolder(View itemView) {
                 super(itemView);
                 iv = itemView.findViewById(R.id.imageView_frindLayout);
+                iv.setBackground(new ShapeDrawable(new OvalShape()));
+                iv.setClipToOutline(true);
                 tv1 = itemView.findViewById(R.id.textView_FriendLayout1);
                 tv2 = itemView.findViewById(R.id.textView_FriendLayou2);
                 btn2 = itemView.findViewById(R.id.btn_addFriend);

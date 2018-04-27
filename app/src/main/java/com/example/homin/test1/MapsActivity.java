@@ -561,6 +561,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Contact contact = dataSnapshot.getValue(Contact.class);
                     if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                         myContact = contact;
+                        Log.i("ddd3333","콘텍트 생성");
                         DaoImple.getInstance().setContact(myContact);
                     }
                     for(int a = 0 ; a < myFriendList.size() ; a++){
@@ -618,6 +619,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Contact contact = dataSnapshot.getValue(Contact.class);
                         if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                             myContact = contact;
+                            DaoImple.getInstance().setContact(contact);
+                            Log.i("ddd3333","콘텍트 생성");
 
                         }
                         if(myFriendList != null){
@@ -966,10 +969,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onLocationChanged(Location location) {
                     check = false;
                     memoCheck = false;
+                    myContact = DaoImple.getInstance().getContact();
                     Log.i("asdqwe","로케이션 체인지");
 
                     List<Double> myLocation = new ArrayList<>();
                     myLocation.add(location.getLatitude());
+                    Log.i("ddd3333",location.getLongitude()+"");
                     myLocation.add(location.getLongitude());
                     myContact.setUserLocation(myLocation);
                     reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
