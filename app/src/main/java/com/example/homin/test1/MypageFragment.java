@@ -29,9 +29,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,6 +80,11 @@ public class MypageFragment extends Fragment {
     private List<UserDataTable> userDataTList;
     private String userName;
 
+    // 공개여부 설정에 필요
+    private Switch swich;
+    private static String public_gab;
+    public boolean Gong_ge;
+
     // 카메라 권한 필요한 것
     private static final int REQ_CODE_PERMISSION = 1;
     // 프로필 눌르면 팝업
@@ -119,6 +126,7 @@ public class MypageFragment extends Fragment {
 
         textView = view.findViewById(R.id.textView);
         textView.setText(DaoImple.getInstance().getLoginId());
+
 
         // 프로필 이미지 설정
         imageView = view.findViewById(R.id.imageView);
@@ -247,6 +255,9 @@ public class MypageFragment extends Fragment {
         adapter = new userDataTableAdapter();
         recycler.setAdapter(adapter);
 
+
+
+
         return view;
 
 
@@ -318,6 +329,26 @@ public class MypageFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        //TODO: 공개여부
+        swich = getView().findViewById(R.id.switchBtn);
+        key = DaoImple.getInstance().getKey();
+
+        swich.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean ischecked) {
+                if ( ischecked == true ) {
+                    reference.child("Contact").child(key).child("public").setValue(true);
+                    Toast.makeText(MypageFragment.context, "공개여부: On", Toast.LENGTH_SHORT).show();
+                } else {
+                    reference.child("Contact").child(key).child("public").setValue(false);
+                    Toast.makeText(MypageFragment.context, "공개여부: Off", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
+
         //TODO: 리사이클러 뷰
 
         if (userDataTList.size()== 0) {
