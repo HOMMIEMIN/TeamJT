@@ -65,6 +65,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -178,7 +182,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ItemPerson targetIdMarker;
     private View shapeView;
     private FloatingActionButton writeMemoButton;
-
+    private GroundOverlay arrow;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -1629,6 +1633,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //클릭을 했으면 작동 백키를 눌렀으면 취소
     // 검색한 주소, 내가 임의로 설정한 위치, 내글에 대한 목적지 설정
     private void setDestination() {
+       Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.arrow2);
+        Bitmap bitmap1 = PersonItemRenderer.getCircleBitmap(bitmap);
+
+
+        double degree = 0;
+        if(mMarker!= null){
+            degree = SphericalUtil.computeHeading(myMarker.getPosition(),mMarker.getPosition());
+        }else if(targetMarker!= null){
+            degree = SphericalUtil.computeHeading(myMarker.getPosition(),targetMarker.getPosition());
+        }else if(targetIdMarker != null){
+           degree =  SphericalUtil.computeHeading(myMarker.getPosition(),targetIdMarker.getPosition());
+        }
+        if(arrow!= null){
+            arrow.remove();
+        }
+
+
+        GroundOverlayOptions groundOverlayOptions = new GroundOverlayOptions().image(BitmapDescriptorFactory.fromResource(R.drawable.arrow2))
+                .position(myMarker.getPosition(),300,300).bearing((float)degree -90);
+        arrow = mMap.addGroundOverlay(groundOverlayOptions);
         shapeView.setBackground(getDrawable(R.drawable.shape));
         distanceIndicator.setVisibility(View.VISIBLE);
 //        Log.i("KSJ", myMarker.getPosition() + "||"+ mMarker.getPosition() + "");
