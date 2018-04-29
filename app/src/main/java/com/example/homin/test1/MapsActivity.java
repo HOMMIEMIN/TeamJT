@@ -2,10 +2,12 @@ package com.example.homin.test1;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -92,195 +94,205 @@ import static com.example.homin.test1.WriteActivity.*;
 import static com.example.homin.test1.ReadMemoActivity.*;
 
 
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleApiClient.OnConnectionFailedListener, MypageFragment.EssaySetlectedCallback {
+
+    private boolean destinationClicked = false;
 
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-    public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
-            GoogleApiClient.OnConnectionFailedListener, MypageFragment.EssaySetlectedCallback {
+    }
 
-        private boolean destinationClicked = false;
+    private static final int cameraZoom = 16;
+    private GoogleMap mMap;
+    private Contact myContact;
+    private Context context;
+    private MapView view;
+    private static final int RESULT_CODE = 20;
+    private LatLng addMakerLocation;
+    private String email;
+    //    private LinearLayout actionLayout;
+    private StorageReference firebaseStorage;
+    private FrameLayout actionLayout;
+    private BottomSheetBehavior bottomSheetBehavior;
+    private View bottomview;
+    private Menu mMenu;
+    private FloatingActionButton actionButton;
+    private DatabaseReference reference;
+    private List<String> myFriendList;
+    private List<String> memoFriendList;
+    private Map<String, ItemPerson> personList;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private LatLng myLatLng;
+    private ItemPerson myMarker;
+    private ClusterManager<ClusterItem> clusterManager;
+    private List<Contact> myFriendContactList;
+    private List<Contact> contactList;
+    private Map<String, Bitmap> pictureList;
+    private boolean check;
+    private Location location;
+    private String provider;
+    private boolean zoomCheck;
+    private boolean memoCheck;
+    private List<ItemMemo> memoList;
+    private List<ItemPerson> personMarkerList;
+    private int pressedTime;
+    private Location getLocation;
+    private long chatCheck;
+    public static String MARKER_LIST = "markerList";
+    private boolean checkLocation;
+    private boolean destoryCheck;
 
+    // MyPage에 이용
+    private static final int CAMERA_CODE = 1000;
+    private static final int GALLERY_CODE = 1001;
+    private static final int CROP_IMAGE_CODE = 1002;
+    //    private Uri filePath;
+    private Uri photoUri, albumUri;
+    private Uri selectedUri;
+    Boolean albumPick = false;
+
+    private String key;
+    public static final String TAG = "mini";
+    public static final String MEMOLIST = "memolistkeys";
+
+    //자기위치로 되돌리는 버튼
+    private FloatingActionButton selfLocationButton;
+
+    //검색창
+    private AutoCompleteTextView mSearchText;//검색창 뷰
+    private PlaceAutoCompleteAdapter placeAutoCompleteAdapter;
+    private GoogleApiClient mGoogleApiClient;
+    private PlaceInfo mPlace; // 자동검색창 각 리스트아이템 대한 정보
+
+    //목적지 설정
+    private Marker mMarker; //목적지 마커(롱클릭시)
+    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));//지구전체 범위
+    private View rootView;
+    private TextView distanceIndicator; //거리표현하는 TextView;
+    private ItemDestination targetMarker;//목적지 마커(검색시)
+    private String targetId; //상대방을 목적지로 선택했을때
+    private ItemPerson targetIdMarker;
+    private View shapeView;
+    private FloatingActionButton writeMemoButton;
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
-        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
 
+                case R.id.navigation_home:
+                    FragmentManager manager = getSupportFragmentManager();
+                    FragmentTransaction transaction = manager.beginTransaction();
+                    FriendFragment friendFragment = new FriendFragment();
+                    transaction.replace(R.id.container_main, friendFragment);
+                    transaction.commit();
+                    return true;
+
+                case R.id.navigation_dashboard:
+                    FragmentManager manager1 = getSupportFragmentManager();
+                    FragmentTransaction transaction1 = manager1.beginTransaction();
+                    ChatListFragment chatListFragment = new ChatListFragment();
+                    transaction1.replace(R.id.container_main, chatListFragment);
+                    transaction1.commit();
+                    return true;
+
+                case R.id.navigation_notifications:
+                    FragmentManager manager2 = getSupportFragmentManager();
+                    FragmentTransaction transaction2 = manager2.beginTransaction();
+                    MypageFragment mypageFragment = new MypageFragment();
+                    transaction2.replace(R.id.container_main, mypageFragment);
+                    transaction2.commit();
+                    return true;
+            }
+            return false;
         }
+    };
 
-        private static final int cameraZoom = 16;
-        private GoogleMap mMap;
-        private Contact myContact;
-        private Context context;
-        private MapView view;
-        private static final int RESULT_CODE = 20;
-        private LatLng addMakerLocation;
-        private String email;
-        //    private LinearLayout actionLayout;
-        private StorageReference firebaseStorage;
-        private FrameLayout actionLayout;
-        private BottomSheetBehavior bottomSheetBehavior;
-        private View bottomview;
-        private Menu mMenu;
-        private FloatingActionButton actionButton;
-        private DatabaseReference reference;
-        private List<String> myFriendList;
-        private List<String> memoFriendList;
-        private Map<String, ItemPerson> personList;
-        private LocationManager locationManager;
-        private LocationListener locationListener;
-        private LatLng myLatLng;
-        private ItemPerson myMarker;
-        private ClusterManager<ClusterItem> clusterManager;
-        private List<Contact> myFriendContactList;
-        private List<Contact> contactList;
-        private Map<String, Bitmap> pictureList;
-        private boolean check;
-        private Location location;
-        private String provider;
-        private boolean zoomCheck;
-        private boolean memoCheck;
-        private List<ItemMemo> memoList;
-        private List<ItemPerson> personMarkerList;
-        private int pressedTime;
-        private Location getLocation;
-        private long chatCheck;
-        public static String MARKER_LIST = "markerList";
-        private boolean checkLocation;
-        private boolean destoryCheck;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+        rootView = findViewById(R.id.container);//Snackbar위한 View member변수
+        Intent intent = new Intent(this, ClosingServics.class);
+        startService(intent);
+        context = getApplicationContext();
+        Log.i("qq23q", "onCreate");
+        memoList = new ArrayList<>();
+        myFriendContactList = new ArrayList<>();
+        personList = new HashMap<>();
+        distanceIndicator = findViewById(R.id.distanceIndicator);
+        shapeView = findViewById(R.id.shapeView);
 
-        // MyPage에 이용
-        private static final int CAMERA_CODE = 1000;
-        private static final int GALLERY_CODE = 1001;
-        private static final int CROP_IMAGE_CODE = 1002;
-        //    private Uri filePath;
-        private Uri photoUri, albumUri;
-        private Uri selectedUri;
-        Boolean albumPick = false;
 
-        private String key;
-        public static final String TAG = "mini";
-        public static final String MEMOLIST = "memolistkeys";
+        //검색창 editText
+        mSearchText = findViewById(R.id.input_search);
 
-        //자기위치로 되돌리는 버튼
-        private FloatingActionButton selfLocationButton;
+        //자기위치찾아주는 버튼 찾기
+        selfLocationButton = findViewById(R.id.selfLocationIdentifier);
+        selfLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 16));
 
-        //검색창
-        private AutoCompleteTextView mSearchText;//검색창 뷰
-        private PlaceAutoCompleteAdapter placeAutoCompleteAdapter;
-        private GoogleApiClient mGoogleApiClient;
-        private PlaceInfo mPlace; // 자동검색창 각 리스트아이템 대한 정보
+            }
+        });
 
-        //목적지 설정
-        private Marker mMarker; //목적지 마커(롱클릭시)
-        private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(new LatLng(-40, -168), new LatLng(71, 136));//지구전체 범위
-        private View rootView;
-        private TextView distanceIndicator; //거리표현하는 TextView;
-        private ItemDestination targetMarker;//목적지 마커(검색시)
-        private String targetId; //상대방을 목적지로 선택했을때
-        private ItemPerson targetIdMarker;
+        //메모쓰는 버튼
+        writeMemoButton = findViewById(R.id.writeMemoButton);
+        writeMemoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-        private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-                = new BottomNavigationView.OnNavigationItemSelectedListener() {
+                writeMyLocation();
+                Intent intent = new Intent(MapsActivity.this,WriteActivity.class);
+                startActivityForResult(intent,RESULT_CODE);
+            }
+        });
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        BottomNavigationView navigationView = findViewById(R.id.navigation);
+        navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        actionButton = findViewById(R.id.floatingActionButton);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        FriendFragment friendFragment = new FriendFragment();
+        transaction.replace(R.id.container_main, friendFragment);
+        transaction.commit();
+
+        registerForContextMenu(findViewById(R.id.map));
+
+        bottomview = findViewById(R.id.bottom_sheet);
+        actionLayout = findViewById(R.id.action_sheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomview);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    actionLayout.setVisibility(View.VISIBLE);
+
+                }
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    actionLayout.setVisibility(View.GONE);
+                }
+
+                if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                    actionLayout.setVisibility(View.VISIBLE);
+                }
+            }
 
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-
-                    case R.id.navigation_home:
-                        FragmentManager manager = getSupportFragmentManager();
-                        FragmentTransaction transaction = manager.beginTransaction();
-                        FriendFragment friendFragment = new FriendFragment();
-                        transaction.replace(R.id.container_main, friendFragment);
-                        transaction.commit();
-                        return true;
-
-                    case R.id.navigation_dashboard:
-                        FragmentManager manager1 = getSupportFragmentManager();
-                        FragmentTransaction transaction1 = manager1.beginTransaction();
-                        ChatListFragment chatListFragment = new ChatListFragment();
-                        transaction1.replace(R.id.container_main, chatListFragment);
-                        transaction1.commit();
-                        return true;
-
-                    case R.id.navigation_notifications:
-                        FragmentManager manager2 = getSupportFragmentManager();
-                        FragmentTransaction transaction2 = manager2.beginTransaction();
-                        MypageFragment mypageFragment = new MypageFragment();
-                        transaction2.replace(R.id.container_main, mypageFragment);
-                        transaction2.commit();
-                        return true;
-                }
-                return false;
-            }
-        };
-
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_maps);
-            rootView = findViewById(R.id.container);//Snackbar위한 View member변수
-            Intent intent = new Intent(this, ClosingServics.class);
-            startService(intent);
-            context = getApplicationContext();
-            Log.i("qq23q", "onCreate");
-            memoList = new ArrayList<>();
-            myFriendContactList = new ArrayList<>();
-            personList = new HashMap<>();
-            distanceIndicator = findViewById(R.id.distanceIndicator);
-
-
-
-
-            //검색창 editText
-            mSearchText = findViewById(R.id.input_search);
-
-            //자기위치찾아주는 버튼 찾기
-            selfLocationButton = findViewById(R.id.selfLocationIdentifier);
-            selfLocationButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 16));
-
-                }
-            });
-
-            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
-            BottomNavigationView navigationView = findViewById(R.id.navigation);
-            navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-            actionButton = findViewById(R.id.floatingActionButton);
-
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            FriendFragment friendFragment = new FriendFragment();
-            transaction.replace(R.id.container_main, friendFragment);
-            transaction.commit();
-
-            registerForContextMenu(findViewById(R.id.map));
-
-            bottomview = findViewById(R.id.bottom_sheet);
-            actionLayout = findViewById(R.id.action_sheet);
-            bottomSheetBehavior = BottomSheetBehavior.from(bottomview);
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-                @Override
-                public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                        actionLayout.setVisibility(View.VISIBLE);
-
-                    }
-                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                        actionLayout.setVisibility(View.GONE);
-                    }
-
-                    if (newState == BottomSheetBehavior.STATE_DRAGGING) {
-                        actionLayout.setVisibility(View.VISIBLE);
-                    }
-                }
-
-                @Override
-                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
             }
         });
@@ -288,45 +300,43 @@ import static com.example.homin.test1.ReadMemoActivity.*;
     }
 
 
-
-
-        /********************************검색창을 위한 메소드들****************************************/
+    /********************************검색창을 위한 메소드들****************************************/
 //목적지 설정후 목적지로 카메라 돌리기
-        private void moveCamera(LatLng latLng, float zoom, String title) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+    private void moveCamera(LatLng latLng, float zoom, String title) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-            if (!title.equals("My Location")) {
-                MarkerOptions options = new MarkerOptions().position(latLng)
-                        .title(title);
-                mMap.addMarker(options);
-            }
-            hideSoftKeyboard();
+        if (!title.equals("My Location")) {
+            MarkerOptions options = new MarkerOptions().position(latLng)
+                    .title(title);
+            mMap.addMarker(options);
         }
+        hideSoftKeyboard();
+    }
 
-        private void moveCamera(LatLng latLng, float zoom, PlaceInfo placeInfo) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+    private void moveCamera(LatLng latLng, float zoom, PlaceInfo placeInfo) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
 
 //
 
-            if (placeInfo != null) {
-                try {
-                    String snippet = "주소: " + placeInfo.getAddress() + "\n" +
-                            "전화번호: " + placeInfo.getPhoneNumber() + "\n" +
-                            "웹싸이트: " + placeInfo.getWebsiteUri() + "\n" +
-                            "별점: " + placeInfo.getRating() + "\n";
+        if (placeInfo != null) {
+            try {
+                String snippet = "주소: " + placeInfo.getAddress() + "\n" +
+                        "전화번호: " + placeInfo.getPhoneNumber() + "\n" +
+                        "웹싸이트: " + placeInfo.getWebsiteUri() + "\n" +
+                        "별점: " + placeInfo.getRating() + "\n";
 
-                    MarkerOptions options = new MarkerOptions().position(latLng).title(placeInfo.getName()).snippet(snippet);
-                    if (mMarker != null) {
-                        mMarker.remove();
-                    }
+                MarkerOptions options = new MarkerOptions().position(latLng).title(placeInfo.getName()).snippet(snippet);
+                if (mMarker != null) {
+                    mMarker.remove();
+                }
 
-                    if (targetMarker != null) {
-                        clusterManager.removeItem(targetMarker);
-                    }
-                    targetMarker = new ItemDestination(latLng, placeInfo.getName(), snippet);
-                    clusterManager.addItem(targetMarker);
-                    clusterManager.cluster();
+                if (targetMarker != null) {
+                    clusterManager.removeItem(targetMarker);
+                }
+                targetMarker = new ItemDestination(latLng, placeInfo.getName(), snippet);
+                clusterManager.addItem(targetMarker);
+                clusterManager.cluster();
 
 //                Collection<Marker> collection = clusterManager.getMarkerCollection().getMarkers();
 //
@@ -340,195 +350,197 @@ import static com.example.homin.test1.ReadMemoActivity.*;
 //                        Toast.makeText(context, x.getTitle(), Toast.LENGTH_SHORT).show();
 //                    }
 //                }
-                } catch (NullPointerException e) {
-                    Log.e("bye", "moveCamera: " + e.getMessage());
-                }
-            } else {
-                mMap.addMarker(new MarkerOptions().position(latLng));
+            } catch (NullPointerException e) {
+                Log.e("bye", "moveCamera: " + e.getMessage());
             }
+        } else {
+            mMap.addMarker(new MarkerOptions().position(latLng));
+        }
 
 
+        hideSoftKeyboard();
+    }
+
+    private void hideSoftKeyboard() {
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+    //Google places API autocomplete suggestion
+
+    private AdapterView.OnItemClickListener mAutoCompleteClickLister = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             hideSoftKeyboard();
+
+            final AutocompletePrediction item = placeAutoCompleteAdapter.getItem(position);
+            final String placeId = item.getPlaceId();
+            PendingResult<PlaceBuffer> placeBufferPendingResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
+            placeBufferPendingResult.setResultCallback(mUpdatePlaceDetailsCallback);
         }
+    };
 
-        private void hideSoftKeyboard() {
-            this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        }
-        //Google places API autocomplete suggestion
-
-        private AdapterView.OnItemClickListener mAutoCompleteClickLister = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                hideSoftKeyboard();
-
-                final AutocompletePrediction item = placeAutoCompleteAdapter.getItem(position);
-                final String placeId = item.getPlaceId();
-                PendingResult<PlaceBuffer> placeBufferPendingResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
-                placeBufferPendingResult.setResultCallback(mUpdatePlaceDetailsCallback);
+    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
+        @Override
+        public void onResult(@NonNull PlaceBuffer places) {
+            if (!places.getStatus().isSuccess()) {
+                Log.d("Bye", "onResult: Place query failed" + places.getStatus().toString());
+                places.release();
+                return;
             }
-        };
-
-        private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback = new ResultCallback<PlaceBuffer>() {
-            @Override
-            public void onResult(@NonNull PlaceBuffer places) {
-                if (!places.getStatus().isSuccess()) {
-                    Log.d("Bye", "onResult: Place query failed" + places.getStatus().toString());
-                    places.release();
-                    return;
-                }
-                final Place place = places.get(0);
+            final Place place = places.get(0);
 
 
-                mPlace = new PlaceInfo();
-                mPlace.setName(place.getName().toString());
-                mPlace.setAddress(place.getAddress().toString());
+            mPlace = new PlaceInfo();
+            mPlace.setName(place.getName().toString());
+            mPlace.setAddress(place.getAddress().toString());
 //            mPlace.setAttribution(place.getAttributions().toString());
-                mPlace.setId(place.getId());
-                mPlace.setLatLng(place.getLatLng());
-                mPlace.setRating(place.getRating());
-                mPlace.setPhoneNumber(place.getPhoneNumber().toString());
-                mPlace.setWebsiteUri(place.getWebsiteUri());
+            mPlace.setId(place.getId());
+            mPlace.setLatLng(place.getLatLng());
+            mPlace.setRating(place.getRating());
+            mPlace.setPhoneNumber(place.getPhoneNumber().toString());
+            mPlace.setWebsiteUri(place.getWebsiteUri());
 
-                Log.d("bye", mPlace.toString());
+            Log.d("bye", mPlace.toString());
 
-                moveCamera(new LatLng(place.getViewport().getCenter().latitude, place.getViewport().getCenter().longitude), 16, mPlace);
+            moveCamera(new LatLng(place.getViewport().getCenter().latitude, place.getViewport().getCenter().longitude), 16, mPlace);
 
             places.release();
         }
 
-        };
+    };
 
-        private void init() {
-            Log.d("bye", "init:initializing");
+    private void init() {
+        Log.d("bye", "init:initializing");
 
-            mGoogleApiClient = new GoogleApiClient
-                    .Builder(this)
-                    .addApi(Places.GEO_DATA_API)
-                    .addApi(Places.PLACE_DETECTION_API)
-                    .enableAutoManage(this, this)
-                    .build();
-            mSearchText.setOnItemClickListener(mAutoCompleteClickLister);
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this, this)
+                .build();
+        mSearchText.setOnItemClickListener(mAutoCompleteClickLister);
 
 //        geoDataClient = Places.getGeoDataClient(this);
 
-            placeAutoCompleteAdapter = new PlaceAutoCompleteAdapter(this, mGoogleApiClient, LAT_LNG_BOUNDS, null);
+        placeAutoCompleteAdapter = new PlaceAutoCompleteAdapter(this, mGoogleApiClient, LAT_LNG_BOUNDS, null);
 
-            mSearchText.setAdapter(placeAutoCompleteAdapter);
-            mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == EditorInfo.IME_ACTION_SEARCH
-                            || actionId == EditorInfo.IME_ACTION_DONE
-                            || event.getAction() == event.ACTION_DOWN
-                            || event.getAction() == event.KEYCODE_ENTER) {
-                        geoLocate();
-                    }
-                    return false;
+        mSearchText.setAdapter(placeAutoCompleteAdapter);
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || event.getAction() == event.ACTION_DOWN
+                        || event.getAction() == event.KEYCODE_ENTER) {
+                    geoLocate();
                 }
-            });
-            hideSoftKeyboard();
+                return false;
+            }
+        });
+        hideSoftKeyboard();
+    }
+
+    private void geoLocate() {
+        Log.d("bye", "geoLocate: geolocating");
+        String searchString = mSearchText.getText().toString();
+        Geocoder geocoder = new Geocoder(com.example.homin.test1.MapsActivity.this);
+
+        List<Address> list = new ArrayList<>();
+
+
+        try {
+            list = geocoder.getFromLocationName(searchString, 1);
+        } catch (IOException e) {
+            Log.e("bye", "geoLocate: Exception" + e.getMessage());
         }
 
-        private void geoLocate() {
-            Log.d("bye", "geoLocate: geolocating");
-            String searchString = mSearchText.getText().toString();
-            Geocoder geocoder = new Geocoder(com.example.homin.test1.MapsActivity.this);
+        if (list.size() > 0) {
+            Address address = list.get(0);
+            Log.i("bye", "geoLocate: found a location" + address.toString());
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
 
-            List<Address> list = new ArrayList<>();
+            moveCamera(latLng, 16, address.getAddressLine(0));
+        }
+        hideSoftKeyboard();
+    }
+
+    /********************************End of 검색창을 위한 메소드들****************************************/
+
+    /**
+     * Manipulates the map once available.
+     * This callback is triggered when the map is ready to be used.
+     * This is where we can add markers or lines, add listeners or move the camera. In this case,
+     * we just add a marker near Sydney, Australia.
+     * If Google Play services is not installed on the device, the user will be prompted to install
+     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * installed Google Play services and returned to the app.
+     */
+    @Override
+    public void onMapReady(final GoogleMap googleMap) {
+        init();
+        email = DaoImple.getInstance().getLoginEmail();
+        mMap = googleMap;
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(com.example.homin.test1.MapsActivity.this));
+
+        reference = FirebaseDatabase.getInstance().getReference();
 
 
-            try {
-                list = geocoder.getFromLocationName(searchString, 1);
-            } catch (IOException e) {
-                Log.e("bye", "geoLocate: Exception" + e.getMessage());
-            }
+        if (clusterManager == null) {
+            clusterManager = new ClusterManager<>(com.example.homin.test1.MapsActivity.this, mMap);
+            clusterManager.setRenderer(new PersonItemRenderer(com.example.homin.test1.MapsActivity.this, mMap, clusterManager));
+            clusterManager.setAlgorithm(new CustomAlgorithm<ClusterItem>());
+            mMap.setOnCameraIdleListener(clusterManager);
+            mMap.setOnMarkerClickListener(clusterManager);
+            mMap.setOnInfoWindowClickListener(clusterManager);
 
-            if (list.size() > 0) {
-                Address address = list.get(0);
-                Log.i("bye", "geoLocate: found a location" + address.toString());
-                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-
-                moveCamera(latLng, 16, address.getAddressLine(0));
-            }
-            hideSoftKeyboard();
         }
 
-        /********************************End of 검색창을 위한 메소드들****************************************/
 
-        /**
-         * Manipulates the map once available.
-         * This callback is triggered when the map is ready to be used.
-         * This is where we can add markers or lines, add listeners or move the camera. In this case,
-         * we just add a marker near Sydney, Australia.
-         * If Google Play services is not installed on the device, the user will be prompted to install
-         * it inside the SupportMapFragment. This method will only be triggered once the user has
-         * installed Google Play services and returned to the app.
-         */
-        @Override
-        public void onMapReady(final GoogleMap googleMap) {
-            init();
-            email = DaoImple.getInstance().getLoginEmail();
-            mMap = googleMap;
-            mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(com.example.homin.test1.MapsActivity.this));
+        clusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterItem>() {
+            @Override
+            public void onClusterItemInfoWindowClick(final ClusterItem clusterItem) {
 
-            reference = FirebaseDatabase.getInstance().getReference();
+                if (clusterItem instanceof ItemDestination) {
 
+                    if (clusterItem.equals(targetMarker)) {
 
-            if (clusterManager == null) {
-                clusterManager = new ClusterManager<>(com.example.homin.test1.MapsActivity.this, mMap);
-                clusterManager.setRenderer(new PersonItemRenderer(com.example.homin.test1.MapsActivity.this, mMap, clusterManager));
-                clusterManager.setAlgorithm(new CustomAlgorithm<ClusterItem>());
-                mMap.setOnCameraIdleListener(clusterManager);
-                mMap.setOnMarkerClickListener(clusterManager);
-                mMap.setOnInfoWindowClickListener(clusterManager);
-
-            }
-
-
-            clusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterItem>() {
-                @Override
-                public void onClusterItemInfoWindowClick(final ClusterItem clusterItem) {
-
-                    if (clusterItem instanceof ItemDestination) {
-
-                        if (clusterItem.equals(targetMarker)) {
-
-                            Snackbar.make(rootView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (mMarker != null) {
-                                        mMarker.remove();
-                                        mMarker = null;
-                                    }
-
-                                    destinationClicked = true;
-                                    setDestination();
-                                }
-                            }).show();
-
-                        }
-                    } else if (clusterItem instanceof ItemMemo) {
-
-                        Snackbar.make(rootView, "전체내용을 보시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
+                        Snackbar.make(rootView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                if (mMarker != null) {
+                                    mMarker.remove();
+                                    mMarker = null;
+                                }
 
-                                Intent intent = new Intent(com.example.homin.test1.MapsActivity.this, ReadMemoActivity.class);
-                                intent.putExtra(MEMO_NAME, ((ItemMemo) clusterItem).getUserName());
-                                intent.putExtra(MEMO_ID, ((ItemMemo) clusterItem).getUserId());
-                                intent.putExtra(MEMO_TITLE, ((ItemMemo) clusterItem).getTitle());
-                                intent.putExtra(MEMO_CONTENT, ((ItemMemo) clusterItem).getContent());
-                                intent.putExtra(MEMO_URL, ((ItemMemo) clusterItem).getImageUrl());
-                                intent.putExtra(MEMO_TIME, ((ItemMemo) clusterItem).getTime());
-                                startActivity(intent);
-
+                                destinationClicked = true;
+                                setDestination();
                             }
                         }).show();
 
+                    }
+                } else if (clusterItem instanceof ItemMemo) {
 
-                    } else if (clusterItem instanceof ItemPerson) {
-                        final String id = ((ItemPerson) clusterItem).getUserId();
-                        Toast.makeText(context, "사람 들어옴", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(rootView, "전체내용을 보시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            Intent intent = new Intent(com.example.homin.test1.MapsActivity.this, ReadMemoActivity.class);
+                            intent.putExtra(MEMO_NAME, ((ItemMemo) clusterItem).getUserName());
+                            intent.putExtra(MEMO_ID, ((ItemMemo) clusterItem).getUserId());
+                            intent.putExtra(MEMO_TITLE, ((ItemMemo) clusterItem).getTitle());
+                            intent.putExtra(MEMO_CONTENT, ((ItemMemo) clusterItem).getContent());
+                            intent.putExtra(MEMO_URL, ((ItemMemo) clusterItem).getImageUrl());
+                            intent.putExtra(MEMO_TIME, ((ItemMemo) clusterItem).getTime());
+                            startActivity(intent);
+
+                        }
+                    }).show();
+
+
+                } else if (clusterItem instanceof ItemPerson) {
+                    final String id = ((ItemPerson) clusterItem).getUserId();
+                    if (id == DaoImple.getInstance().getContact().getUserId()) {
+
+                    } else {
                         Snackbar.make(rootView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -585,116 +597,93 @@ import static com.example.homin.test1.ReadMemoActivity.*;
 
                     }
                 }
-            });
-
-
-
-            clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
-                @Override
-                public boolean onClusterClick(Cluster<ClusterItem> cluster) {
-
-                    Collection<ClusterItem> clusters = cluster.getItems();
-                    List<ItemMemo> itemMemos = new ArrayList<>();
-                    List<ItemPerson> itemPeople = new ArrayList<>();
-                    for (ClusterItem m : clusters) {
-                        if (m instanceof ItemMemo) {
-                            itemMemos.add((ItemMemo) m);
-                            Log.i("ggqs", "메모 클릭");
-                        } else {
-                            itemPeople.add((ItemPerson) m);
-                            Log.i("ggqs", "사람 클릭");
-                        }
-                    }
-                    if (itemMemos.size() != 0) {
-                        Intent intent = new Intent(com.example.homin.test1.MapsActivity.this, ItemDetailActivity.class);
-                        intent.putExtra(MARKER_LIST, "memo");
-                        DaoImple.getInstance().setItemMemoList(itemMemos);
-                        Log.i("ggqs", itemMemos.size() + "");
-                        startActivity(intent);
-                    } else {
-                        Intent intent = new Intent(com.example.homin.test1.MapsActivity.this, ItemDetailActivity.class);
-                        DaoImple.getInstance().setItemPersonList(itemPeople);
-                        intent.putExtra(MARKER_LIST, "person");
-                        Log.i("ggqs", itemPeople.size() + "");
-                        startActivity(intent);
-                    }
-
-
-                return true;
             }
         });
 
-        // 사람이나 메모 클릭시, 메모 마커는 메모 상세보기, 사람마커는 아직 미설정
-        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterItem>() {
+
+        clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
             @Override
-            public boolean onClusterItemClick(ClusterItem clusterItem) {
-                if (clusterItem instanceof ItemMemo) {
-                    Toast.makeText(context, "메모 클릭", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MapsActivity.this, ReadMemoActivity.class);
-                    intent.putExtra(MEMO_NAME, ((ItemMemo) clusterItem).getUserName());
-                    intent.putExtra(MEMO_ID, ((ItemMemo) clusterItem).getUserId());
-                    intent.putExtra(MEMO_TITLE, ((ItemMemo) clusterItem).getTitle());
-                    intent.putExtra(MEMO_CONTENT, ((ItemMemo) clusterItem).getContent());
-                    intent.putExtra(MEMO_URL, ((ItemMemo) clusterItem).getImageUrl());
-                    intent.putExtra(MEMO_TIME, ((ItemMemo) clusterItem).getTime());
-                    startActivity(intent);
+            public boolean onClusterClick(Cluster<ClusterItem> cluster) {
 
-                } else {
-
-                    Toast.makeText(context, "사람 클릭", Toast.LENGTH_SHORT).show();
+                Collection<ClusterItem> clusters = cluster.getItems();
+                List<ItemMemo> itemMemos = new ArrayList<>();
+                List<ItemPerson> itemPeople = new ArrayList<>();
+                for (ClusterItem m : clusters) {
+                    if (m instanceof ItemMemo) {
+                        itemMemos.add((ItemMemo) m);
+                        Log.i("ggqs", "메모 클릭");
+                    } else {
+                        itemPeople.add((ItemPerson) m);
+                        Log.i("ggqs", "사람 클릭");
+                    }
                 }
+                if (itemMemos.size() != 0) {
+                    Intent intent = new Intent(com.example.homin.test1.MapsActivity.this, ItemDetailActivity.class);
+                    intent.putExtra(MARKER_LIST, "memo");
+                    DaoImple.getInstance().setItemMemoList(itemMemos);
+                    Log.i("ggqs", itemMemos.size() + "");
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(com.example.homin.test1.MapsActivity.this, ItemDetailActivity.class);
+                    DaoImple.getInstance().setItemPersonList(itemPeople);
+                    intent.putExtra(MARKER_LIST, "person");
+                    Log.i("ggqs", itemPeople.size() + "");
+                    startActivity(intent);
+                }
+
+
                 return true;
             }
         });
 
 
-            Log.i("gg6", "클러스터 설정");
-            Log.i("asd123", "onMapReady");
-            myLocationUpdate(); // 내 위치 업데이트
+        Log.i("gg6", "클러스터 설정");
+        Log.i("asd123", "onMapReady");
+        myLocationUpdate(); // 내 위치 업데이트
 
-            getFriendList(); // 친구 목록 가져오기
-
-
-            Log.i("fffff", "체인지 끝남3");
+        getFriendList(); // 친구 목록 가져오기
 
 
-            // 친구 요청 Activity 실행
-            actionButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent1 = new Intent(com.example.homin.test1.MapsActivity.this, WatingActivity.class);
-                    startActivity(intent1);
-
-                }
-            });
+        Log.i("fffff", "체인지 끝남3");
 
 
-            mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-                @Override
-                public void onMapLongClick(final LatLng latLng) {
+        // 친구 요청 Activity 실행
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(com.example.homin.test1.MapsActivity.this, WatingActivity.class);
+                startActivity(intent1);
 
-                    Snackbar.make(rootView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            distanceIndicator.setText("");
-                            destinationClicked = true;
-                            MarkerOptions options = new MarkerOptions().position(latLng).title("목적지").snippet("위도:" + latLng.latitude + "/n" + "경도: " + latLng.longitude);
-                            if (mMarker != null) {
-                                mMarker.remove();
-                            }
+            }
+        });
 
-                            if (targetMarker != null) {
-                                clusterManager.removeItem(targetMarker);
-                                clusterManager.cluster();
-                            }
-                            mMarker = mMap.addMarker(options);
-                            setDestination();
 
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(final LatLng latLng) {
+
+                Snackbar.make(rootView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        distanceIndicator.setText("");
+                        destinationClicked = true;
+                        MarkerOptions options = new MarkerOptions().position(latLng).title("목적지").snippet("위도:" + latLng.latitude + "/n" + "경도: " + latLng.longitude);
+                        if (mMarker != null) {
+                            mMarker.remove();
                         }
-                    }).show();
 
-                }
-            });
+                        if (targetMarker != null) {
+                            clusterManager.removeItem(targetMarker);
+                            clusterManager.cluster();
+                        }
+                        mMarker = mMap.addMarker(options);
+                        setDestination();
+
+                    }
+                }).show();
+
+            }
+        });
 
         // 친구 위치정보 받아오기
         reference.child("Contact").addChildEventListener(new ChildEventListener() {
@@ -766,35 +755,36 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                     }
                 }
             }
-             // 친구 위치 바뀌었을때 정보 갱신
+
+            // 친구 위치 바뀌었을때 정보 갱신
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 check = false;
-                Log.i("fffff","체인지 들어옴");
+                Log.i("fffff", "체인지 들어옴");
                 reference.child("Contact").addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         Contact contact = dataSnapshot.getValue(Contact.class);
-                        if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                        if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                             myContact = contact;
                             List<String> realFriendList = contact.getFriendList();
                             myFriendList = new ArrayList<>();
 
-                            for(int a = 0 ; a < realFriendList.size() ; a++){
+                            for (int a = 0; a < realFriendList.size(); a++) {
                                 String name = realFriendList.get(a);
                                 myFriendList.add(name);
                             }
                             myFriendList.add(DaoImple.getInstance().getLoginEmail());
                             DaoImple.getInstance().setContact(contact);
-                            Log.i("ddd3333","콘텍트 생성");
+                            Log.i("ddd3333", "콘텍트 생성");
 
                         }
-                        if(myFriendList != null){
-                            for(int a = 0 ; a < myFriendList.size() ; a++){
-                                Log.i("asdasd11",myFriendList.get(a));
-                                if(myFriendList.get(a).equals(contact.getUserId())) {
+                        if (myFriendList != null) {
+                            for (int a = 0; a < myFriendList.size(); a++) {
+                                Log.i("asdasd11", myFriendList.get(a));
+                                if (myFriendList.get(a).equals(contact.getUserId())) {
                                     // 공개 여부 확인
-                                    if(contact.isPublic() || contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                    if (contact.isPublic() || contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                                         // 로그인 되있는 상태라면 사용자 마커 표시
                                         if (contact.isLoginCheck()) {
                                             Log.i("asdasd", "로그인 됨 : " + contact.getUserId());
@@ -920,7 +910,7 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                                             }
                                         }
                                     }
-                                    }
+                                }
 
                             }
                             clusterManager.cluster();
@@ -983,17 +973,17 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                 if (num != -1) {
                     long chatCount = dataSnapshot.getChildrenCount();
                     Log.i("ddd66", "들어옴");
-                    for(DataSnapshot d : dataSnapshot.getChildren()){
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
                         chatCheck++;
                         Chat chat = d.getValue(Chat.class);
                         Log.i("ddd66", chat.getChat());
                         if (!(chat.getId().equals(DaoImple.getInstance().getLoginEmail()))) {
-                            Log.i("ddd77","count : " + chatCount + "," + "chat : " + chatCheck);
-                            if(chatCount == chatCheck) {
-                                Log.i("ddd66", chatCount+"");
+                            Log.i("ddd77", "count : " + chatCount + "," + "chat : " + chatCheck);
+                            if (chatCount == chatCheck) {
+                                Log.i("ddd66", chatCount + "");
                                 Context activityCheck = DaoImple.getInstance().getChattingActivity();
-                                if(activityCheck == null) {
-                                    Log.i("ddd66", "체크" + activityCheck+"");
+                                if (activityCheck == null) {
+                                    Log.i("ddd66", "체크" + activityCheck + "");
                                     Toast.makeText(context, chat.getName() + " : " + chat.getChat(), Toast.LENGTH_SHORT).show();
                                     chatCheck = 0;
                                 }
@@ -1021,11 +1011,7 @@ import static com.example.homin.test1.ReadMemoActivity.*;
         });
 
 
-
-
     }
-
-
 
 
     // 내 친구 리스트 받아오고 친구 메모 가져오기
@@ -1036,33 +1022,32 @@ import static com.example.homin.test1.ReadMemoActivity.*;
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Contact contact = dataSnapshot.getValue(Contact.class);
                 contactList.add(contact);
-                if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                     myContact = contact;
                     DaoImple.getInstance().setContact(contact);
                     List<Double> lastLocation = contact.getUserLocation();
-                    LatLng latLng = new LatLng(lastLocation.get(0),lastLocation.get(1));
+                    LatLng latLng = new LatLng(lastLocation.get(0), lastLocation.get(1));
                     myLatLng = latLng;
                 }
-                if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
-                    if(contact.getFriendList() != null) {
+                if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                    if (contact.getFriendList() != null) {
 
                         List<String> fflist = contact.getFriendList(); // 친구 목록 저장
                         myFriendList = new ArrayList<>();
-                        for(int a = 0 ; a < fflist.size() ; a++){
+                        for (int a = 0; a < fflist.size(); a++) {
                             String name = fflist.get(a);
                             myFriendList.add(name);
 
                         }
 
-                            myFriendList.add(DaoImple.getInstance().getLoginEmail());
-                        for(int a = 0 ; a < myFriendList.size() ; a++) { //  친구 목록으로 메모 가져오기
+                        myFriendList.add(DaoImple.getInstance().getLoginEmail());
+                        for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
 
                             String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
                             friendMemeList(key); // 친구들 메모 가져오는 메소드
 
 
                         }
-
 
 
                     }
@@ -1073,27 +1058,27 @@ import static com.example.homin.test1.ReadMemoActivity.*;
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Contact contact = dataSnapshot.getValue(Contact.class);
-                if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
-                    if(contact.getFriendList() != null) {
+                if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                    if (contact.getFriendList() != null) {
                         myFriendList = contact.getFriendList();
                         List<String> fflist = contact.getFriendList(); // 친구 목록 저장
                         List<String> realFriendList = new ArrayList<>();
                         myContact = contact;
                         DaoImple.getInstance().setContact(contact);
-                        for(int a = 0 ; a < fflist.size() ; a++){
+                        for (int a = 0; a < fflist.size(); a++) {
                             String name = fflist.get(a);
                             realFriendList.add(name);
                         }
 
                         realFriendList.add(DaoImple.getInstance().getLoginEmail());
                         clusterManager.clearItems();
-                        for(int a = 0 ; a < realFriendList.size() ; a++) { //  친구 목록으로 메모 가져오기
+                        for (int a = 0; a < realFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
                             String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
                             friendMemeList(key); // 친구들 메모 가져오는 메소드
 
 
                         }
-                        }
+                    }
                 }
 
             }
@@ -1128,21 +1113,21 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                 Log.i("asd13", "들어옴");
                 UserDataTable data = dataSnapshot.getValue(UserDataTable.class);
                 List<Double> friendLocation = data.getLocation();
-                ItemMemo friendMemo = new ItemMemo(friendLocation.get(0),friendLocation.get(1),
-                        data.getUserId(),data.getName(),data.getTitle(),data.getContent(),
-                        data.getData(),data.getImageUrl(),BitmapFactory.decodeResource(context.getResources(),R.drawable.letter));
-                if(!memoCheck) {
+                ItemMemo friendMemo = new ItemMemo(friendLocation.get(0), friendLocation.get(1),
+                        data.getUserId(), data.getName(), data.getTitle(), data.getContent(),
+                        data.getData(), data.getImageUrl(), BitmapFactory.decodeResource(context.getResources(), R.drawable.letter));
+                if (!memoCheck) {
                     memoList.add(friendMemo);
                     clusterManager.clearItems();
                     memoCheck = true;
                 }
 
-                if(memoList.size() != 0){
-                    if(data.getContent().equals(memoList.get(memoList.size()-1).getContent())
-                            && data.getTitle().equals(memoList.get(memoList.size()-1).getTitle()) &&
-                            data.getData().equals(memoList.get(memoList.size()-1).getTime())){
+                if (memoList.size() != 0) {
+                    if (data.getContent().equals(memoList.get(memoList.size() - 1).getContent())
+                            && data.getTitle().equals(memoList.get(memoList.size() - 1).getTitle()) &&
+                            data.getData().equals(memoList.get(memoList.size() - 1).getTime())) {
 
-                    }else{
+                    } else {
                         memoList.add(friendMemo);
                         // 메모의 거리를 계산 해주는 메소드
                         memoDistanceAdd(friendMemo);
@@ -1176,26 +1161,26 @@ import static com.example.homin.test1.ReadMemoActivity.*;
 
     // 메모와의 거리를 계산해주는 메소드
     private void memoDistanceAdd(ItemMemo friendMemo) {
-                Location myMemoLocation = new Location("my");
-                myMemoLocation.setLatitude(myLatLng.latitude);
-                myMemoLocation.setLatitude(myLatLng.longitude);
-                Location yourMemoLocation = new Location("your");
-                yourMemoLocation.setLatitude(friendMemo.getPosition().latitude);
-                yourMemoLocation.setLatitude(friendMemo.getPosition().longitude);
+        Location myMemoLocation = new Location("my");
+        myMemoLocation.setLatitude(myLatLng.latitude);
+        myMemoLocation.setLatitude(myLatLng.longitude);
+        Location yourMemoLocation = new Location("your");
+        yourMemoLocation.setLatitude(friendMemo.getPosition().latitude);
+        yourMemoLocation.setLatitude(friendMemo.getPosition().longitude);
 
 //         나와 메모의 거리가 300m 미만이라면 메모 add
-                float distance = yourMemoLocation.distanceTo(myMemoLocation);
-                if(distance < 300) {
-                    clusterManager.addItem(friendMemo);
-                    Collection<ClusterItem> clusterItems = clusterManager.getAlgorithm().getItems();
-                    for(ClusterItem a : clusterItems){
-                        if(a instanceof ItemMemo){
-                            Log.i("bbv",((ItemMemo)a).getContent());
-                            Log.i("bbv",((ItemMemo)a).getUserId());
-                        }
-                    }
-                    clusterManager.cluster();
+        float distance = yourMemoLocation.distanceTo(myMemoLocation);
+        if (distance < 300) {
+            clusterManager.addItem(friendMemo);
+            Collection<ClusterItem> clusterItems = clusterManager.getAlgorithm().getItems();
+            for (ClusterItem a : clusterItems) {
+                if (a instanceof ItemMemo) {
+                    Log.i("bbv", ((ItemMemo) a).getContent());
+                    Log.i("bbv", ((ItemMemo) a).getUserId());
                 }
+            }
+            clusterManager.cluster();
+        }
 
 
     }
@@ -1204,18 +1189,18 @@ import static com.example.homin.test1.ReadMemoActivity.*;
     // 내 gps 위치 받아오고, firebase에 contact 업데이트
     @SuppressLint("MissingPermission")
     private void myLocationUpdate() {
-        Log.i("asd123","myLocationUpdate");
+        Log.i("asd123", "myLocationUpdate");
         if (locationManager == null) {
             locationManager = (LocationManager) this.getSystemService(context.LOCATION_SERVICE);
-            Log.i("vvv456","로케이션 매니저 생성");
+            Log.i("vvv456", "로케이션 매니저 생성");
         }
-        Log.i("","");
+        Log.i("", "");
 
         // 최적 gps 하드웨어 검색
         Criteria c = new Criteria();
-        provider = locationManager.getBestProvider(c,true);
+        provider = locationManager.getBestProvider(c, true);
         // 사용가능한 장치가 없다면 모든 장치에서 검색
-        if(provider == null || !locationManager.isProviderEnabled(provider)) {
+        if (provider == null || !locationManager.isProviderEnabled(provider)) {
             List<String> hardWare = locationManager.getAllProviders();
             for (int a = 0; a < hardWare.size(); a++) {
                 String gpsHardware = hardWare.get(a);
@@ -1227,86 +1212,57 @@ import static com.example.homin.test1.ReadMemoActivity.*;
         }
 
 
-            // 내 GPS 위치가 바뀔 때 마다, 내 마커 생성
-            locationListener = new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    check = false;
-                    if(myContact == null) {
-                        myContact = DaoImple.getInstance().getContact();
-                    }
-                    Log.i("asdqwe","로케이션 체인지");
+        // 내 GPS 위치가 바뀔 때 마다, 내 마커 생성
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                check = false;
+                if (myContact == null) {
+                    myContact = DaoImple.getInstance().getContact();
+                }
+                Log.i("asdqwe", "로케이션 체인지");
 
-                    List<Double> myLocation = new ArrayList<>();
-                    myLocation.add(location.getLatitude());
-                    Log.i("ddd3333",location.getLongitude()+"");
-                    myLocation.add(location.getLongitude());
-                    myContact.setUserLocation(myLocation);
-                    reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+                List<Double> myLocation = new ArrayList<>();
+                myLocation.add(location.getLatitude());
+                Log.i("ddd3333", location.getLongitude() + "");
+                myLocation.add(location.getLongitude());
+                myContact.setUserLocation(myLocation);
+                reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
 
-                    // 내 위치를 myLatLng로 생성
-                        myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-
-
-                    if(!zoomCheck) {
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));
-                        zoomCheck = true;
-                        clusterManager.cluster();
-                    }
+                // 내 위치를 myLatLng로 생성
+                myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
 
-
+                if (!zoomCheck) {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));
+                    zoomCheck = true;
+                    clusterManager.cluster();
                 }
 
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
 
-                }
+            }
 
-                @Override
-                public void onProviderEnabled(String provider) {
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
 
-                }
+            }
 
-                @Override
-                public void onProviderDisabled(String provider) {
+            @Override
+            public void onProviderEnabled(String provider) {
 
-                }
-            };
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 100, locationListener);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 100, locationListener);
 
 
-
     }
 
-
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        menu.add(0, 1, 0, "글 남기기");
-        menu.add(0, 2, 0, "목적지로 설정하기");
-        menu.add(0, 3, 0, "취소");
-        super.onCreateContextMenu(menu, v, menuInfo);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case 1:
-                writeMyLocation();
-                Intent intent = new Intent(MapsActivity.this,WriteActivity.class);
-                startActivityForResult(intent,RESULT_CODE);
-                break;
-            case 2:
-                break;
-            case 3:
-                closeContextMenu();
-                break;
-        }
-        return super.onContextItemSelected(item);
-    }
 
 //    // 갤러리에서 사진 선택하는 메소드
 //    public void clickedProImgBotton() {
@@ -1331,21 +1287,19 @@ import static com.example.homin.test1.ReadMemoActivity.*;
 //    }
 
 
-
-
     @SuppressLint("MissingPermission")
-    void writeMyLocation(){
+    void writeMyLocation() {
         // 현재 내 위치 가져오기
         reference.child("Contact").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                for(DataSnapshot data : dataSnapshot.getChildren()){
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
 
                 }
                 Contact con = dataSnapshot.getValue(Contact.class);
-                if(con.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                if (con.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                     List<Double> location = con.getUserLocation();
-                    LatLng myLL = new LatLng(location.get(0),location.get(1));
+                    LatLng myLL = new LatLng(location.get(0), location.get(1));
                     DaoImple.getInstance().setWriteLocation(myLL);
                 }
             }
@@ -1385,28 +1339,28 @@ import static com.example.homin.test1.ReadMemoActivity.*;
             Log.i(TAG, "RESULT_OK");
             switch (requestCode) {
                 case RESULT_CODE:
-                    Log.i("ggv","onActivityResult");
+                    Log.i("ggv", "onActivityResult");
                     String title = data.getStringExtra(TITLE_KEY);
                     String body = data.getStringExtra(BODY_KEY);
                     String time = data.getStringExtra(TIME_KEY);
                     String imageUrl = data.getStringExtra(IMAGEURL_KEY);
-                    Log.i("ggv","onActivityResult 데이터 뺌");
+                    Log.i("ggv", "onActivityResult 데이터 뺌");
                     Log.i("gg", title + body);
                     if (!(title.equals("")) && !(body.equals(""))) {
                         // 클러스터 매니저에 메모 에드
                         LatLng memoLocation = DaoImple.getInstance().getWriteLocation();
-                        ItemMemo myMemo = new ItemMemo(memoLocation.latitude,memoLocation.longitude,
-                                DaoImple.getInstance().getLoginEmail(),DaoImple.getInstance().getLoginId(),title,body,
-                                time,imageUrl,BitmapFactory.decodeResource(context.getResources(),R.drawable.letter));
-                        Log.i("bb","onActivityResult 내 메모 add");
+                        ItemMemo myMemo = new ItemMemo(memoLocation.latitude, memoLocation.longitude,
+                                DaoImple.getInstance().getLoginEmail(), DaoImple.getInstance().getLoginId(), title, body,
+                                time, imageUrl, BitmapFactory.decodeResource(context.getResources(), R.drawable.letter));
+                        Log.i("bb", "onActivityResult 내 메모 add");
                         // 파이어베이스에 메모 업로드
                         List<Double> tableLocation = new ArrayList<>();
                         tableLocation.add(memoLocation.latitude);
                         tableLocation.add(memoLocation.longitude);
-                        UserDataTable table = new UserDataTable(DaoImple.getInstance().getLoginEmail(),DaoImple.getInstance().getLoginId()
-                                ,imageUrl,tableLocation,title,body,time);
+                        UserDataTable table = new UserDataTable(DaoImple.getInstance().getLoginEmail(), DaoImple.getInstance().getLoginId()
+                                , imageUrl, tableLocation, title, body, time);
                         reference.child("userData").child(DaoImple.getInstance().getKey()).push().setValue(table);
-                        Log.i("ggv","onActivityResult 파이어베이스 push()");
+                        Log.i("ggv", "onActivityResult 파이어베이스 push()");
 
                     }
                     break;
@@ -1470,13 +1424,35 @@ import static com.example.homin.test1.ReadMemoActivity.*;
             } // end switch
 
         } // end if
+
+        if(requestCode == 5004 && resultCode==1){
+            final LatLng latLng = (LatLng)data.getParcelableExtra("LatLng");
+
+                    distanceIndicator.setText("");
+                    destinationClicked = true;
+                    MarkerOptions options = new MarkerOptions().position(latLng).title("목적지").snippet("위도:" + latLng.latitude + "/n" + "경도: " + latLng.longitude);
+                    if (mMarker != null) {
+                        mMarker.remove();
+                    }
+
+                    if (targetMarker != null) {
+                        clusterManager.removeItem(targetMarker);
+                        clusterManager.cluster();
+                    }
+                    mMarker = mMap.addMarker(options);
+                    setDestination();
+
+                    bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED);
+                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+
+        }
     } // onActivityResult()
 
     //EssayDetaliActivity의 인덱스갑 가져오는것
     @Override
     public void onessaySetlected(int position) {
-        Intent intent = EssayDetailActivity.newIntent(this,position);
-        startActivity(intent);
+        Intent intent = EssayDetailActivity.newIntent(this, position);
+        startActivityForResult(intent,5004);
     }
 
 
@@ -1486,6 +1462,48 @@ import static com.example.homin.test1.ReadMemoActivity.*;
         if (bottomSheetBehavior.getState() == 3) {
             bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED);
             pressedTime = 0;
+        } else if((myMarker != null && mMarker != null)|| (myMarker != null && targetMarker != null)||(myMarker != null && targetId != null && targetIdMarker != null)){
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+
+            dialog.setTitle( "목적지 취소여부" )
+                    .setMessage("선택된 목적지를 취소하시겠습니까?")
+                    .setNegativeButton("아니요", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialoginterface, int i) {
+                            dialoginterface.cancel();
+                        }
+                    })
+                    .setPositiveButton("예", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialoginterface, int i) {
+//                          if(myMarker != null && mMarker != null){
+////                              shapeView.setBackground(null);
+//                              distanceIndicator.setVisibility(View.GONE);
+//                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+//                              destinationClicked = false;
+//
+//                              mMarker.remove();
+//                          }else if(myMarker != null && targetMarker != null){
+////                              shapeView.setBackground(null);
+//                              distanceIndicator.setVisibility(View.GONE);
+//                              distanceIndicator.setText("");
+//                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+//                              destinationClicked = false;
+//                              clusterManager.removeItem(targetMarker);
+//                              clusterManager.cluster();
+//
+//                          }else if(myMarker != null && targetId != null && targetIdMarker != null){
+////                              shapeView.setBackground(null);
+//                              distanceIndicator.setVisibility(View.GONE);
+//                              distanceIndicator.setText("");
+//                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+//                              destinationClicked = false;
+//                              targetId = null;
+//                              targetIdMarker = null;
+//
+//                          }
+                        }
+                    }).show();
+
         } else {
             // 백키를 두번 눌렀을때, 그 간격이 2초 이하면 어플 종료
             if (pressedTime == 0) {
@@ -1508,11 +1526,10 @@ import static com.example.homin.test1.ReadMemoActivity.*;
     }
 
 
-
     @Override
     protected void onDestroy() {
 
-            reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
+        reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
 
         super.onDestroy();
     }
@@ -1522,8 +1539,8 @@ import static com.example.homin.test1.ReadMemoActivity.*;
         List<Double> myLocation = myContact.getUserLocation();
         double lat = myLocation.get(0);
         double lon = myLocation.get(1);
-        lat+=0.01;
-        lon+=0.01;
+        lat += 0.01;
+        lon += 0.01;
         myLocation.clear();
         myLocation.add(lat);
         myLocation.add(lon);
@@ -1609,62 +1626,75 @@ import static com.example.homin.test1.ReadMemoActivity.*;
 
     } // end cropImage()
 
-        //클릭을 했으면 작동 백키를 눌렀으면 취소
-        // 검색한 주소, 내가 임의로 설정한 위치, 내글에 대한 목적지 설정
-        private void setDestination() {
-
-            distanceIndicator.setVisibility(View.VISIBLE);
+    //클릭을 했으면 작동 백키를 눌렀으면 취소
+    // 검색한 주소, 내가 임의로 설정한 위치, 내글에 대한 목적지 설정
+    private void setDestination() {
+        shapeView.setBackground(getDrawable(R.drawable.shape));
+        distanceIndicator.setVisibility(View.VISIBLE);
 //        Log.i("KSJ", myMarker.getPosition() + "||"+ mMarker.getPosition() + "");
-            if (myMarker != null && mMarker != null) {
-                Log.i("KSJ", myMarker.getPosition() + "||" + mMarker.getPosition() + "");
-                double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), mMarker.getPosition());
-//            Location.distanceBetween();
-                Log.i("KSJ", "distance: " + distance);
-                distanceIndicator.setText(distance + " M ");
-                if (distance < 100) {
-                    distanceIndicator.setVisibility(View.GONE);
-                    Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
-                    destinationClicked = false;
+        if (myMarker != null && mMarker != null) {
+            double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), mMarker.getPosition());
+            String stringDistance = Double.toString(distance);
+            int index = stringDistance.indexOf(".");
+            String m = stringDistance.substring(0, index);
+            Toast.makeText(context, index + "", Toast.LENGTH_SHORT).show();
+            String cm = stringDistance.substring(index+1,index+3);
+            Log.i("KSJ", "distance: " + distance);
+            distanceIndicator.setText("목적지까지의 거리: " +m + "M " + cm + "CM");
 
-                    mMarker.remove();
+            if (distance < 100) {
+                shapeView.setBackground(null);
+                distanceIndicator.setVisibility(View.GONE);
+                Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
+                destinationClicked = false;
 
-                }
-            } else if (myMarker != null && targetMarker != null) {
-                Log.i("KSJ", myMarker.getPosition() + "||" + targetMarker.getPosition() + "target?");
-                double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetMarker.getPosition());
-//            Location.distanceBetween();
-                Log.i("KSJ", "distance: " + distance);
-                distanceIndicator.setText(distance + " M ");
-                if (distance < 100) {
-                    distanceIndicator.setVisibility(View.GONE);
-                    distanceIndicator.setText("");
-                    Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
-                    destinationClicked = false;
+                mMarker.remove();
 
-                    clusterManager.removeItem(targetMarker);
-                    clusterManager.cluster();
+            }
+        } else if (myMarker != null && targetMarker != null) {
+            Log.i("KSJ", myMarker.getPosition() + "||" + targetMarker.getPosition() + "target?");
+            double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetIdMarker.getPosition());
+            String stringDistance = Double.toString(distance);
+            int index = stringDistance.indexOf(".");
+            String m = stringDistance.substring(0, index);
+            Toast.makeText(context, index + "", Toast.LENGTH_SHORT).show();
+            String cm = stringDistance.substring(index+1,index+3);
+            Log.i("KSJ", "distance: " + distance);
+            distanceIndicator.setText("목적지까지의 거리: " +m + "M " + cm + "CM");
 
-                }
+            if (distance < 100) {
+                shapeView.setBackground(null);
+                distanceIndicator.setVisibility(View.GONE);
+                distanceIndicator.setText("");
+                Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
+                destinationClicked = false;
 
-            } else if (myMarker != null && targetId != null && targetIdMarker != null) {
-                double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetIdMarker.getPosition());
-                String stringDistance = Double.toString(distance);
-                int index = stringDistance.indexOf('.');
-                String m = stringDistance.substring(0,index);
-                Toast.makeText(context, index+"", Toast.LENGTH_SHORT).show();
-                String cm = stringDistance.substring(index);
-                Log.i("KSJ", "distance: " + distance);
-                distanceIndicator.setText(m + " M " +cm + "CM" );
-                if (distance < 100) {
-                    distanceIndicator.setVisibility(View.GONE);
-                    distanceIndicator.setText("");
-                    Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
-                    destinationClicked = false;
-                    targetId = null;
-                    targetIdMarker = null;
-                }
+                clusterManager.removeItem(targetMarker);
+                clusterManager.cluster();
+
+            }
+
+        } else if (myMarker != null && targetId != null && targetIdMarker != null) {
+            double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetIdMarker.getPosition());
+            String stringDistance = Double.toString(distance);
+            int index = stringDistance.indexOf(".");
+            String m = stringDistance.substring(0, index);
+            Toast.makeText(context, index + "", Toast.LENGTH_SHORT).show();
+            String cm = stringDistance.substring(index+1,index+3);
+            Log.i("KSJ", "distance: " + distance);
+            distanceIndicator.setText("목적지까지의 거리: " +m + "M " + cm + "CM");
+            if (distance < 100) {
+                shapeView.setBackground(null);
+                distanceIndicator.setVisibility(View.GONE);
+                distanceIndicator.setText("");
+                Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
+                destinationClicked = false;
+                targetId = null;
+                targetIdMarker = null;
             }
         }
+    }
+
 
 
 }

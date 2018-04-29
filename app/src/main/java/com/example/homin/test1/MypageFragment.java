@@ -103,6 +103,7 @@ public class MypageFragment extends Fragment {
     private EssaySetlectedCallback callback;
 
 
+
     public MypageFragment() {
         // Required empty public constructor
     }
@@ -333,6 +334,7 @@ public class MypageFragment extends Fragment {
         super.onStart();
 
         //TODO: 공개여부
+
         swich = getView().findViewById(R.id.switchBtn);
         key = DaoImple.getInstance().getKey();
         Gong_ge = DaoImple.getInstance().getContact().isPublic();
@@ -741,7 +743,6 @@ public static String getAddress(Context context,double lat, double lng) {
         }
 
     }
-
 
 
 

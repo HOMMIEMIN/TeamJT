@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.model.LatLng;
 
 public class EssayDetailActivity extends AppCompatActivity {
     // 마이페이지에서 글목록 중 하나 선택시 불러오는 내용
@@ -38,12 +39,14 @@ public class EssayDetailActivity extends AppCompatActivity {
     private static String key;
     // 맵 줌 위한 변수
     private int DEFAULT_ZOOM_LEVEL = 13;
+    public View myView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_essay_detail);
 
+        myView = findViewById(R.id.mypageView);
         // 어플 위에 뜨는 액션바 숨기는 코드!
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
@@ -216,13 +219,17 @@ public class EssayDetailActivity extends AppCompatActivity {
     }
 
     public void onClickSetDestination(View view) {
-        Snackbar.make(view, "목적지로 설정하시겠습니까?", Snackbar.LENGTH_LONG).setAction("확인", new View.OnClickListener() {
+
+        Snackbar.make(myView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Double lat = userDataTable.getLocation().get(0);
-                Double lng = userDataTable.getLocation().get(1);
+
+                LatLng latLng = new LatLng(userDataTable.getLocation().get(0), userDataTable.getLocation().get(1));
+                Intent intent = new Intent(EssayDetailActivity.this, MapsActivity.class);
+                intent.putExtra("LatLng", latLng);
+                setResult(1, intent);
+                finish();
             }
         }).show();
-
     }
 }
