@@ -950,8 +950,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i("fffff11", "distance : " + distance);
                 if(distance < 300) {
                     clusterManager.addItem(friendMemo);
-//                    Log.i("fffff", data.getTitle());
-                    Log.i("fffff", "친구 메모 에드");
+                    Log.i("aaa1234", friendMemo.getTitle());
+                    Log.i("aaa1234", "친구 메모 에드");
                 }
 //
     }
@@ -1001,7 +1001,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
 
                     // 내 위치를 myLatLng로 생성
-                    myLatLng = new LatLng(location.getLatitude(),location.getLongitude());
+                        myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+
 
                     if(!zoomCheck) {
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));
@@ -1161,7 +1163,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         ItemMemo myMemo = new ItemMemo(memoLocation.latitude,memoLocation.longitude,
                                 DaoImple.getInstance().getLoginEmail(),DaoImple.getInstance().getLoginId(),title,body,
                                 time,imageUrl,BitmapFactory.decodeResource(context.getResources(),R.drawable.letter));
-
                         Log.i("bb","onActivityResult 내 메모 add");
                         // 파이어베이스에 메모 업로드
                         List<Double> tableLocation = new ArrayList<>();
@@ -1280,7 +1281,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         asd.setLoginCheck(false);
 
             reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(asd);
-//        locationManager.removeUpdates(locationListener);
 
         super.onDestroy();
     }

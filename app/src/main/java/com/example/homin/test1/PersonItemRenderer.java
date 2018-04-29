@@ -42,7 +42,6 @@ import jp.wasabeef.glide.transformations.CropCircleTransformation;
 public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     Context context;
     GoogleMap googleMap;
-    boolean imageCheck;
 
     private static Activity getActivity(Context context) {
         if (context == null) {
@@ -68,13 +67,14 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        Bitmap roundBitmap = getCircleBitmap(resource);
-                        marker.setIcon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+                        if(marker != null) {
+                            Bitmap roundBitmap = getCircleBitmap(resource);
+                            marker.setIcon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+                        }
 //                Log.i("asdfg","다운로드 완료 : " + ((ItemPerson) clusterItem).getUserId());
                     }
                 });
             }
-            imageCheck = true;
             super.onClusterItemRendered(clusterItem, marker);
         }
 
