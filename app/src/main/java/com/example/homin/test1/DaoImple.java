@@ -1,5 +1,6 @@
 package com.example.homin.test1;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.Resources;
@@ -37,6 +38,7 @@ public class DaoImple {
     private UserDataTable myPageUserData;
     private FragmentActivity fragmentActivity;
     private String newDate;
+    private Context ChattingActivity;
 
     public UserDataTable getMyPageUserData() {
         return myPageUserData;
@@ -181,6 +183,13 @@ public class DaoImple {
         return newDate;
     }
 
+    public Context getChattingActivity() {
+        return ChattingActivity;
+    }
+
+    public void setChattingActivity(Context chattingActivity) {
+        ChattingActivity = chattingActivity;
+    }
 
     public static FragmentActivity getActivity(Context context) {
         if (context instanceof FragmentActivity) {
@@ -200,6 +209,18 @@ public class DaoImple {
         return null;
     }
 
+    private static Activity getChatActivity(Context context) {
+        if (context == null) {
+            return null;
+        }
+        if (context instanceof Activity) {
+            if (!((Activity) context).isFinishing())
+                return (Activity) context;
+        } else if (context instanceof ContextWrapper) {
+            return getActivity(((ContextWrapper) context).getBaseContext());
+        }
+        return null;
+    }
 
 
 

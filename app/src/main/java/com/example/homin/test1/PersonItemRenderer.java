@@ -67,7 +67,8 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
 
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        if(marker != null) {
+                        Context get = getActivity(context);
+                        if(marker != null && get != null) {
                             Bitmap roundBitmap = getCircleBitmap(resource);
                             marker.setIcon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
                         }

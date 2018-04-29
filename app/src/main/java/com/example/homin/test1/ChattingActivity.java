@@ -147,7 +147,7 @@ public class ChattingActivity extends AppCompatActivity {
         et = findViewById(R.id.editText_sends);
         btn = findViewById(R.id.button_sends);
         recyclerView = findViewById(R.id.recyclerView_chatting);
-
+        DaoImple.getInstance().setChattingActivity(this);
         if (cList != null) {
             Log.i("kaka", "cList: " + cList);
         } else {
@@ -276,4 +276,22 @@ public class ChattingActivity extends AppCompatActivity {
         return result;
     }
 
+    @Override
+    protected void onPause() {
+        Log.i("ddd66", "onDestroy");
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        DaoImple.getInstance().setChattingActivity(null);
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.i("ddd66", "onDestroy");
+        DaoImple.getInstance().setChattingActivity(null);
+        super.onDestroy();
+    }
 }

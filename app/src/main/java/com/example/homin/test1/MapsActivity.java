@@ -134,7 +134,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location getLocation;
     public static String MARKER_LIST = "markerList";
     private boolean checkLocation;
-    private boolean idCheck;
+    private int chatCheck;
 
 
 
@@ -570,8 +570,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 if (contact.getResizePictureUrl() != null) {
                                     ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                             friendLocation.get(1), contact.getUserId(), contact.getUserName(),contact.getResizePictureUrl());
-                                    if (contact.isLoginCheck()) {
-                                        clusterManager.addItem(friendMarker);
+                                    // 공개 여부 확인
+                                    if(contact.isPublic() || contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                        // 로그인 상태 확인
+                                        if (contact.isLoginCheck()) {
+                                            clusterManager.addItem(friendMarker);
+                                        }
                                     }
                                     // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
                                     if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
@@ -633,117 +637,120 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             for(int a = 0 ; a < myFriendList.size() ; a++){
                                 Log.i("asdasd11",myFriendList.get(a));
                                 if(myFriendList.get(a).equals(contact.getUserId())) {
-                                    // 로그인 되있는 상태라면 사용자 마커 표시
-                                    if (contact.isLoginCheck()) {
-                                        Log.i("asdasd", "로그인 됨 : " + contact.getUserId());
-                                        // 현재 저장 된 모든 마커 꺼내기
-                                        Collection<ClusterItem> markers = clusterManager.getAlgorithm().getItems();
-                                        // 저장 된 이름 정보와 firebase에 저장 된 이름 비교
-                                        for (int b = 0; b < personList.size(); b++) {
-                                            ClusterItem m = personList.get(contact.getUserId());
-                                            if (m instanceof ItemPerson || m == null) {
-                                                if(m == null){
-                                                    List<Double> friendLocation = contact.getUserLocation();
-                                                    if (contact.getResizePictureUrl() != null) {
-                                                        ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                friendLocation.get(1), contact.getUserId(), contact.getUserName(),contact.getResizePictureUrl());
+                                    // 공개 여부 확인
+                                    if(contact.isPublic() || contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                        // 로그인 되있는 상태라면 사용자 마커 표시
+                                        if (contact.isLoginCheck()) {
+                                            Log.i("asdasd", "로그인 됨 : " + contact.getUserId());
+                                            // 현재 저장 된 모든 마커 꺼내기
+                                            Collection<ClusterItem> markers = clusterManager.getAlgorithm().getItems();
+                                            // 저장 된 이름 정보와 firebase에 저장 된 이름 비교
+                                            for (int b = 0; b < personList.size(); b++) {
+                                                ClusterItem m = personList.get(contact.getUserId());
+                                                if (m instanceof ItemPerson || m == null) {
+                                                    if (m == null) {
+                                                        List<Double> friendLocation = contact.getUserLocation();
+                                                        if (contact.getResizePictureUrl() != null) {
+                                                            ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                                                    friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
 
-                                                        Log.i("fffff", "체인지 : 바뀐위치 저장");
-                                                        clusterManager.addItem(friendMarker);
-                                                        personList.put(contact.getUserId(), friendMarker);
-                                                        Log.i("asdasd", "마커 생성");
-                                                        Log.i("asdasd ", contact.getUserId());
+                                                            Log.i("fffff", "체인지 : 바뀐위치 저장");
+                                                            clusterManager.addItem(friendMarker);
+                                                            personList.put(contact.getUserId(), friendMarker);
+                                                            Log.i("asdasd", "마커 생성");
+                                                            Log.i("asdasd ", contact.getUserId());
 
-                                                        Log.i("fffff", contact.getUserId());
-                                                        Log.i("fffff", "체인지 : 친구위치 마커생성");
-                                                        Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
-                                                    } else {
-                                                        BitmapFactory.Options options = new BitmapFactory.Options();
-                                                        options.inSampleSize = 1;
-                                                        Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
-                                                        Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
-                                                        ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
-                                                        clusterManager.addItem(friendMarker);
-                                                        personList.put(contact.getUserId(), friendMarker);
-                                                        Log.i("asdasd", "마커 생성");
-                                                        Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
-                                                        Log.i("fffff", "체인지 else : " + contact.getUserId());
-                                                    }
-
-                                                }else {
-                                                    Log.i("asdqwe", "사람임");
-                                                    Log.i("asdqwe", "0   " + contact.getUserId());
-                                                    if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
-                                                        ItemPerson ip = personList.get(contact.getUserId());
-                                                        Log.i("asdqwe", "1   " + contact.getUserId());
-                                                        // 저장 되있는 Location 정보와 firebase에 저장된 Location 비교
-                                                        LatLng saveLatLng = ip.getPosition();
-                                                        if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                                                            myMarker = ip;
+                                                            Log.i("fffff", contact.getUserId());
+                                                            Log.i("fffff", "체인지 : 친구위치 마커생성");
+                                                            Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
+                                                        } else {
+                                                            BitmapFactory.Options options = new BitmapFactory.Options();
+                                                            options.inSampleSize = 1;
+                                                            Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
+                                                            Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
+                                                            ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                                                    friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+                                                            clusterManager.addItem(friendMarker);
+                                                            personList.put(contact.getUserId(), friendMarker);
+                                                            Log.i("asdasd", "마커 생성");
+                                                            Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
+                                                            Log.i("fffff", "체인지 else : " + contact.getUserId());
                                                         }
-                                                        Log.i("fffff", "리스트 크기 : " + personList.size());
-                                                        Log.i("fffff", "저장 : " + ip.getUserName());
-                                                        LatLng newLatLng = new LatLng(contact.getUserLocation().get(0),
-                                                                contact.getUserLocation().get(1));
-                                                        Log.i("asdqwe", "2   " + contact.getUserId());
-                                                        Log.i("qweasd", saveLatLng.toString() + contact.getUserId());
-                                                        Log.i("qweasd", newLatLng.toString());
-                                                        if (saveLatLng.longitude != newLatLng.longitude ||
-                                                                saveLatLng.latitude != newLatLng.latitude) {
-                                                            Log.i("asdqwe", "3   " + contact.getUserId());
-                                                            Log.i("asdqwe", "체인지 : 위치 바뀜");
-                                                            // 서로 다른 Location이 저장되 있다면, clusterManager에 저장된 마커 삭제
-                                                            clusterManager.removeItem(ip);
-                                                            personList.remove(contact.getUserId());
-                                                            // 다시 마커 생성 후, clusterManager과 personList에 저장
-                                                            List<Double> friendLocation = contact.getUserLocation();
-                                                            if (contact.getResizePictureUrl() != null) {
 
-                                                                ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+                                                    } else {
+                                                        Log.i("asdqwe", "사람임");
+                                                        Log.i("asdqwe", "0   " + contact.getUserId());
+                                                        if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
+                                                            ItemPerson ip = personList.get(contact.getUserId());
+                                                            Log.i("asdqwe", "1   " + contact.getUserId());
+                                                            // 저장 되있는 Location 정보와 firebase에 저장된 Location 비교
+                                                            LatLng saveLatLng = ip.getPosition();
+                                                            if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                                                myMarker = ip;
+                                                            }
+                                                            Log.i("fffff", "리스트 크기 : " + personList.size());
+                                                            Log.i("fffff", "저장 : " + ip.getUserName());
+                                                            LatLng newLatLng = new LatLng(contact.getUserLocation().get(0),
+                                                                    contact.getUserLocation().get(1));
+                                                            Log.i("asdqwe", "2   " + contact.getUserId());
+                                                            Log.i("qweasd", saveLatLng.toString() + contact.getUserId());
+                                                            Log.i("qweasd", newLatLng.toString());
+                                                            if (saveLatLng.longitude != newLatLng.longitude ||
+                                                                    saveLatLng.latitude != newLatLng.latitude) {
+                                                                Log.i("asdqwe", "3   " + contact.getUserId());
+                                                                Log.i("asdqwe", "체인지 : 위치 바뀜");
+                                                                // 서로 다른 Location이 저장되 있다면, clusterManager에 저장된 마커 삭제
+                                                                clusterManager.removeItem(ip);
+                                                                personList.remove(contact.getUserId());
+                                                                // 다시 마커 생성 후, clusterManager과 personList에 저장
+                                                                List<Double> friendLocation = contact.getUserLocation();
+                                                                if (contact.getResizePictureUrl() != null) {
 
-                                                                Log.i("fffff", "체인지 : 바뀐위치 저장");
-                                                                clusterManager.addItem(friendMarker);
-                                                                personList.put(contact.getUserId(), friendMarker);
-                                                                Log.i("asdasd", "마커 생성");
-                                                                Log.i("asdasd ", contact.getUserId());
+                                                                    ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
 
-                                                                Log.i("fffff", contact.getUserId());
-                                                                Log.i("fffff", "체인지 : 친구위치 마커생성");
-                                                                Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
-                                                            } else {
-                                                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                                                options.inSampleSize = 1;
-                                                                Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
-                                                                Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
-                                                                ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
-                                                                clusterManager.addItem(friendMarker);
-                                                                personList.put(contact.getUserId(), friendMarker);
-                                                                Log.i("asdasd", "마커 생성");
-                                                                Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
-                                                                Log.i("fffff", "체인지 else : " + contact.getUserId());
+                                                                    Log.i("fffff", "체인지 : 바뀐위치 저장");
+                                                                    clusterManager.addItem(friendMarker);
+                                                                    personList.put(contact.getUserId(), friendMarker);
+                                                                    Log.i("asdasd", "마커 생성");
+                                                                    Log.i("asdasd ", contact.getUserId());
 
+                                                                    Log.i("fffff", contact.getUserId());
+                                                                    Log.i("fffff", "체인지 : 친구위치 마커생성");
+                                                                    Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
+                                                                } else {
+                                                                    BitmapFactory.Options options = new BitmapFactory.Options();
+                                                                    options.inSampleSize = 1;
+                                                                    Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
+                                                                    Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
+                                                                    ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+                                                                    clusterManager.addItem(friendMarker);
+                                                                    personList.put(contact.getUserId(), friendMarker);
+                                                                    Log.i("asdasd", "마커 생성");
+                                                                    Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
+                                                                    Log.i("fffff", "체인지 else : " + contact.getUserId());
+
+
+                                                                }
 
                                                             }
-
                                                         }
                                                     }
+
                                                 }
 
                                             }
+                                        } else {
+                                            Collection<ClusterItem> markers = clusterManager.getAlgorithm().getItems();
+                                            for (ClusterItem m : markers) {
+                                                if (m instanceof ItemPerson) {
+                                                    if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
+                                                        ItemPerson ip = personList.get(contact.getUserId());
+                                                        clusterManager.removeItem(ip);
 
-                                        }
-                                    }else{
-                                        Collection<ClusterItem> markers = clusterManager.getAlgorithm().getItems();
-                                        for(ClusterItem m : markers){
-                                            if(m instanceof ItemPerson){
-                                              if(((ItemPerson)m).getUserId().equals(contact.getUserId())){
-                                                  ItemPerson ip = personList.get(contact.getUserId());
-                                                  clusterManager.removeItem(ip);
-
-                                              }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -793,8 +800,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        Log.i("fffff","체인지 끝남");
+        // 채팅 수신 토스트로 보여주기
+        reference.child("Chat").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                chatCheck = 0;
+                Log.i("ddd66", "체인지");
+                String key = dataSnapshot.getKey();
+                int num = key.indexOf(DaoImple.getInstance().getKey());
+                Log.i("ddd66", num + "");
+                if (num != -1) {
+                    long chatCount = dataSnapshot.getChildrenCount();
+                    Log.i("ddd66", "들어옴");
+                    for(DataSnapshot d : dataSnapshot.getChildren()){
+                        chatCheck++;
+                        Chat chat = d.getValue(Chat.class);
+                        Log.i("ddd66", chat.getChat());
+                        if (!(chat.getId().equals(DaoImple.getInstance().getLoginEmail()))) {
+                            Log.i("ddd77","count : " + chatCount + "," + "chat : " + chatCheck);
+                            if(chatCount == chatCheck) {
+                                Log.i("ddd66", chatCount+"");
+                                Context activityCheck = DaoImple.getInstance().getChattingActivity();
+                                if(activityCheck == null) {
+                                    Log.i("ddd66", "체크" + activityCheck+"");
+                                    Toast.makeText(context, chat.getName() + " : " + chat.getChat(), Toast.LENGTH_SHORT).show();
+                                    chatCheck = 0;
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
     }
+
 
 
 
@@ -824,16 +888,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         }
 
-                        myFriendList.add(DaoImple.getInstance().getLoginEmail());
-                        Log.i("fffff","친구 목록 저장");
-                        if(!memoCheck) {
-                            Log.i("fffff", "친구 메모 삭제");
-                            for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
-                                String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
-                                Log.i("asd13", "에드에서 부름");
-                                friendMemeList(key); // 친구들 메모 가져오는 메소드
-                            }
+                            myFriendList.add(DaoImple.getInstance().getLoginEmail());
+                        for(int a = 0 ; a < myFriendList.size() ; a++) { //  친구 목록으로 메모 가져오기
+
+                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
+                            friendMemeList(key); // 친구들 메모 가져오는 메소드
+
+
                         }
+
 
 
                     }
@@ -844,8 +907,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Contact contact = dataSnapshot.getValue(Contact.class);
-                contactList.clear();
-                contactList.add(contact);
                 if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                     if(contact.getFriendList() != null) {
                         myFriendList = contact.getFriendList();
@@ -861,10 +922,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         realFriendList.add(DaoImple.getInstance().getLoginEmail());
                         clusterManager.clearItems();
                         for(int a = 0 ; a < realFriendList.size() ; a++) { //  친구 목록으로 메모 가져오기
-
                             String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
                             friendMemeList(key); // 친구들 메모 가져오는 메소드
-                            Log.i("asd13", "체인지에서 부름");
+
+
                         }
                         }
                 }
@@ -893,7 +954,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // 친구 메모리스트 받아오기
     private void friendMemeList(String key) {
-
+        memoList.clear();
+        memoCheck = false;
         reference.child("userData").child(key).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -958,17 +1020,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 float distance = yourMemoLocation.distanceTo(myMemoLocation);
                 if(distance < 300) {
                     clusterManager.addItem(friendMemo);
-                    Collection<ClusterItem> collection = clusterManager.getAlgorithm().getItems();
-                    for(ClusterItem m : collection){
-                        if(m instanceof ItemMemo){
-                            Log.i("asdfff",((ItemMemo)m).getContent());
-                            Log.i("asdfff", "distance : " + distance);
+                    Collection<ClusterItem> clusterItems = clusterManager.getAlgorithm().getItems();
+                    for(ClusterItem a : clusterItems){
+                        if(a instanceof ItemMemo){
+                            Log.i("bbv",((ItemMemo)a).getContent());
+                            Log.i("bbv",((ItemMemo)a).getUserId());
                         }
                     }
-                    Log.i("aaa1234", friendMemo.getTitle());
-                    Log.i("aaa1234", "친구 메모 에드");
+                    clusterManager.cluster();
                 }
-//
+
     }
 
     // 내 gps 위치 받아오고, firebase에 contact 업데이트
@@ -1282,10 +1343,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onDestroy() {
 
-        Contact asd = DaoImple.getInstance().getContact();
-        asd.setLoginCheck(false);
-
-            reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(asd);
+            reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
 
         super.onDestroy();
     }
