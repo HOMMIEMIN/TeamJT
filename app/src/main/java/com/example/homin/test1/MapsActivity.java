@@ -1,4 +1,3 @@
-
 package com.example.homin.test1;
 
 import android.Manifest;
@@ -143,6 +142,7 @@ import static com.example.homin.test1.ReadMemoActivity.*;
         private List<ItemPerson> personMarkerList;
         private int pressedTime;
         private Location getLocation;
+        private long chatCheck;
         public static String MARKER_LIST = "markerList";
         private boolean checkLocation;
         private boolean destoryCheck;
@@ -228,7 +228,7 @@ import static com.example.homin.test1.ReadMemoActivity.*;
             distanceIndicator = findViewById(R.id.distanceIndicator);
 
 
-            pictureList = DaoImple.getInstance().getPictureList();
+
 
             //검색창 editText
             mSearchText = findViewById(R.id.input_search);
@@ -282,44 +282,12 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                 @Override
                 public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 
-                }
-            });
+            }
+        });
 
-//        chatToastMessage();
+    }
 
 
-        }
-
-//    private void chatToastMessage() {
-//        reference.child("Chat").addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                Chat c = dataSnapshot.getValue(Chat.class);
-//
-//
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
 
 
         /********************************검색창을 위한 메소드들****************************************/
@@ -339,19 +307,7 @@ import static com.example.homin.test1.ReadMemoActivity.*;
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
 
-//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//                if (marker == mMarker) {
-//                    if (mMarker.isInfoWindowShown()) {
-//                        mMarker.hideInfoWindow();
-//                    } else {
-//                        mMarker.showInfoWindow();
-//                    }
-//                }
-//                return false;
-//            }
-//        });
+//
 
             if (placeInfo != null) {
                 try {
@@ -437,8 +393,8 @@ import static com.example.homin.test1.ReadMemoActivity.*;
 
                 moveCamera(new LatLng(place.getViewport().getCenter().latitude, place.getViewport().getCenter().longitude), 16, mPlace);
 
-                places.release();
-            }
+            places.release();
+        }
 
         };
 
@@ -529,7 +485,6 @@ import static com.example.homin.test1.ReadMemoActivity.*;
             }
 
 
-            //InfoWindowClickListener for ClusterItems
             clusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterItem>() {
                 @Override
                 public void onClusterItemInfoWindowClick(final ClusterItem clusterItem) {
@@ -633,6 +588,7 @@ import static com.example.homin.test1.ReadMemoActivity.*;
             });
 
 
+
             clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItem>() {
                 @Override
                 public boolean onClusterClick(Cluster<ClusterItem> cluster) {
@@ -664,9 +620,32 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                     }
 
 
-                    return true;
+                return true;
+            }
+        });
+
+        // 사람이나 메모 클릭시, 메모 마커는 메모 상세보기, 사람마커는 아직 미설정
+        clusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterItem>() {
+            @Override
+            public boolean onClusterItemClick(ClusterItem clusterItem) {
+                if (clusterItem instanceof ItemMemo) {
+                    Toast.makeText(context, "메모 클릭", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MapsActivity.this, ReadMemoActivity.class);
+                    intent.putExtra(MEMO_NAME, ((ItemMemo) clusterItem).getUserName());
+                    intent.putExtra(MEMO_ID, ((ItemMemo) clusterItem).getUserId());
+                    intent.putExtra(MEMO_TITLE, ((ItemMemo) clusterItem).getTitle());
+                    intent.putExtra(MEMO_CONTENT, ((ItemMemo) clusterItem).getContent());
+                    intent.putExtra(MEMO_URL, ((ItemMemo) clusterItem).getImageUrl());
+                    intent.putExtra(MEMO_TIME, ((ItemMemo) clusterItem).getTime());
+                    startActivity(intent);
+
+                } else {
+
+                    Toast.makeText(context, "사람 클릭", Toast.LENGTH_SHORT).show();
                 }
-            });
+                return true;
+            }
+        });
 
 
             Log.i("gg6", "클러스터 설정");
@@ -717,89 +696,105 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                 }
             });
 
-            // 친구 위치정보 받아오기
-            reference.child("Contact").addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    if (myFriendList != null) {
-                        Contact contact = dataSnapshot.getValue(Contact.class);
-                        if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                            myContact = contact;
-                            DaoImple.getInstance().setContact(myContact);
-                        }
-                        for (int a = 0; a < myFriendList.size(); a++) {
-                            // 친구들 위치정보 받아와서 구글맵에 갱신
-                            if (myFriendList.get(a).equals(contact.getUserId())) {
-                                // 로그인 되어있는 상태라면 사용자 마커 표시
-                                List<Double> friendLocation = contact.getUserLocation();
-                                if (contact.getResizePictureUrl() != null) {
-                                    ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+        // 친구 위치정보 받아오기
+        reference.child("Contact").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (myFriendList != null) {
+                    Contact contact = dataSnapshot.getValue(Contact.class);
+                    if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                        myContact = contact;
+                        Log.i("ddd3333", "콘텍트 생성");
+                        DaoImple.getInstance().setContact(myContact);
+                    }
+                    for (int a = 0; a < myFriendList.size(); a++) {
+                        // 친구들 위치정보 받아와서 구글맵에 갱신
+                        if (myFriendList.get(a).equals(contact.getUserId())) {
+                            // 로그인 되어있는 상태라면 사용자 마커 표시
+                            List<Double> friendLocation = contact.getUserLocation();
+                            if (contact.getResizePictureUrl() != null) {
+                                ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+                                // 공개 여부 확인
+                                if (contact.isPublic() || contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                    // 로그인 상태 확인
                                     if (contact.isLoginCheck()) {
                                         clusterManager.addItem(friendMarker);
                                     }
-                                    // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
-                                    if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                                        myMarker = friendMarker;
+                                }
+                                // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
+                                if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                    myMarker = friendMarker;
+                                }
+                                personList.put(contact.getUserId(), friendMarker);
+                                clusterManager.cluster();
+//
+
+                            } else {
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inSampleSize = 1;
+                                Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
+                                Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
+                                ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+                                // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
+                                if (targetId != null) {
+                                    if (contact.getUserId().equals(targetId)) {
+                                        targetIdMarker = friendMarker;
                                     }
+                                }
+                                if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                    myMarker = friendMarker;
+                                    if (destinationClicked) {
+                                        setDestination();
+                                    }
+                                    if (targetId != null) {
+                                        setDestination();
+                                    }
+                                    if (contact.isLoginCheck()) {
+                                        clusterManager.addItem(friendMarker);
+                                    }
+
                                     personList.put(contact.getUserId(), friendMarker);
                                     clusterManager.cluster();
 //
-
-                                } else {
-                                    BitmapFactory.Options options = new BitmapFactory.Options();
-                                    options.inSampleSize = 1;
-                                    Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
-                                    Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
-                                    ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
-                                    // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
-                                    if (targetId != null) {
-                                        if (contact.getUserId().equals(targetId)) {
-                                            targetIdMarker = friendMarker;
-                                        }
-                                    }
-                                    if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                                        myMarker = friendMarker;
-                                        if (destinationClicked) {
-                                            setDestination();
-                                        }
-                                        if (targetId != null) {
-                                            setDestination();
-                                        }
-                                        if (contact.isLoginCheck()) {
-                                            clusterManager.addItem(friendMarker);
-                                        }
-
-                                        personList.put(contact.getUserId(), friendMarker);
-                                        clusterManager.cluster();
-//
-                                    }
-
                                 }
 
                             }
+
                         }
                     }
                 }
+            }
+             // 친구 위치 바뀌었을때 정보 갱신
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                check = false;
+                Log.i("fffff","체인지 들어옴");
+                reference.child("Contact").addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        Contact contact = dataSnapshot.getValue(Contact.class);
+                        if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                            myContact = contact;
+                            List<String> realFriendList = contact.getFriendList();
+                            myFriendList = new ArrayList<>();
 
-                // 친구 위치 바뀌었을때 정보 갱신
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    check = false;
-                    Log.i("fffff", "체인지 들어옴");
-                    reference.child("Contact").addChildEventListener(new ChildEventListener() {
-                        @Override
-                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                            Contact contact = dataSnapshot.getValue(Contact.class);
-                            if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                                myContact = contact;
-                                DaoImple.getInstance().setContact(contact);
-
+                            for(int a = 0 ; a < realFriendList.size() ; a++){
+                                String name = realFriendList.get(a);
+                                myFriendList.add(name);
                             }
-                            if (myFriendList != null) {
-                                for (int a = 0; a < myFriendList.size(); a++) {
-                                    if (myFriendList.get(a).equals(contact.getUserId())) {
+                            myFriendList.add(DaoImple.getInstance().getLoginEmail());
+                            DaoImple.getInstance().setContact(contact);
+                            Log.i("ddd3333","콘텍트 생성");
+
+                        }
+                        if(myFriendList != null){
+                            for(int a = 0 ; a < myFriendList.size() ; a++){
+                                Log.i("asdasd11",myFriendList.get(a));
+                                if(myFriendList.get(a).equals(contact.getUserId())) {
+                                    // 공개 여부 확인
+                                    if(contact.isPublic() || contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                                         // 로그인 되있는 상태라면 사용자 마커 표시
                                         if (contact.isLoginCheck()) {
                                             Log.i("asdasd", "로그인 됨 : " + contact.getUserId());
@@ -808,15 +803,10 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                                             // 저장 된 이름 정보와 firebase에 저장 된 이름 비교
                                             for (int b = 0; b < personList.size(); b++) {
                                                 ClusterItem m = personList.get(contact.getUserId());
-                                                for (int aa = 0; aa < myFriendList.size(); aa++) {
-                                                    Log.i("asdqwe", "체인지 친구목록 : " + myFriendList.get(aa));
-                                                }
                                                 if (m instanceof ItemPerson || m == null) {
                                                     if (m == null) {
                                                         List<Double> friendLocation = contact.getUserLocation();
                                                         if (contact.getResizePictureUrl() != null) {
-                                                            Bitmap picture = pictureList.get(contact.getUserId());
-
                                                             ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                                                     friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
 
@@ -873,7 +863,6 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                                                             Log.i("qweasd", newLatLng.toString());
                                                             if (saveLatLng.longitude != newLatLng.longitude ||
                                                                     saveLatLng.latitude != newLatLng.latitude) {
-
                                                                 Log.i("asdqwe", "3   " + contact.getUserId());
                                                                 Log.i("asdqwe", "체인지 : 위치 바뀜");
                                                                 // 서로 다른 Location이 저장되 있다면, clusterManager에 저장된 마커 삭제
@@ -931,223 +920,311 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                                             }
                                         }
                                     }
+                                    }
 
+                            }
+                            clusterManager.cluster();
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        // 채팅 수신 토스트로 보여주기
+        reference.child("Chat").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                chatCheck = 0;
+                Log.i("ddd66", "체인지");
+                String key = dataSnapshot.getKey();
+                int num = key.indexOf(DaoImple.getInstance().getKey());
+                Log.i("ddd66", num + "");
+                if (num != -1) {
+                    long chatCount = dataSnapshot.getChildrenCount();
+                    Log.i("ddd66", "들어옴");
+                    for(DataSnapshot d : dataSnapshot.getChildren()){
+                        chatCheck++;
+                        Chat chat = d.getValue(Chat.class);
+                        Log.i("ddd66", chat.getChat());
+                        if (!(chat.getId().equals(DaoImple.getInstance().getLoginEmail()))) {
+                            Log.i("ddd77","count : " + chatCount + "," + "chat : " + chatCheck);
+                            if(chatCount == chatCheck) {
+                                Log.i("ddd66", chatCount+"");
+                                Context activityCheck = DaoImple.getInstance().getChattingActivity();
+                                if(activityCheck == null) {
+                                    Log.i("ddd66", "체크" + activityCheck+"");
+                                    Toast.makeText(context, chat.getName() + " : " + chat.getChat(), Toast.LENGTH_SHORT).show();
+                                    chatCheck = 0;
                                 }
-                                clusterManager.cluster();
                             }
-                        }
-
-                        @Override
-                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                        }
-
-                        @Override
-                        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                        }
-
-                        @Override
-                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-            Log.i("fffff", "체인지 끝남");
-        }
-
-
-        // 내 친구 리스트 받아오고 친구 메모 가져오기
-        private void getFriendList() {
-            contactList = new ArrayList<>();
-            reference.child("Contact").addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    Contact contact = dataSnapshot.getValue(Contact.class);
-                    contactList.add(contact);
-                    if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                        myContact = contact;
-                        List<Double> lastLocation = contact.getUserLocation();
-                        LatLng latLng = new LatLng(lastLocation.get(0), lastLocation.get(1));
-                        myLatLng = latLng;
-                    }
-                    if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                        if (contact.getFriendList() != null) {
-                            myFriendList = contact.getFriendList(); // 친구 목록 저장
-                            memoFriendList = contact.getFriendList();
-                            memoFriendList.add(DaoImple.getInstance().getLoginEmail());
-                            Log.i("fffff", "친구 목록 저장");
-
-                            Log.i("fffff", "친구 메모 삭제");
-                            for (int a = 0; a < memoFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
-                                Log.i("fffff", "메모 반복문 들어옴");
-                                String key = DaoImple.getInstance().getFirebaseKey(memoFriendList.get(a));
-                                friendMemeList(key); // 친구들 메모 가져오는 메소드
-                            }
-
-
                         }
                     }
 
                 }
+            }
 
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    Contact contact = dataSnapshot.getValue(Contact.class);
-                    contactList.clear();
-                    contactList.add(contact);
-                    if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                        if (contact.getFriendList() != null) {
-                            DaoImple.getInstance().setContact(contact);
-                            List<String> fflist = contact.getFriendList(); // 친구 목록 저장
-                            myFriendList = new ArrayList<>();
-                            for (int a = 0; a < fflist.size(); a++) {
-                                String name = fflist.get(a);
-                                myFriendList.add(name);
-                            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
+    }
+
+
+
+
+    // 내 친구 리스트 받아오고 친구 메모 가져오기
+    private void getFriendList() {
+        contactList = new ArrayList<>();
+        reference.child("Contact").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Contact contact = dataSnapshot.getValue(Contact.class);
+                contactList.add(contact);
+                if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                    myContact = contact;
+                    DaoImple.getInstance().setContact(contact);
+                    List<Double> lastLocation = contact.getUserLocation();
+                    LatLng latLng = new LatLng(lastLocation.get(0),lastLocation.get(1));
+                    myLatLng = latLng;
+                }
+                if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                    if(contact.getFriendList() != null) {
+
+                        List<String> fflist = contact.getFriendList(); // 친구 목록 저장
+                        myFriendList = new ArrayList<>();
+                        for(int a = 0 ; a < fflist.size() ; a++){
+                            String name = fflist.get(a);
+                            myFriendList.add(name);
+
+                        }
 
                             myFriendList.add(DaoImple.getInstance().getLoginEmail());
-                            Log.i("zxc", "메모 체인지");
-                            clusterManager.clearItems();
-                            for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
-                                Log.i("fffff", "메모 반복문 들어옴 체인지");
-                                String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
-                                friendMemeList(key); // 친구들 메모 가져오는 메소드
-                            }
+                        for(int a = 0 ; a < myFriendList.size() ; a++) { //  친구 목록으로 메모 가져오기
+
+                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
+                            friendMemeList(key); // 친구들 메모 가져오는 메소드
+
+
+                        }
+
+
+
+                    }
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Contact contact = dataSnapshot.getValue(Contact.class);
+                if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                    if(contact.getFriendList() != null) {
+                        myFriendList = contact.getFriendList();
+                        List<String> fflist = contact.getFriendList(); // 친구 목록 저장
+                        List<String> realFriendList = new ArrayList<>();
+                        myContact = contact;
+                        DaoImple.getInstance().setContact(contact);
+                        for(int a = 0 ; a < fflist.size() ; a++){
+                            String name = fflist.get(a);
+                            realFriendList.add(name);
+                        }
+
+                        realFriendList.add(DaoImple.getInstance().getLoginEmail());
+                        clusterManager.clearItems();
+                        for(int a = 0 ; a < realFriendList.size() ; a++) { //  친구 목록으로 메모 가져오기
+                            String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
+                            friendMemeList(key); // 친구들 메모 가져오는 메소드
+
+
+                        }
+                        }
+                }
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+
+
+    }
+
+    // 친구 메모리스트 받아오기
+    private void friendMemeList(String key) {
+        memoList.clear();
+        memoCheck = false;
+        reference.child("userData").child(key).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.i("asd13", "들어옴");
+                UserDataTable data = dataSnapshot.getValue(UserDataTable.class);
+                List<Double> friendLocation = data.getLocation();
+                ItemMemo friendMemo = new ItemMemo(friendLocation.get(0),friendLocation.get(1),
+                        data.getUserId(),data.getName(),data.getTitle(),data.getContent(),
+                        data.getData(),data.getImageUrl(),BitmapFactory.decodeResource(context.getResources(),R.drawable.letter));
+                if(!memoCheck) {
+                    memoList.add(friendMemo);
+                    clusterManager.clearItems();
+                    memoCheck = true;
+                }
+
+                if(memoList.size() != 0){
+                    if(data.getContent().equals(memoList.get(memoList.size()-1).getContent())
+                            && data.getTitle().equals(memoList.get(memoList.size()-1).getTitle()) &&
+                            data.getData().equals(memoList.get(memoList.size()-1).getTime())){
+
+                    }else{
+                        memoList.add(friendMemo);
+                        // 메모의 거리를 계산 해주는 메소드
+                        memoDistanceAdd(friendMemo);
+                        Log.i("asd13", "메모 생성");
+                    }
+                }
+                clusterManager.cluster();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    // 메모와의 거리를 계산해주는 메소드
+    private void memoDistanceAdd(ItemMemo friendMemo) {
+                Location myMemoLocation = new Location("my");
+                myMemoLocation.setLatitude(myLatLng.latitude);
+                myMemoLocation.setLatitude(myLatLng.longitude);
+                Location yourMemoLocation = new Location("your");
+                yourMemoLocation.setLatitude(friendMemo.getPosition().latitude);
+                yourMemoLocation.setLatitude(friendMemo.getPosition().longitude);
+
+//         나와 메모의 거리가 300m 미만이라면 메모 add
+                float distance = yourMemoLocation.distanceTo(myMemoLocation);
+                if(distance < 300) {
+                    clusterManager.addItem(friendMemo);
+                    Collection<ClusterItem> clusterItems = clusterManager.getAlgorithm().getItems();
+                    for(ClusterItem a : clusterItems){
+                        if(a instanceof ItemMemo){
+                            Log.i("bbv",((ItemMemo)a).getContent());
+                            Log.i("bbv",((ItemMemo)a).getUserId());
                         }
                     }
-
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-
-            });
-
-
-        }
-
-        // 친구 메모리스트 받아오기
-        private void friendMemeList(String key) {
-            reference.child("userData").child(key).addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    Log.i("fffff", "들어옴");
-                    UserDataTable data = dataSnapshot.getValue(UserDataTable.class);
-                    List<Double> friendLocation = data.getLocation();
-                    ItemMemo friendMemo = new ItemMemo(friendLocation.get(0), friendLocation.get(1),
-                            data.getUserId(), data.getName(), data.getTitle(), data.getContent(),
-                            data.getData(), data.getImageUrl(), BitmapFactory.decodeResource(context.getResources(), R.drawable.letter));
-                    memoList.add(friendMemo);
-                    // 메모의 거리를 계산 해주는 메소드
-                    memoDistanceAdd(friendMemo);
-                    Log.i("fffff", "메모 생성");
-
                     clusterManager.cluster();
                 }
 
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                }
+    }
 
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+    // 내 gps 위치 받아오고, firebase에 contact 업데이트
+    @SuppressLint("MissingPermission")
+    private void myLocationUpdate() {
+        Log.i("asd123","myLocationUpdate");
+        if (locationManager == null) {
+            locationManager = (LocationManager) this.getSystemService(context.LOCATION_SERVICE);
+            Log.i("vvv456","로케이션 매니저 생성");
         }
+        Log.i("","");
 
-        // 메모와의 거리를 계산해주는 메소드
-        private void memoDistanceAdd(ItemMemo friendMemo) {
-            Location myMemoLocation = new Location("my");
-            myMemoLocation.setLatitude(myLatLng.latitude);
-            myMemoLocation.setLatitude(myLatLng.longitude);
-            Location yourMemoLocation = new Location("your");
-            yourMemoLocation.setLatitude(friendMemo.getPosition().latitude);
-            yourMemoLocation.setLatitude(friendMemo.getPosition().longitude);
-
-//         나와 메모의 거리가 300m 미만이라면 메모 add
-            float distance = yourMemoLocation.distanceTo(myMemoLocation);
-            Log.i("fffff11", "myLocation : " + myLatLng.latitude + " " + myLatLng.longitude);
-            Log.i("fffff11", "distance : " + distance);
-            if (distance < 300) {
-                clusterManager.addItem(friendMemo);
-//                    Log.i("fffff", data.getTitle());
-                Log.i("fffff", "친구 메모 에드");
-            }
-//
-        }
-
-        // 내 gps 위치 받아오고, firebase에 contact 업데이트
-        @SuppressLint("MissingPermission")
-        private void myLocationUpdate() {
-            Log.i("asd123", "myLocationUpdate");
-            if (locationManager == null) {
-                locationManager = (LocationManager) this.getSystemService(context.LOCATION_SERVICE);
-                Log.i("vvv456", "로케이션 매니저 생성");
-            }
-            Log.i("", "");
-
-            // 최적 gps 하드웨어 검색
-            Criteria c = new Criteria();
-            provider = locationManager.getBestProvider(c, true);
-            // 사용가능한 장치가 없다면 모든 장치에서 검색
-            if (provider == null || !locationManager.isProviderEnabled(provider)) {
-                List<String> hardWare = locationManager.getAllProviders();
-                for (int a = 0; a < hardWare.size(); a++) {
-                    String gpsHardware = hardWare.get(a);
-                    if (locationManager.isProviderEnabled(gpsHardware)) {
-                        provider = gpsHardware;
-                        break;
-                    }
+        // 최적 gps 하드웨어 검색
+        Criteria c = new Criteria();
+        provider = locationManager.getBestProvider(c,true);
+        // 사용가능한 장치가 없다면 모든 장치에서 검색
+        if(provider == null || !locationManager.isProviderEnabled(provider)) {
+            List<String> hardWare = locationManager.getAllProviders();
+            for (int a = 0; a < hardWare.size(); a++) {
+                String gpsHardware = hardWare.get(a);
+                if (locationManager.isProviderEnabled(gpsHardware)) {
+                    provider = gpsHardware;
+                    break;
                 }
             }
+        }
 
 
             // 내 GPS 위치가 바뀔 때 마다, 내 마커 생성
@@ -1155,32 +1232,29 @@ import static com.example.homin.test1.ReadMemoActivity.*;
                 @Override
                 public void onLocationChanged(Location location) {
                     check = false;
-                    memoCheck = false;
+                    if(myContact == null) {
+                        myContact = DaoImple.getInstance().getContact();
+                    }
+                    Log.i("asdqwe","로케이션 체인지");
 
                     List<Double> myLocation = new ArrayList<>();
                     myLocation.add(location.getLatitude());
+                    Log.i("ddd3333",location.getLongitude()+"");
                     myLocation.add(location.getLongitude());
-                    myContact = DaoImple.getInstance().getContact();
                     myContact.setUserLocation(myLocation);
                     reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
 
                     // 내 위치를 myLatLng로 생성
-                    myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                        myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-                    if (!zoomCheck) {
+
+
+                    if(!zoomCheck) {
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));
                         zoomCheck = true;
                         clusterManager.cluster();
                     }
 
-                    clusterManager.clearItems();
-                    Log.i("fffff", "메모 삭제");
-                    if (memoList != null) {
-
-                        for (int a = 0; a < memoList.size(); a++) {
-                            memoDistanceAdd(memoList.get(a));
-                        }
-                    }
 
 
                 }
@@ -1200,300 +1274,340 @@ import static com.example.homin.test1.ReadMemoActivity.*;
 
                 }
             };
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 100, locationListener);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 100, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 100, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 100, locationListener);
 
 
+
+    }
+
+
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        menu.add(0, 1, 0, "글 남기기");
+        menu.add(0, 2, 0, "목적지로 설정하기");
+        menu.add(0, 3, 0, "취소");
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case 1:
+                writeMyLocation();
+                Intent intent = new Intent(MapsActivity.this,WriteActivity.class);
+                startActivityForResult(intent,RESULT_CODE);
+                break;
+            case 2:
+                break;
+            case 3:
+                closeContextMenu();
+                break;
         }
+        return super.onContextItemSelected(item);
+    }
+
+//    // 갤러리에서 사진 선택하는 메소드
+//    public void clickedProImgBotton() {
+//        Intent intent = new Intent(Intent.ACTION_PICK);
+//        //TODO: ACTION_PICK(이미지가 저장되어있는 폴더를 선택) ACTION_GET_CONTENT(전체 이미지를 폴더 구분없이 최신 이미지 순)랑 둘 비교
+//        intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        intent.setType("image/*");
+//        startActivityForResult(intent, GALLERY_CODE);
+//        Log.i(TAG, "갤러리 코드: " + intent);
+//    } // end clickedProImgBotton()
+//
+//
+//    // 팝업뜰때 카메라 눌렀을때 발생하는 메소드  속에 내부메소드!
+//    public void popupCameraInCameraMethod() {
+//        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        if (intent.resolveActivity(getPackageManager()) != null) {
+//            Log.i(TAG, "intent.getData(): " + intent.getData());
+//            startActivityForResult(intent, CAMERA_CODE);
+//
+//            Log.i(TAG, "팝업창에서 카메라 눌른후");
+//        }
+//    }
 
 
-        @SuppressLint("MissingPermission")
-        void writeMyLocation() {
-            // 현재 내 위치 가져오기
-            reference.child("Contact").addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+
+
+    @SuppressLint("MissingPermission")
+    void writeMyLocation(){
+        // 현재 내 위치 가져오기
+        reference.child("Contact").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                for(DataSnapshot data : dataSnapshot.getChildren()){
+
+                }
+                Contact con = dataSnapshot.getValue(Contact.class);
+                if(con.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
+                    List<Double> location = con.getUserLocation();
+                    LatLng myLL = new LatLng(location.get(0),location.get(1));
+                    DaoImple.getInstance().setWriteLocation(myLL);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        // 현재 gps 위치 저장
+
+
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("ggv", "onActivityResult 들어옴");
+        // WriteActivity에서 받아온 글 정보들을 마커로 생성
+        if (resultCode == RESULT_OK) {
+            Log.i(TAG, "RESULT_OK");
+            switch (requestCode) {
+                case RESULT_CODE:
+                    Log.i("ggv","onActivityResult");
+                    String title = data.getStringExtra(TITLE_KEY);
+                    String body = data.getStringExtra(BODY_KEY);
+                    String time = data.getStringExtra(TIME_KEY);
+                    String imageUrl = data.getStringExtra(IMAGEURL_KEY);
+                    Log.i("ggv","onActivityResult 데이터 뺌");
+                    Log.i("gg", title + body);
+                    if (!(title.equals("")) && !(body.equals(""))) {
+                        // 클러스터 매니저에 메모 에드
+                        LatLng memoLocation = DaoImple.getInstance().getWriteLocation();
+                        ItemMemo myMemo = new ItemMemo(memoLocation.latitude,memoLocation.longitude,
+                                DaoImple.getInstance().getLoginEmail(),DaoImple.getInstance().getLoginId(),title,body,
+                                time,imageUrl,BitmapFactory.decodeResource(context.getResources(),R.drawable.letter));
+                        Log.i("bb","onActivityResult 내 메모 add");
+                        // 파이어베이스에 메모 업로드
+                        List<Double> tableLocation = new ArrayList<>();
+                        tableLocation.add(memoLocation.latitude);
+                        tableLocation.add(memoLocation.longitude);
+                        UserDataTable table = new UserDataTable(DaoImple.getInstance().getLoginEmail(),DaoImple.getInstance().getLoginId()
+                                ,imageUrl,tableLocation,title,body,time);
+                        reference.child("userData").child(DaoImple.getInstance().getKey()).push().setValue(table);
+                        Log.i("ggv","onActivityResult 파이어베이스 push()");
 
                     }
-                    Contact con = dataSnapshot.getValue(Contact.class);
-                    if (con.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                        List<Double> location = con.getUserLocation();
-                        LatLng myLL = new LatLng(location.get(0), location.get(1));
-                        DaoImple.getInstance().setWriteLocation(myLL);
+                    break;
+
+                case GALLERY_CODE: // 갤러리에서 선택한 사진처리
+                    albumPick = true;
+                    File albumFile = null;
+                    try {
+                        albumFile = MypageFragment.createImageFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                }
 
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-            // 현재 gps 위치 저장
-
-
-        }
-
-
-        @Override
-        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            super.onActivityResult(requestCode, resultCode, data);
-            Log.i("ggv", "onActivityResult 들어옴");
-            // WriteActivity에서 받아온 글 정보들을 마커로 생성
-            if (resultCode == RESULT_OK) {
-                Log.i(TAG, "RESULT_OK");
-                switch (requestCode) {
-                    case RESULT_CODE:
-                        Log.i("ggv", "onActivityResult");
-                        String title = data.getStringExtra(TITLE_KEY);
-                        String body = data.getStringExtra(BODY_KEY);
-                        String time = data.getStringExtra(TIME_KEY);
-                        String imageUrl = data.getStringExtra(IMAGEURL_KEY);
-                        Log.i("ggv", "onActivityResult 데이터 뺌");
-                        Log.i("gg", title + body);
-                        if (!(title.equals("")) && !(body.equals(""))) {
-                            // 클러스터 매니저에 메모 에드
-                            LatLng memoLocation = DaoImple.getInstance().getWriteLocation();
-                            ItemMemo myMemo = new ItemMemo(memoLocation.latitude, memoLocation.longitude,
-                                    DaoImple.getInstance().getLoginEmail(), DaoImple.getInstance().getLoginId(), title, body,
-                                    time, imageUrl, BitmapFactory.decodeResource(context.getResources(), R.drawable.letter));
-
-                            Log.i("bb", "onActivityResult 내 메모 add");
-                            // 파이어베이스에 메모 업로드
-                            List<Double> tableLocation = new ArrayList<>();
-                            tableLocation.add(memoLocation.latitude);
-                            tableLocation.add(memoLocation.longitude);
-                            UserDataTable table = new UserDataTable(DaoImple.getInstance().getLoginEmail(), DaoImple.getInstance().getLoginId()
-                                    , imageUrl, tableLocation, title, body, time);
-                            reference.child("userData").child(DaoImple.getInstance().getKey()).push().setValue(table);
-                            Log.i("ggv", "onActivityResult 파이어베이스 push()");
-
-                        }
-                        break;
-
-                    case GALLERY_CODE: // 갤러리에서 선택한 사진처리
-                        albumPick = true;
-                        File albumFile = null;
-                        try {
-                            albumFile = MypageFragment.createImageFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        if (albumFile != null) {
+                    if (albumFile != null) {
 //                        albumUri = Uri.fromFile(albumFile);
-                            albumUri = FileProvider.getUriForFile(this, getPackageName(), albumFile);
-                        }
+                        albumUri = FileProvider.getUriForFile(this, getPackageName(), albumFile);
+                    }
 
-                        photoUri = data.getData(); // 선택한 사진 Uri 정보
+                    photoUri = data.getData(); // 선택한 사진 Uri 정보
 
-                    case CAMERA_CODE: // 팝업창에서 카메라 버튼 클릭
+                case CAMERA_CODE: // 팝업창에서 카메라 버튼 클릭
 //                    ProgressDialog progressDialog = new ProgressDialog(this);
 //                    progressDialog.setMessage("처리 중...");
 //                    progressDialog.show();
 
-                        cropImage();
+                    cropImage();
 
 //                    progressDialog.dismiss();
-                        break;
+                    break;
 
-                    case CROP_IMAGE_CODE: // user가 지정한 사진 설정 처리
+                case CROP_IMAGE_CODE: // user가 지정한 사진 설정 처리
 //                    Bitmap cropImg = BitmapFactory.decodeFile(photoUri.getPath());
 
-                        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE); // 동기화?
-                        if (albumPick == false) {
-                            mediaScanIntent.setData(photoUri);
+                    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE); // 동기화?
+                    if (albumPick == false) {
+                        mediaScanIntent.setData(photoUri);
 
-                        } else if (albumPick == true) {
-                            albumPick = false;
-                            mediaScanIntent.setData(albumUri);
-
-                        }
-                        this.sendBroadcast(mediaScanIntent);
-
-                        MypageFragment.uploadFile(selectedUri);
-                        MypageFragment.resizeImg(selectedUri);
-
-                        break;
-
-                    case 400:
-
-                        boolean check = data.getBooleanExtra("check", false);
-                        if (check) {
-                            actionButton.setImageResource(R.drawable.ddww);
-                        } else {
-                            actionButton.setImageResource(R.drawable.ic_notifications_black_24dp);
-                        }
-
-                        break;
-
-                } // end switch
-
-            } // end if
-        } // onActivityResult()
-
-        //EssayDetaliActivity의 인덱스갑 가져오는것
-        @Override
-        public void onessaySetlected(int position) {
-            Intent intent = EssayDetailActivity.newIntent(this, position);
-            startActivity(intent);
-        }
-
-
-        @Override
-        public void onBackPressed() {
-            // 메신저창이 올라와 있는 상태에서 백키 누르면 메신저창은 내려감.
-            if (bottomSheetBehavior.getState() == 3) {
-                bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED);
-                pressedTime = 0;
-            } else {
-                // 백키를 두번 눌렀을때, 그 간격이 2초 이하면 어플 종료
-                if (pressedTime == 0) {
-                    Toast.makeText(context, "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
-                    pressedTime = (int) System.currentTimeMillis();
-                } else {
-                    int second = (int) (System.currentTimeMillis() - pressedTime);
-                    if (second > 2000) {
-                        Toast.makeText(context, "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
-                        pressedTime = 0;
-                    } else {
-                        Contact myContact = DaoImple.getInstance().getContact();
-                        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
-                        finishAffinity();
+                    } else if (albumPick == true) {
+                        albumPick = false;
+                        mediaScanIntent.setData(albumUri);
 
                     }
+                    this.sendBroadcast(mediaScanIntent);
+
+                    MypageFragment.uploadFile(selectedUri);
+                    MypageFragment.resizeImg(selectedUri);
+
+                    break;
+
+                case 400:
+
+                    boolean check = data.getBooleanExtra("check", false);
+                    if (check) {
+                        actionButton.setImageResource(R.drawable.ddww);
+                    } else {
+                        actionButton.setImageResource(R.drawable.ic_notifications_black_24dp);
+                    }
+
+                    break;
+
+            } // end switch
+
+        } // end if
+    } // onActivityResult()
+
+    //EssayDetaliActivity의 인덱스갑 가져오는것
+    @Override
+    public void onessaySetlected(int position) {
+        Intent intent = EssayDetailActivity.newIntent(this,position);
+        startActivity(intent);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        // 메신저창이 올라와 있는 상태에서 백키 누르면 메신저창은 내려감.
+        if (bottomSheetBehavior.getState() == 3) {
+            bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED);
+            pressedTime = 0;
+        } else {
+            // 백키를 두번 눌렀을때, 그 간격이 2초 이하면 어플 종료
+            if (pressedTime == 0) {
+                Toast.makeText(context, "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
+                pressedTime = (int) System.currentTimeMillis();
+            } else {
+                int second = (int) (System.currentTimeMillis() - pressedTime);
+                if (second > 2000) {
+                    Toast.makeText(context, "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
+                    pressedTime = 0;
+                } else {
+                    Contact myContact = DaoImple.getInstance().getContact();
+                    reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
+                    finishAffinity();
+
                 }
             }
-
         }
 
-
-        @Override
-        protected void onDestroy() {
-
-            Contact asd = DaoImple.getInstance().getContact();
-            asd.setLoginCheck(false);
-
-            reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(asd);
-
-            Log.i("ggqs","디스트로이 액티비티");
-            super.onDestroy();
-
-        }
+    }
 
 
 
-        private Contact missLocation(Contact myContact) {
-            List<Double> myLocation = myContact.getUserLocation();
-            double lat = myLocation.get(0);
-            double lon = myLocation.get(1);
-            lat += 0.01;
-            lon += 0.01;
-            myLocation.clear();
-            myLocation.add(lat);
-            myLocation.add(lon);
-            return myContact;
-        }
+    @Override
+    protected void onDestroy() {
+
+            reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
+
+        super.onDestroy();
+    }
 
 
-        // 갤러리에서 사진 선택하는 메소드
-        public void clickedProImgBotton() {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            //TODO: ACTION_PICK(이미지가 저장되어있는 폴더를 선택) ACTION_GET_CONTENT(전체 이미지를 폴더 구분없이 최신 이미지 순)랑 둘 비교
+    private Contact missLocation(Contact myContact) {
+        List<Double> myLocation = myContact.getUserLocation();
+        double lat = myLocation.get(0);
+        double lon = myLocation.get(1);
+        lat+=0.01;
+        lon+=0.01;
+        myLocation.clear();
+        myLocation.add(lat);
+        myLocation.add(lon);
+        return myContact;
+    }
+
+
+    // 갤러리에서 사진 선택하는 메소드
+    public void clickedProImgBotton() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        //TODO: ACTION_PICK(이미지가 저장되어있는 폴더를 선택) ACTION_GET_CONTENT(전체 이미지를 폴더 구분없이 최신 이미지 순)랑 둘 비교
 //        intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //        intent.setType("image/*");
 //        intent.setType(MediaStore.Images.Media.CONTENT_TYPE); // ?? 이렇게 하면 어떻게 나오지
 
 //        intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, MediaStore.Images.Media.CONTENT_TYPE);
-            intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
-            startActivityForResult(intent, GALLERY_CODE);
-        } // end clickedProImgBotton()
+        intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+        startActivityForResult(intent, GALLERY_CODE);
+    } // end clickedProImgBotton()
 
 
-        // 프로필 사진 직접 촬영하는 메소드
-        public void popupCameraInCameraMethod() {
-            String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state)) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    File photoFile = null;
-                    try {
-                        photoFile = MypageFragment.createImageFile(); // 원본 이미지 파일 저장 폴더 생성
-                    } catch (IOException ex) {
-                        Toast.makeText(this, "createImageFile 실패", Toast.LENGTH_LONG).show();
-                    }
-
-                    if (photoFile != null) {
-//                    photoUri = Uri.fromFile(photoFile); // 원본 파일 경로 받아옴
-                        photoUri = FileProvider.getUriForFile(this, getPackageName(), photoFile);
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri); // 경로에 저장
-
-                        startActivityForResult(takePictureIntent, CAMERA_CODE);
-                    }
-
+    // 프로필 사진 직접 촬영하는 메소드
+    public void popupCameraInCameraMethod() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                File photoFile = null;
+                try {
+                    photoFile = MypageFragment.createImageFile(); // 원본 이미지 파일 저장 폴더 생성
+                } catch (IOException ex) {
+                    Toast.makeText(this, "createImageFile 실패", Toast.LENGTH_LONG).show();
                 }
+
+                if (photoFile != null) {
+//                    photoUri = Uri.fromFile(photoFile); // 원본 파일 경로 받아옴
+                    photoUri = FileProvider.getUriForFile(this, getPackageName(), photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri); // 경로에 저장
+
+                    startActivityForResult(takePictureIntent, CAMERA_CODE);
+                }
+
             }
-        } // end popupCameraInCameraMethod()
+        }
+    } // end popupCameraInCameraMethod()
 
 
-        // 원본 이미지 crop하는 메소드
-        private void cropImage() {
+    // 원본 이미지 crop하는 메소드
+    private void cropImage() {
 
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            cropIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            cropIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        Intent cropIntent = new Intent("com.android.camera.action.CROP");
+        cropIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        cropIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-            cropIntent.setDataAndType(photoUri, "image/*");
+        cropIntent.setDataAndType(photoUri, "image/*");
 //        cropIntent.putExtra("outputX", 200); // crop한 이미지의 x축 크기
 //        cropIntent.putExtra("outputY", 200); // crop한 이미지의 y축 크기
 //        cropIntent.putExtra("aspectX", 1); // crop 박스의 x축 비율
 //        cropIntent.putExtra("aspectY", 1); // crop 박스의 y축 비율
-            cropIntent.putExtra("scale", true);
+        cropIntent.putExtra("scale", true);
 
-            if (albumPick == false) {
-                selectedUri = photoUri;
-                cropIntent.putExtra("output", selectedUri);
+        if (albumPick == false) {
+            selectedUri = photoUri;
+            cropIntent.putExtra("output", selectedUri);
 
-            } else if (albumPick == true) {
-                selectedUri = albumUri;
-                cropIntent.putExtra("output", selectedUri);
-
-            }
-
-            List<ResolveInfo> list = getPackageManager().queryIntentActivities(cropIntent, 0);
-            grantUriPermission(list.get(0).activityInfo.packageName, selectedUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            Intent in = new Intent(cropIntent);
-            ResolveInfo res = list.get(0);
-            in.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            in.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            grantUriPermission(res.activityInfo.packageName, selectedUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            in.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
-
-            startActivityForResult(in, CROP_IMAGE_CODE);
-
-        } // end cropImage()
-
-        private void setMarkerInfoListener() {
-
+        } else if (albumPick == true) {
+            selectedUri = albumUri;
+            cropIntent.putExtra("output", selectedUri);
 
         }
 
+        List<ResolveInfo> list = getPackageManager().queryIntentActivities(cropIntent, 0);
+        grantUriPermission(list.get(0).activityInfo.packageName, selectedUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        Intent in = new Intent(cropIntent);
+        ResolveInfo res = list.get(0);
+        in.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        in.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        grantUriPermission(res.activityInfo.packageName, selectedUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        in.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
+
+        startActivityForResult(in, CROP_IMAGE_CODE);
+
+    } // end cropImage()
 
         //클릭을 했으면 작동 백키를 눌렀으면 취소
         // 검색한 주소, 내가 임의로 설정한 위치, 내글에 대한 목적지 설정
@@ -1553,4 +1667,4 @@ import static com.example.homin.test1.ReadMemoActivity.*;
         }
 
 
-    }
+}
