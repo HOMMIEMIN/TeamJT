@@ -123,7 +123,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ClusterManager<ClusterItem> clusterManager;
     private List<Contact> myFriendContactList;
     private List<Contact> contactList;
-    private Map<String, Bitmap> pictureList;
     private boolean check;
     private Location location;
     private String provider;
@@ -136,6 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static String MARKER_LIST = "markerList";
     private boolean checkLocation;
     private boolean idCheck;
+
 
 
     // MyPage에 이용
@@ -210,8 +210,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myFriendContactList = new ArrayList<>();
         personList = new HashMap<>();
 
-
-        pictureList = DaoImple.getInstance().getPictureList();
 
         //검색창 editText
         mSearchText = findViewById(R.id.input_search);
@@ -647,8 +645,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 if(m == null){
                                                     List<Double> friendLocation = contact.getUserLocation();
                                                     if (contact.getResizePictureUrl() != null) {
-                                                        Bitmap picture = pictureList.get(contact.getUserId());
-
                                                         ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                                                 friendLocation.get(1), contact.getUserId(), contact.getUserName(),contact.getResizePictureUrl());
 
@@ -830,12 +826,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         myFriendList.add(DaoImple.getInstance().getLoginEmail());
                         Log.i("fffff","친구 목록 저장");
-
-                        Log.i("fffff","친구 메모 삭제");
-                        for(int a = 0 ; a < myFriendList.size() ; a++){ //  친구 목록으로 메모 가져오기
-                            Log.i("fffff","메모 반복문 들어옴");
-                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
-                            friendMemeList(key); // 친구들 메모 가져오는 메소드
+                        if(!memoCheck) {
+                            Log.i("fffff", "친구 메모 삭제");
+                            for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
+                                String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
+                                Log.i("asd13", "에드에서 부름");
+                                friendMemeList(key); // 친구들 메모 가져오는 메소드
+                            }
                         }
 
 
@@ -862,12 +859,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         realFriendList.add(DaoImple.getInstance().getLoginEmail());
-                        Log.i("zxc","메모 체인지");
                         clusterManager.clearItems();
                         for(int a = 0 ; a < realFriendList.size() ; a++) { //  친구 목록으로 메모 가져오기
-                            Log.i("fffff", "메모 반복문 들어옴 체인지");
+
                             String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
                             friendMemeList(key); // 친구들 메모 가져오는 메소드
+                            Log.i("asd13", "체인지에서 부름");
                         }
                         }
                 }
@@ -896,20 +893,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // 친구 메모리스트 받아오기
     private void friendMemeList(String key) {
+
         reference.child("userData").child(key).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.i("fffff", "들어옴");
+                Log.i("asd13", "들어옴");
                 UserDataTable data = dataSnapshot.getValue(UserDataTable.class);
                 List<Double> friendLocation = data.getLocation();
                 ItemMemo friendMemo = new ItemMemo(friendLocation.get(0),friendLocation.get(1),
                         data.getUserId(),data.getName(),data.getTitle(),data.getContent(),
                         data.getData(),data.getImageUrl(),BitmapFactory.decodeResource(context.getResources(),R.drawable.letter));
-                memoList.add(friendMemo);
-                // 메모의 거리를 계산 해주는 메소드
-                memoDistanceAdd(friendMemo);
-                Log.i("fffff", "메모 생성");
+                if(!memoCheck) {
+                    memoList.add(friendMemo);
+                    memoCheck = true;
+                }
 
+                if(memoList.size() != 0){
+                    if(data.getContent().equals(memoList.get(memoList.size()-1).getContent())
+                            && data.getTitle().equals(memoList.get(memoList.size()-1).getTitle()) &&
+                            data.getData().equals(memoList.get(memoList.size()-1).getTime())){
+
+                    }else{
+                        memoList.add(friendMemo);
+                        // 메모의 거리를 계산 해주는 메소드
+                        memoDistanceAdd(friendMemo);
+                        Log.i("asd13", "메모 생성");
+                    }
+                }
                 clusterManager.cluster();
             }
 
@@ -946,10 +956,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 //         나와 메모의 거리가 300m 미만이라면 메모 add
                 float distance = yourMemoLocation.distanceTo(myMemoLocation);
-                Log.i("fffff11", "myLocation : " + myLatLng.latitude + " " +myLatLng.longitude);
-                Log.i("fffff11", "distance : " + distance);
                 if(distance < 300) {
                     clusterManager.addItem(friendMemo);
+                    Collection<ClusterItem> collection = clusterManager.getAlgorithm().getItems();
+                    for(ClusterItem m : collection){
+                        if(m instanceof ItemMemo){
+                            Log.i("asdfff",((ItemMemo)m).getContent());
+                            Log.i("asdfff", "distance : " + distance);
+                        }
+                    }
                     Log.i("aaa1234", friendMemo.getTitle());
                     Log.i("aaa1234", "친구 메모 에드");
                 }
@@ -987,7 +1002,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onLocationChanged(Location location) {
                     check = false;
-                    memoCheck = false;
                     if(myContact == null) {
                         myContact = DaoImple.getInstance().getContact();
                     }
@@ -1010,15 +1024,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         zoomCheck = true;
                         clusterManager.cluster();
                     }
-
-                        clusterManager.clearItems();
-                        Log.i("fffff","메모 삭제");
-                        if(memoList != null) {
-
-                            for (int a = 0; a < memoList.size(); a++) {
-                                memoDistanceAdd(memoList.get(a));
-                            }
-                        }
 
 
 
