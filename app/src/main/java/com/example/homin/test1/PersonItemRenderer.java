@@ -59,14 +59,21 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     }
 
     @Override
+    protected void onClusterRendered(Cluster<ClusterItem> cluster, Marker marker) {
+        super.onClusterRendered(cluster, marker);
+        marker.setAnchor(0.5f,0.5f);
+
+    }
+
+    @Override
     protected void onClusterItemRendered(final ClusterItem clusterItem, final Marker marker) {
 
-        Log.i("dd4432", "context: " + context);
-
+        marker.setAnchor(0.5f,0.5f);
         Context get = getActivity(context);
         if (clusterItem instanceof ItemPerson) {
             if (get != null) {
                 Glide.with(get).load(((ItemPerson) clusterItem).getImage()).asBitmap().fitCenter().into(new SimpleTarget<Bitmap>() {
+
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                         Bitmap roundBitmap = getCircleBitmap(resource);
