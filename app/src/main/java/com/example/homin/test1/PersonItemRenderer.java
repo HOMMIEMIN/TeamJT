@@ -58,9 +58,16 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     }
 
     @Override
+    protected void onClusterRendered(Cluster<ClusterItem> cluster, Marker marker) {
+        super.onClusterRendered(cluster, marker);
+        marker.setAnchor(0.5f,0.5f);
+
+    }
+
+    @Override
     protected void onClusterItemRendered(ClusterItem clusterItem, final Marker marker) {
 
-
+        marker.setAnchor(0.5f,0.5f);
         Context get = getActivity(context);
         if (clusterItem instanceof ItemPerson) {
             if (get != null) {
@@ -97,6 +104,7 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     @Override
     protected void onBeforeClusterItemRendered(final ClusterItem item, final MarkerOptions markerOptions) {
         super.onBeforeClusterItemRendered(item, markerOptions);
+
 
         if (item instanceof ItemPerson) {
 

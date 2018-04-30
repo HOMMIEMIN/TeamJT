@@ -24,6 +24,19 @@ import com.google.maps.android.clustering.ClusterItem;
 
         }
 
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public void setUserName(String userName) {
+            this.userName = userName;
+        }
+
+        public void setImage(String image) {
+            this.image = image;
+        }
+
+
         public String getTitle() {
             return userId;
         }
