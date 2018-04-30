@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:contentPadding="0dp"
-    >
+    app:contentPadding="0dp">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"

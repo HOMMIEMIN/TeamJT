@@ -117,8 +117,9 @@ public class FriendFragment extends Fragment {
             if(holder.getItemViewType() == 0) {
                 if (activity != null) {
                     if (realFriendList.get(position).getResizePictureUrl() != null) {
-                        Glide.with(activity).load(realFriendList.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
-                                .centerCrop().into(holder.iv);
+//                        Glide.with(activity).load(realFriendList.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
+//                                .centerCrop().into(holder.iv);
+                        Glide.with(activity).load(realFriendList.get(position).getResizePictureUrl()).into(holder.iv);
                         holder.tv1.setText(realFriendList.get(position).getUserName());
                     } else {
                         holder.iv.setImageResource(R.drawable.p1);
@@ -129,8 +130,9 @@ public class FriendFragment extends Fragment {
                 if (activity != null) {
                     if (list2.size() != 0) {
                         if (list2.get(position).getResizePictureUrl() != null) {
-                            Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
-                                    .centerCrop().into(holder.iv);
+//                            Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
+//                                    .centerCrop().into(holder.iv);
+                            Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity)).into(holder.iv);
                             holder.tv1.setText(list2.get(position).getUserName());
                             Log.i("zxzxzx",list2.get(position).getUserName());
                             holder.tv3.setText(list2.get(position).getUserId());
