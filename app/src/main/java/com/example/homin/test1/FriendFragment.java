@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -123,22 +125,31 @@ public class FriendFragment extends Fragment {
                         holder.tv1.setText(realFriendList.get(position).getUserName());
                     }
                 }
-            }
-
-
             }else{
-                if(list2.size() != 0) {
-                    if(list2.get(position).getResizePictureUrl() != null) {
-                        Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
-                                .centerCrop().into(holder.iv);
-                        holder.tv1.setText(list2.get(position).getUserName());
-                    }else{
-                        holder.iv.setImageResource(R.drawable.p1);
-                        holder.tv1.setText(list2.get(position).getUserName());
+                if (activity != null) {
+                    if (list2.size() != 0) {
+                        if (list2.get(position).getResizePictureUrl() != null) {
+                            Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
+                                    .centerCrop().into(holder.iv);
+                            holder.tv1.setText(list2.get(position).getUserName());
+                            Log.i("zxzxzx",list2.get(position).getUserName());
+                            holder.tv3.setText(list2.get(position).getUserId());
+                            Log.i("zxzxzx",list2.get(position).getUserId());
+                        } else {
+                            holder.iv.setImageResource(R.drawable.p1);
+                            holder.tv1.setText(list2.get(position).getUserName());
+                            Log.i("zxzxzx",list2.get(position).getUserName());
+                            holder.tv3.setText(list2.get(position).getUserId());
+                            Log.i("zxzxzx",list2.get(position).getUserId());
+                        }
                     }
                 }
 
             }
+
+
+            }
+
 
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -165,6 +176,7 @@ public class FriendFragment extends Fragment {
                     }
                 }
             });
+
             if(holder.btn2 != null) {
                 holder.btn2.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -243,15 +255,19 @@ public class FriendFragment extends Fragment {
         class FriendHolder extends RecyclerView.ViewHolder{
             ImageView iv;
             TextView tv1;
-            TextView tv2;
+            TextView tv2, tv3;
             Button btn2;
 
             public FriendHolder(View itemView) {
                 super(itemView);
                 iv = itemView.findViewById(R.id.imageView_frindLayout);
+                iv.setBackground(new ShapeDrawable(new OvalShape()));
+                iv.setClipToOutline(true);
                 tv1 = itemView.findViewById(R.id.textView_FriendLayout1);
                 tv2 = itemView.findViewById(R.id.textView_FriendLayou2);
                 btn2 = itemView.findViewById(R.id.btn_addFriend);
+                tv3 = itemView.findViewById(R.id.textView_findId);
+
             }
         }
     }

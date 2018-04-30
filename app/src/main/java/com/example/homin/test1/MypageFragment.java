@@ -29,9 +29,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,6 +55,7 @@ import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.security.PrivateKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,6 +68,7 @@ import java.util.Locale;
 public class MypageFragment extends Fragment {
 
     private static final String TAG = "changeImage";
+    private static final String TAG1 = "alstjrdl";
 
     public static userDataTableAdapter adapter;
 
@@ -77,6 +81,11 @@ public class MypageFragment extends Fragment {
     private RecyclerView recycler;
     private List<UserDataTable> userDataTList;
     private String userName;
+
+    // 공개여부 설정에 필요
+    private Switch swich;
+    private static String public_gab;
+    public boolean Gong_ge;
 
     // 카메라 권한 필요한 것
     private static final int REQ_CODE_PERMISSION = 1;
@@ -92,6 +101,7 @@ public class MypageFragment extends Fragment {
     }
 
     private EssaySetlectedCallback callback;
+
 
 
     public MypageFragment() {
@@ -119,6 +129,7 @@ public class MypageFragment extends Fragment {
 
         textView = view.findViewById(R.id.textView);
         textView.setText(DaoImple.getInstance().getLoginId());
+
 
         // 프로필 이미지 설정
         imageView = view.findViewById(R.id.imageView);
@@ -247,6 +258,9 @@ public class MypageFragment extends Fragment {
         adapter = new userDataTableAdapter();
         recycler.setAdapter(adapter);
 
+
+
+
         return view;
 
 
@@ -318,6 +332,37 @@ public class MypageFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+        //TODO: 공개여부
+
+        swich = getView().findViewById(R.id.switchBtn);
+        key = DaoImple.getInstance().getKey();
+        Gong_ge = DaoImple.getInstance().getContact().isPublic();
+        Log.i(TAG1,"맨처음 Gong_ge 값은:  "+ Gong_ge);
+        if (Gong_ge == true ) {
+            swich.setChecked(true);
+            Log.i(TAG1,"if가 ture 일때 Gong_ge 값:  "+ Gong_ge);
+        } else {
+            swich.setChecked(false);
+            Log.i(TAG1,"if가 false 일때 Gong_ge 값:  "+ Gong_ge);
+        }
+
+        swich.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean ischecked) {
+                if ( ischecked == true ) {
+                    reference.child("Contact").child(key).child("public").setValue(true);
+                    Log.i(TAG1,"스위치 ture 일때 Gong_ge 값:  "+ ischecked);
+                    Toast.makeText(MypageFragment.context, "내정보 공개", Toast.LENGTH_SHORT).show();
+                } else {
+                    reference.child("Contact").child(key).child("public").setValue(false);
+                    Log.i(TAG1,"스위치 false 일때 Gong_ge 값:  "+ ischecked);
+                    Toast.makeText(MypageFragment.context, "내정보 비공개", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
         //TODO: 리사이클러 뷰
 
         if (userDataTList.size()== 0) {
@@ -698,7 +743,6 @@ public static String getAddress(Context context,double lat, double lng) {
         }
 
     }
-
 
 
 

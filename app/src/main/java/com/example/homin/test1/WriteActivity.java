@@ -54,6 +54,7 @@ public class WriteActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
+
         et1 = findViewById(R.id.editText3);
         et2 = findViewById(R.id.editText4);
         imageView = findViewById(R.id.open_imageView);

@@ -2,10 +2,12 @@ package com.example.homin.test1;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -63,6 +65,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -90,9 +96,6 @@ import java.util.Map;
 
 import static com.example.homin.test1.WriteActivity.*;
 import static com.example.homin.test1.ReadMemoActivity.*;
-
-
-
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -142,6 +145,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<ItemPerson> personMarkerList;
     private int pressedTime;
     private Location getLocation;
+    private long chatCheck;
     public static String MARKER_LIST = "markerList";
     private boolean checkLocation;
     private boolean destoryCheck;
@@ -176,7 +180,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ItemDestination targetMarker;//목적지 마커(검색시)
     private String targetId; //상대방을 목적지로 선택했을때
     private ItemPerson targetIdMarker;
-
+    private View shapeView;
+    private FloatingActionButton writeMemoButton;
+    private GroundOverlay arrow;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -225,9 +231,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myFriendContactList = new ArrayList<>();
         personList = new HashMap<>();
         distanceIndicator = findViewById(R.id.distanceIndicator);
+        shapeView = findViewById(R.id.shapeView);
 
-
-        pictureList = DaoImple.getInstance().getPictureList();
 
         //검색창 editText
         mSearchText = findViewById(R.id.input_search);
@@ -239,6 +244,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, 16));
 
+            }
+        });
+
+        //메모쓰는 버튼
+        writeMemoButton = findViewById(R.id.writeMemoButton);
+        writeMemoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                writeMyLocation();
+                Intent intent = new Intent(MapsActivity.this,WriteActivity.class);
+                startActivityForResult(intent,RESULT_CODE);
             }
         });
 
@@ -284,41 +301,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-//        chatToastMessage();
-
-
     }
-
-//    private void chatToastMessage() {
-//        reference.child("Chat").addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                Chat c = dataSnapshot.getValue(Chat.class);
-//
-//
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-//    }
 
 
     /********************************검색창을 위한 메소드들****************************************/
@@ -338,19 +321,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
 
-//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//                if (marker == mMarker) {
-//                    if (mMarker.isInfoWindowShown()) {
-//                        mMarker.hideInfoWindow();
-//                    } else {
-//                        mMarker.showInfoWindow();
-//                    }
-//                }
-//                return false;
-//            }
-//        });
+//
 
         if (placeInfo != null) {
             try {
@@ -475,7 +446,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void geoLocate() {
         Log.d("bye", "geoLocate: geolocating");
         String searchString = mSearchText.getText().toString();
-        Geocoder geocoder = new Geocoder(MapsActivity.this);
+        Geocoder geocoder = new Geocoder(com.example.homin.test1.MapsActivity.this);
 
         List<Address> list = new ArrayList<>();
 
@@ -512,14 +483,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         init();
         email = DaoImple.getInstance().getLoginEmail();
         mMap = googleMap;
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(com.example.homin.test1.MapsActivity.this));
 
         reference = FirebaseDatabase.getInstance().getReference();
 
 
         if (clusterManager == null) {
-            clusterManager = new ClusterManager<>(MapsActivity.this, mMap);
-            clusterManager.setRenderer(new PersonItemRenderer(MapsActivity.this, mMap, clusterManager));
+            clusterManager = new ClusterManager<>(com.example.homin.test1.MapsActivity.this, mMap);
+            clusterManager.setRenderer(new PersonItemRenderer(com.example.homin.test1.MapsActivity.this, mMap, clusterManager));
             clusterManager.setAlgorithm(new CustomAlgorithm<ClusterItem>());
             mMap.setOnCameraIdleListener(clusterManager);
             mMap.setOnMarkerClickListener(clusterManager);
@@ -528,7 +499,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-        //InfoWindowClickListener for ClusterItems
         clusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterItem>() {
             @Override
             public void onClusterItemInfoWindowClick(final ClusterItem clusterItem) {
@@ -557,7 +527,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         @Override
                         public void onClick(View v) {
 
-                            Intent intent = new Intent(MapsActivity.this, ReadMemoActivity.class);
+                            Intent intent = new Intent(com.example.homin.test1.MapsActivity.this, ReadMemoActivity.class);
                             intent.putExtra(MEMO_NAME, ((ItemMemo) clusterItem).getUserName());
                             intent.putExtra(MEMO_ID, ((ItemMemo) clusterItem).getUserId());
                             intent.putExtra(MEMO_TITLE, ((ItemMemo) clusterItem).getTitle());
@@ -572,10 +542,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 } else if (clusterItem instanceof ItemPerson) {
                     final String id = ((ItemPerson) clusterItem).getUserId();
-                    Toast.makeText(context, "사람 들어옴", Toast.LENGTH_SHORT).show();
-                    Snackbar.make(rootView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                    if (id == DaoImple.getInstance().getContact().getUserId()) {
+
+                    } else {
+                        Snackbar.make(rootView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 //                            final String key =  DaoImple.getInstance().getFirebaseKey(id);
 //                            reference.child("contact").child(key).addChildEventListener(new ChildEventListener() {
 //                                @Override
@@ -603,30 +575,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //
 //                                }
 //                            })
-                            distanceIndicator.setText("위치 확인중");
-                            if (mMarker != null) {
-                                mMarker.remove();
-                                mMarker = null;
+                                distanceIndicator.setText("위치 확인중");
+                                if (mMarker != null) {
+                                    mMarker.remove();
+                                    mMarker = null;
+                                }
+
+
+                                destinationClicked = false;
+
+                                if (targetMarker != null) {
+                                    clusterManager.removeItem(targetMarker);
+                                    clusterManager.cluster();
+                                    targetMarker = null;
+                                }
+                                if (mMarker != null) {
+                                    mMarker.remove();
+                                }
+
+                                destinationClicked = false;
+                                targetId = ((ItemPerson) clusterItem).getUserId();
+                                setDestination();
                             }
+                        }).show();
 
-
-                            destinationClicked = false;
-
-                            if (targetMarker != null) {
-                                clusterManager.removeItem(targetMarker);
-                                clusterManager.cluster();
-                                targetMarker = null;
-                            }
-                            if (mMarker != null) {
-                                mMarker.remove();
-                            }
-
-                            destinationClicked = false;
-                            targetId = ((ItemPerson) clusterItem).getUserId();
-                            setDestination();
-                        }
-                    }).show();
-
+                    }
                 }
             }
         });
@@ -649,13 +622,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }
                 if (itemMemos.size() != 0) {
-                    Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
+                    Intent intent = new Intent(com.example.homin.test1.MapsActivity.this, ItemDetailActivity.class);
                     intent.putExtra(MARKER_LIST, "memo");
                     DaoImple.getInstance().setItemMemoList(itemMemos);
                     Log.i("ggqs", itemMemos.size() + "");
                     startActivity(intent);
                 } else {
-                    Intent intent = new Intent(MapsActivity.this, ItemDetailActivity.class);
+                    Intent intent = new Intent(com.example.homin.test1.MapsActivity.this, ItemDetailActivity.class);
                     DaoImple.getInstance().setItemPersonList(itemPeople);
                     intent.putExtra(MARKER_LIST, "person");
                     Log.i("ggqs", itemPeople.size() + "");
@@ -682,7 +655,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent1 = new Intent(MapsActivity.this, WatingActivity.class);
+                Intent intent1 = new Intent(com.example.homin.test1.MapsActivity.this, WatingActivity.class);
                 startActivity(intent1);
 
             }
@@ -724,6 +697,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Contact contact = dataSnapshot.getValue(Contact.class);
                     if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                         myContact = contact;
+                        Log.i("ddd3333", "콘텍트 생성");
                         DaoImple.getInstance().setContact(myContact);
                     }
                     for (int a = 0; a < myFriendList.size(); a++) {
@@ -734,8 +708,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             if (contact.getResizePictureUrl() != null) {
                                 ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                         friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
-                                if (contact.isLoginCheck()) {
-                                    clusterManager.addItem(friendMarker);
+                                // 공개 여부 확인
+                                if (contact.isPublic() || contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                    // 로그인 상태 확인
+                                    if (contact.isLoginCheck()) {
+                                        clusterManager.addItem(friendMarker);
+                                    }
                                 }
                                 // 내 마커는 목적지 설정을 위해 멤버 변수에 저장
                                 if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
@@ -793,138 +771,145 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Contact contact = dataSnapshot.getValue(Contact.class);
                         if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                             myContact = contact;
+                            List<String> realFriendList = contact.getFriendList();
+                            myFriendList = new ArrayList<>();
+
+                            for (int a = 0; a < realFriendList.size(); a++) {
+                                String name = realFriendList.get(a);
+                                myFriendList.add(name);
+                            }
+                            myFriendList.add(DaoImple.getInstance().getLoginEmail());
                             DaoImple.getInstance().setContact(contact);
+                            Log.i("ddd3333", "콘텍트 생성");
 
                         }
                         if (myFriendList != null) {
                             for (int a = 0; a < myFriendList.size(); a++) {
+                                Log.i("asdasd11", myFriendList.get(a));
                                 if (myFriendList.get(a).equals(contact.getUserId())) {
-                                    // 로그인 되있는 상태라면 사용자 마커 표시
-                                    if (contact.isLoginCheck()) {
-                                        Log.i("asdasd", "로그인 됨 : " + contact.getUserId());
-                                        // 현재 저장 된 모든 마커 꺼내기
-                                        Collection<ClusterItem> markers = clusterManager.getAlgorithm().getItems();
-                                        // 저장 된 이름 정보와 firebase에 저장 된 이름 비교
-                                        for (int b = 0; b < personList.size(); b++) {
-                                            ClusterItem m = personList.get(contact.getUserId());
-                                            for (int aa = 0; aa < myFriendList.size(); aa++) {
-                                                Log.i("asdqwe", "체인지 친구목록 : " + myFriendList.get(aa));
-                                            }
-                                            if (m instanceof ItemPerson || m == null) {
-                                                if (m == null) {
-                                                    List<Double> friendLocation = contact.getUserLocation();
-                                                    if (contact.getResizePictureUrl() != null) {
-                                                        Bitmap picture = pictureList.get(contact.getUserId());
+                                    // 공개 여부 확인
+                                    if (contact.isPublic() || contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                        // 로그인 되있는 상태라면 사용자 마커 표시
+                                        if (contact.isLoginCheck()) {
+                                            Log.i("asdasd", "로그인 됨 : " + contact.getUserId());
+                                            // 현재 저장 된 모든 마커 꺼내기
+                                            Collection<ClusterItem> markers = clusterManager.getAlgorithm().getItems();
+                                            // 저장 된 이름 정보와 firebase에 저장 된 이름 비교
+                                            for (int b = 0; b < personList.size(); b++) {
+                                                ClusterItem m = personList.get(contact.getUserId());
+                                                if (m instanceof ItemPerson || m == null) {
+                                                    if (m == null) {
+                                                        List<Double> friendLocation = contact.getUserLocation();
+                                                        if (contact.getResizePictureUrl() != null) {
+                                                            ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                                                    friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
 
-                                                        ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+                                                            Log.i("fffff", "체인지 : 바뀐위치 저장");
+                                                            clusterManager.addItem(friendMarker);
+                                                            personList.put(contact.getUserId(), friendMarker);
+                                                            Log.i("asdasd", "마커 생성");
+                                                            Log.i("asdasd ", contact.getUserId());
 
-                                                        Log.i("fffff", "체인지 : 바뀐위치 저장");
-                                                        clusterManager.addItem(friendMarker);
-                                                        personList.put(contact.getUserId(), friendMarker);
-                                                        Log.i("asdasd", "마커 생성");
-                                                        Log.i("asdasd ", contact.getUserId());
+                                                            Log.i("fffff", contact.getUserId());
+                                                            Log.i("fffff", "체인지 : 친구위치 마커생성");
+                                                            Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
+                                                        } else {
+                                                            BitmapFactory.Options options = new BitmapFactory.Options();
+                                                            options.inSampleSize = 1;
+                                                            Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
+                                                            Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
+                                                            ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                                                    friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+                                                            clusterManager.addItem(friendMarker);
+                                                            personList.put(contact.getUserId(), friendMarker);
+                                                            Log.i("asdasd", "마커 생성");
+                                                            Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
+                                                            Log.i("fffff", "체인지 else : " + contact.getUserId());
+                                                        }
 
-                                                        Log.i("fffff", contact.getUserId());
-                                                        Log.i("fffff", "체인지 : 친구위치 마커생성");
-                                                        Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
                                                     } else {
-                                                        BitmapFactory.Options options = new BitmapFactory.Options();
-                                                        options.inSampleSize = 1;
-                                                        Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
-                                                        Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
-                                                        ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
-                                                        clusterManager.addItem(friendMarker);
-                                                        personList.put(contact.getUserId(), friendMarker);
-                                                        Log.i("asdasd", "마커 생성");
-                                                        Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
-                                                        Log.i("fffff", "체인지 else : " + contact.getUserId());
+                                                        Log.i("asdqwe", "사람임");
+                                                        Log.i("asdqwe", "0   " + contact.getUserId());
+                                                        if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
+                                                            ItemPerson ip = personList.get(contact.getUserId());
+                                                            Log.i("asdqwe", "1   " + contact.getUserId());
+                                                            // 저장 되있는 Location 정보와 firebase에 저장된 Location 비교
+                                                            LatLng saveLatLng = ip.getPosition();
+                                                            if (targetId != null) {
+                                                                if (contact.getUserId().equals(targetId)) {
+                                                                    targetIdMarker = ip;
+                                                                    setDestination();
+                                                                }
+                                                            }
+
+                                                            if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
+                                                                myMarker = ip;
+                                                                if (destinationClicked) {
+                                                                    setDestination();
+                                                                }
+                                                            }
+                                                            Log.i("fffff", "리스트 크기 : " + personList.size());
+                                                            Log.i("fffff", "저장 : " + ip.getUserName());
+                                                            LatLng newLatLng = new LatLng(contact.getUserLocation().get(0),
+                                                                    contact.getUserLocation().get(1));
+                                                            Log.i("asdqwe", "2   " + contact.getUserId());
+                                                            Log.i("qweasd", saveLatLng.toString() + contact.getUserId());
+                                                            Log.i("qweasd", newLatLng.toString());
+                                                            if (saveLatLng.longitude != newLatLng.longitude ||
+                                                                    saveLatLng.latitude != newLatLng.latitude) {
+                                                                Log.i("asdqwe", "3   " + contact.getUserId());
+                                                                Log.i("asdqwe", "체인지 : 위치 바뀜");
+                                                                // 서로 다른 Location이 저장되 있다면, clusterManager에 저장된 마커 삭제
+                                                                clusterManager.removeItem(ip);
+                                                                personList.remove(contact.getUserId());
+                                                                // 다시 마커 생성 후, clusterManager과 personList에 저장
+                                                                List<Double> friendLocation = contact.getUserLocation();
+                                                                if (contact.getResizePictureUrl() != null) {
+
+                                                                    ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+
+                                                                    Log.i("fffff", "체인지 : 바뀐위치 저장");
+                                                                    clusterManager.addItem(friendMarker);
+                                                                    personList.put(contact.getUserId(), friendMarker);
+                                                                    Log.i("asdasd", "마커 생성");
+                                                                    Log.i("asdasd ", contact.getUserId());
+
+                                                                    Log.i("fffff", contact.getUserId());
+                                                                    Log.i("fffff", "체인지 : 친구위치 마커생성");
+                                                                    Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
+                                                                } else {
+                                                                    BitmapFactory.Options options = new BitmapFactory.Options();
+                                                                    options.inSampleSize = 1;
+                                                                    Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
+                                                                    Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
+                                                                    ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
+                                                                            friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
+                                                                    clusterManager.addItem(friendMarker);
+                                                                    personList.put(contact.getUserId(), friendMarker);
+                                                                    Log.i("asdasd", "마커 생성");
+                                                                    Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
+                                                                    Log.i("fffff", "체인지 else : " + contact.getUserId());
+
+
+                                                                }
+
+                                                            }
+                                                        }
                                                     }
 
-                                                } else {
-                                                    Log.i("asdqwe", "사람임");
-                                                    Log.i("asdqwe", "0   " + contact.getUserId());
-                                                    if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
-                                                        ItemPerson ip = personList.get(contact.getUserId());
-                                                        Log.i("asdqwe", "1   " + contact.getUserId());
-                                                        // 저장 되있는 Location 정보와 firebase에 저장된 Location 비교
-                                                        LatLng saveLatLng = ip.getPosition();
-                                                        if (targetId != null) {
-                                                            if (contact.getUserId().equals(targetId)) {
-                                                                targetIdMarker = ip;
-                                                                setDestination();
-                                                            }
-                                                        }
-
-                                                        if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
-                                                            myMarker = ip;
-                                                            if (destinationClicked) {
-                                                                setDestination();
-                                                            }
-                                                        }
-                                                        Log.i("fffff", "리스트 크기 : " + personList.size());
-                                                        Log.i("fffff", "저장 : " + ip.getUserName());
-                                                        LatLng newLatLng = new LatLng(contact.getUserLocation().get(0),
-                                                                contact.getUserLocation().get(1));
-                                                        Log.i("asdqwe", "2   " + contact.getUserId());
-                                                        Log.i("qweasd", saveLatLng.toString() + contact.getUserId());
-                                                        Log.i("qweasd", newLatLng.toString());
-                                                        if (saveLatLng.longitude != newLatLng.longitude ||
-                                                                saveLatLng.latitude != newLatLng.latitude) {
-
-                                                            Log.i("asdqwe", "3   " + contact.getUserId());
-                                                            Log.i("asdqwe", "체인지 : 위치 바뀜");
-                                                            // 서로 다른 Location이 저장되 있다면, clusterManager에 저장된 마커 삭제
-                                                            clusterManager.removeItem(ip);
-                                                            personList.remove(contact.getUserId());
-                                                            // 다시 마커 생성 후, clusterManager과 personList에 저장
-                                                            List<Double> friendLocation = contact.getUserLocation();
-                                                            if (contact.getResizePictureUrl() != null) {
-
-                                                                ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
-
-                                                                Log.i("fffff", "체인지 : 바뀐위치 저장");
-                                                                clusterManager.addItem(friendMarker);
-                                                                personList.put(contact.getUserId(), friendMarker);
-                                                                Log.i("asdasd", "마커 생성");
-                                                                Log.i("asdasd ", contact.getUserId());
-
-                                                                Log.i("fffff", contact.getUserId());
-                                                                Log.i("fffff", "체인지 : 친구위치 마커생성");
-                                                                Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
-                                                            } else {
-                                                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                                                options.inSampleSize = 1;
-                                                                Bitmap otherPicture = BitmapFactory.decodeResource(getResources(), R.drawable.what, options);
-                                                                Bitmap picture = Bitmap.createScaledBitmap(otherPicture, 128, 128, true);
-                                                                ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
-                                                                        friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
-                                                                clusterManager.addItem(friendMarker);
-                                                                personList.put(contact.getUserId(), friendMarker);
-                                                                Log.i("asdasd", "마커 생성");
-                                                                Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
-                                                                Log.i("fffff", "체인지 else : " + contact.getUserId());
-
-
-                                                            }
-
-                                                        }
-                                                    }
                                                 }
 
                                             }
+                                        } else {
+                                            Collection<ClusterItem> markers = clusterManager.getAlgorithm().getItems();
+                                            for (ClusterItem m : markers) {
+                                                if (m instanceof ItemPerson) {
+                                                    if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
+                                                        ItemPerson ip = personList.get(contact.getUserId());
+                                                        clusterManager.removeItem(ip);
 
-                                        }
-                                    } else {
-                                        Collection<ClusterItem> markers = clusterManager.getAlgorithm().getItems();
-                                        for (ClusterItem m : markers) {
-                                            if (m instanceof ItemPerson) {
-                                                if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
-                                                    ItemPerson ip = personList.get(contact.getUserId());
-                                                    clusterManager.removeItem(ip);
-
+                                                    }
                                                 }
                                             }
                                         }
@@ -975,7 +960,61 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        Log.i("fffff", "체인지 끝남");
+        // 채팅 수신 토스트로 보여주기
+        reference.child("Chat").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                chatCheck = 0;
+                Log.i("ddd66", "체인지");
+                String key = dataSnapshot.getKey();
+                int num = key.indexOf(DaoImple.getInstance().getKey());
+                Log.i("ddd66", num + "");
+                if (num != -1) {
+                    long chatCount = dataSnapshot.getChildrenCount();
+                    Log.i("ddd66", "들어옴");
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                        chatCheck++;
+                        Chat chat = d.getValue(Chat.class);
+                        Log.i("ddd66", chat.getChat());
+                        if (!(chat.getId().equals(DaoImple.getInstance().getLoginEmail()))) {
+                            Log.i("ddd77", "count : " + chatCount + "," + "chat : " + chatCheck);
+                            if (chatCount == chatCheck) {
+                                Log.i("ddd66", chatCount + "");
+                                Context activityCheck = DaoImple.getInstance().getChattingActivity();
+                                if (activityCheck == null) {
+                                    Log.i("ddd66", "체크" + activityCheck + "");
+                                    Toast.makeText(context, chat.getName() + " : " + chat.getChat(), Toast.LENGTH_SHORT).show();
+                                    chatCheck = 0;
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 
 
@@ -989,22 +1028,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 contactList.add(contact);
                 if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                     myContact = contact;
+                    DaoImple.getInstance().setContact(contact);
                     List<Double> lastLocation = contact.getUserLocation();
                     LatLng latLng = new LatLng(lastLocation.get(0), lastLocation.get(1));
                     myLatLng = latLng;
                 }
                 if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                     if (contact.getFriendList() != null) {
-                        myFriendList = contact.getFriendList(); // 친구 목록 저장
-                        memoFriendList = contact.getFriendList();
-                        memoFriendList.add(DaoImple.getInstance().getLoginEmail());
-                        Log.i("fffff", "친구 목록 저장");
 
-                        Log.i("fffff", "친구 메모 삭제");
-                        for (int a = 0; a < memoFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
-                            Log.i("fffff", "메모 반복문 들어옴");
-                            String key = DaoImple.getInstance().getFirebaseKey(memoFriendList.get(a));
+                        List<String> fflist = contact.getFriendList(); // 친구 목록 저장
+                        myFriendList = new ArrayList<>();
+                        for (int a = 0; a < fflist.size(); a++) {
+                            String name = fflist.get(a);
+                            myFriendList.add(name);
+
+                        }
+
+                        myFriendList.add(DaoImple.getInstance().getLoginEmail());
+                        for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
+
+                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
                             friendMemeList(key); // 친구들 메모 가져오는 메소드
+
+
                         }
 
 
@@ -1016,25 +1062,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Contact contact = dataSnapshot.getValue(Contact.class);
-                contactList.clear();
-                contactList.add(contact);
                 if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                     if (contact.getFriendList() != null) {
-                        DaoImple.getInstance().setContact(contact);
+                        myFriendList = contact.getFriendList();
                         List<String> fflist = contact.getFriendList(); // 친구 목록 저장
-                        myFriendList = new ArrayList<>();
+                        List<String> realFriendList = new ArrayList<>();
+                        myContact = contact;
+                        DaoImple.getInstance().setContact(contact);
                         for (int a = 0; a < fflist.size(); a++) {
                             String name = fflist.get(a);
-                            myFriendList.add(name);
+                            realFriendList.add(name);
                         }
 
-                        myFriendList.add(DaoImple.getInstance().getLoginEmail());
-                        Log.i("zxc", "메모 체인지");
+                        realFriendList.add(DaoImple.getInstance().getLoginEmail());
                         clusterManager.clearItems();
-                        for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
-                            Log.i("fffff", "메모 반복문 들어옴 체인지");
-                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
+                        for (int a = 0; a < realFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
+                            String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
                             friendMemeList(key); // 친구들 메모 가져오는 메소드
+
+
                         }
                     }
                 }
@@ -1063,20 +1109,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // 친구 메모리스트 받아오기
     private void friendMemeList(String key) {
+        memoList.clear();
+        memoCheck = false;
         reference.child("userData").child(key).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.i("fffff", "들어옴");
+                Log.i("asd13", "들어옴");
                 UserDataTable data = dataSnapshot.getValue(UserDataTable.class);
                 List<Double> friendLocation = data.getLocation();
                 ItemMemo friendMemo = new ItemMemo(friendLocation.get(0), friendLocation.get(1),
                         data.getUserId(), data.getName(), data.getTitle(), data.getContent(),
                         data.getData(), data.getImageUrl(), BitmapFactory.decodeResource(context.getResources(), R.drawable.letter));
-                memoList.add(friendMemo);
-                // 메모의 거리를 계산 해주는 메소드
-                memoDistanceAdd(friendMemo);
-                Log.i("fffff", "메모 생성");
+                if (!memoCheck) {
+                    memoList.add(friendMemo);
+                    clusterManager.clearItems();
+                    memoCheck = true;
+                }
 
+                if (memoList.size() != 0) {
+                    if (data.getContent().equals(memoList.get(memoList.size() - 1).getContent())
+                            && data.getTitle().equals(memoList.get(memoList.size() - 1).getTitle()) &&
+                            data.getData().equals(memoList.get(memoList.size() - 1).getTime())) {
+
+                    } else {
+                        memoList.add(friendMemo);
+                        // 메모의 거리를 계산 해주는 메소드
+                        memoDistanceAdd(friendMemo);
+                        Log.i("asd13", "메모 생성");
+                    }
+                }
                 clusterManager.cluster();
             }
 
@@ -1113,15 +1174,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 //         나와 메모의 거리가 300m 미만이라면 메모 add
         float distance = yourMemoLocation.distanceTo(myMemoLocation);
-        Log.i("fffff11", "myLocation : " + myLatLng.latitude + " " + myLatLng.longitude);
-        Log.i("fffff11", "distance : " + distance);
         if (distance < 300) {
             clusterManager.addItem(friendMemo);
-//                    Log.i("fffff", data.getTitle());
-            Log.i("fffff", "친구 메모 에드");
+            Collection<ClusterItem> clusterItems = clusterManager.getAlgorithm().getItems();
+            for (ClusterItem a : clusterItems) {
+                if (a instanceof ItemMemo) {
+                    Log.i("bbv", ((ItemMemo) a).getContent());
+                    Log.i("bbv", ((ItemMemo) a).getUserId());
+                }
+            }
+            clusterManager.cluster();
         }
-//
+
+
     }
+
 
     // 내 gps 위치 받아오고, firebase에 contact 업데이트
     @SuppressLint("MissingPermission")
@@ -1154,31 +1221,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onLocationChanged(Location location) {
                 check = false;
-                memoCheck = false;
+                if (myContact == null) {
+                    myContact = DaoImple.getInstance().getContact();
+                }
+                Log.i("asdqwe", "로케이션 체인지");
 
                 List<Double> myLocation = new ArrayList<>();
                 myLocation.add(location.getLatitude());
+                Log.i("ddd3333", location.getLongitude() + "");
                 myLocation.add(location.getLongitude());
-                myContact = DaoImple.getInstance().getContact();
                 myContact.setUserLocation(myLocation);
                 reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(myContact);
 
                 // 내 위치를 myLatLng로 생성
                 myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
+
                 if (!zoomCheck) {
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));
                     zoomCheck = true;
                     clusterManager.cluster();
-                }
-
-                clusterManager.clearItems();
-                Log.i("fffff", "메모 삭제");
-                if (memoList != null) {
-
-                    for (int a = 0; a < memoList.size(); a++) {
-                        memoDistanceAdd(memoList.get(a));
-                    }
                 }
 
 
@@ -1204,6 +1266,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+
+
+//    // 갤러리에서 사진 선택하는 메소드
+//    public void clickedProImgBotton() {
+//        Intent intent = new Intent(Intent.ACTION_PICK);
+//        //TODO: ACTION_PICK(이미지가 저장되어있는 폴더를 선택) ACTION_GET_CONTENT(전체 이미지를 폴더 구분없이 최신 이미지 순)랑 둘 비교
+//        intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        intent.setType("image/*");
+//        startActivityForResult(intent, GALLERY_CODE);
+//        Log.i(TAG, "갤러리 코드: " + intent);
+//    } // end clickedProImgBotton()
+//
+//
+//    // 팝업뜰때 카메라 눌렀을때 발생하는 메소드  속에 내부메소드!
+//    public void popupCameraInCameraMethod() {
+//        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        if (intent.resolveActivity(getPackageManager()) != null) {
+//            Log.i(TAG, "intent.getData(): " + intent.getData());
+//            startActivityForResult(intent, CAMERA_CODE);
+//
+//            Log.i(TAG, "팝업창에서 카메라 눌른후");
+//        }
+//    }
 
 
     @SuppressLint("MissingPermission")
@@ -1271,7 +1356,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         ItemMemo myMemo = new ItemMemo(memoLocation.latitude, memoLocation.longitude,
                                 DaoImple.getInstance().getLoginEmail(), DaoImple.getInstance().getLoginId(), title, body,
                                 time, imageUrl, BitmapFactory.decodeResource(context.getResources(), R.drawable.letter));
-
                         Log.i("bb", "onActivityResult 내 메모 add");
                         // 파이어베이스에 메모 업로드
                         List<Double> tableLocation = new ArrayList<>();
@@ -1344,13 +1428,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } // end switch
 
         } // end if
+
+        if(requestCode == 5004 && resultCode==1){
+            final LatLng latLng = (LatLng)data.getParcelableExtra("LatLng");
+
+                    distanceIndicator.setText("");
+                    destinationClicked = true;
+                    MarkerOptions options = new MarkerOptions().position(latLng).title("목적지").snippet("위도:" + latLng.latitude + "/n" + "경도: " + latLng.longitude);
+                    if (mMarker != null) {
+                        mMarker.remove();
+                    }
+
+                    if (targetMarker != null) {
+                        clusterManager.removeItem(targetMarker);
+                        clusterManager.cluster();
+                    }
+                    mMarker = mMap.addMarker(options);
+                    setDestination();
+
+                    bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED);
+                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+
+        }
     } // onActivityResult()
 
     //EssayDetaliActivity의 인덱스갑 가져오는것
     @Override
     public void onessaySetlected(int position) {
         Intent intent = EssayDetailActivity.newIntent(this, position);
-        startActivity(intent);
+        startActivityForResult(intent,5004);
     }
 
 
@@ -1360,6 +1466,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (bottomSheetBehavior.getState() == 3) {
             bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED);
             pressedTime = 0;
+        } else if((myMarker != null && mMarker != null)|| (myMarker != null && targetMarker != null)||(myMarker != null && targetId != null && targetIdMarker != null)){
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+
+            dialog.setTitle( "목적지 취소여부" )
+                    .setMessage("선택된 목적지를 취소하시겠습니까?")
+                    .setNegativeButton("아니요", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialoginterface, int i) {
+                            dialoginterface.cancel();
+                        }
+                    })
+                    .setPositiveButton("예", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialoginterface, int i) {
+//                          if(myMarker != null && mMarker != null){
+////                              shapeView.setBackground(null);
+//                              distanceIndicator.setVisibility(View.GONE);
+//                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+//                              destinationClicked = false;
+//
+//                              mMarker.remove();
+//                          }else if(myMarker != null && targetMarker != null){
+////                              shapeView.setBackground(null);
+//                              distanceIndicator.setVisibility(View.GONE);
+//                              distanceIndicator.setText("");
+//                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+//                              destinationClicked = false;
+//                              clusterManager.removeItem(targetMarker);
+//                              clusterManager.cluster();
+//
+//                          }else if(myMarker != null && targetId != null && targetIdMarker != null){
+////                              shapeView.setBackground(null);
+//                              distanceIndicator.setVisibility(View.GONE);
+//                              distanceIndicator.setText("");
+//                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+//                              destinationClicked = false;
+//                              targetId = null;
+//                              targetIdMarker = null;
+//
+//                          }
+                        }
+                    }).show();
+
         } else {
             // 백키를 두번 눌렀을때, 그 간격이 2초 이하면 어플 종료
             if (pressedTime == 0) {
@@ -1385,16 +1533,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onDestroy() {
 
-        Contact asd = DaoImple.getInstance().getContact();
-        asd.setLoginCheck(false);
+        reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
 
-        reference.child("Contact").child(DaoImple.getInstance().getKey()).setValue(asd);
-
-        Log.i("ggqs","디스트로이 액티비티");
         super.onDestroy();
-
     }
-
 
 
     private Contact missLocation(Contact myContact) {
@@ -1488,25 +1630,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     } // end cropImage()
 
-    private void setMarkerInfoListener() {
-
-
-    }
-
-
     //클릭을 했으면 작동 백키를 눌렀으면 취소
     // 검색한 주소, 내가 임의로 설정한 위치, 내글에 대한 목적지 설정
     private void setDestination() {
+       Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.arrow2);
+        Bitmap bitmap1 = PersonItemRenderer.getCircleBitmap(bitmap);
 
+
+        double degree = 0;
+        if(mMarker!= null){
+            degree = SphericalUtil.computeHeading(myMarker.getPosition(),mMarker.getPosition());
+        }else if(targetMarker!= null){
+            degree = SphericalUtil.computeHeading(myMarker.getPosition(),targetMarker.getPosition());
+        }else if(targetIdMarker != null){
+           degree =  SphericalUtil.computeHeading(myMarker.getPosition(),targetIdMarker.getPosition());
+        }
+        if(arrow!= null){
+            arrow.remove();
+        }
+
+
+        GroundOverlayOptions groundOverlayOptions = new GroundOverlayOptions().image(BitmapDescriptorFactory.fromResource(R.drawable.arrow2))
+                .position(myMarker.getPosition(),300,300).bearing((float)degree -90);
+        arrow = mMap.addGroundOverlay(groundOverlayOptions);
+        shapeView.setBackground(getDrawable(R.drawable.shape));
         distanceIndicator.setVisibility(View.VISIBLE);
 //        Log.i("KSJ", myMarker.getPosition() + "||"+ mMarker.getPosition() + "");
         if (myMarker != null && mMarker != null) {
-            Log.i("KSJ", myMarker.getPosition() + "||" + mMarker.getPosition() + "");
             double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), mMarker.getPosition());
-//            Location.distanceBetween();
+            String stringDistance = Double.toString(distance);
+            int index = stringDistance.indexOf(".");
+            String m = stringDistance.substring(0, index);
+            Toast.makeText(context, index + "", Toast.LENGTH_SHORT).show();
+            String cm = stringDistance.substring(index+1,index+3);
             Log.i("KSJ", "distance: " + distance);
-            distanceIndicator.setText(distance + " M ");
+            distanceIndicator.setText("목적지까지의 거리: " +m + "M " + cm + "CM");
+
             if (distance < 100) {
+                shapeView.setBackground(null);
                 distanceIndicator.setVisibility(View.GONE);
                 Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
                 destinationClicked = false;
@@ -1516,11 +1677,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         } else if (myMarker != null && targetMarker != null) {
             Log.i("KSJ", myMarker.getPosition() + "||" + targetMarker.getPosition() + "target?");
-            double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetMarker.getPosition());
-//            Location.distanceBetween();
+            double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetIdMarker.getPosition());
+            String stringDistance = Double.toString(distance);
+            int index = stringDistance.indexOf(".");
+            String m = stringDistance.substring(0, index);
+            Toast.makeText(context, index + "", Toast.LENGTH_SHORT).show();
+            String cm = stringDistance.substring(index+1,index+3);
             Log.i("KSJ", "distance: " + distance);
-            distanceIndicator.setText(distance + " M ");
+            distanceIndicator.setText("목적지까지의 거리: " +m + "M " + cm + "CM");
+
             if (distance < 100) {
+                shapeView.setBackground(null);
                 distanceIndicator.setVisibility(View.GONE);
                 distanceIndicator.setText("");
                 Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
@@ -1534,13 +1701,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else if (myMarker != null && targetId != null && targetIdMarker != null) {
             double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetIdMarker.getPosition());
             String stringDistance = Double.toString(distance);
-            int index = stringDistance.indexOf('.');
-            String m = stringDistance.substring(0,index);
-            Toast.makeText(context, index+"", Toast.LENGTH_SHORT).show();
-            String cm = stringDistance.substring(index);
+            int index = stringDistance.indexOf(".");
+            String m = stringDistance.substring(0, index);
+            Toast.makeText(context, index + "", Toast.LENGTH_SHORT).show();
+            String cm = stringDistance.substring(index+1,index+3);
             Log.i("KSJ", "distance: " + distance);
-            distanceIndicator.setText(m + " M " +cm + "CM" );
+            distanceIndicator.setText("목적지까지의 거리: " +m + "M " + cm + "CM");
             if (distance < 100) {
+                shapeView.setBackground(null);
                 distanceIndicator.setVisibility(View.GONE);
                 distanceIndicator.setText("");
                 Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
@@ -1550,6 +1718,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
     }
+
 
 
 }

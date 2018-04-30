@@ -1,6 +1,9 @@
 package com.example.homin.test1;
 
+import android.graphics.Bitmap;
+
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 
 public class ItemDestination implements ClusterItem {
