@@ -10,6 +10,8 @@ import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,9 +41,18 @@ public class DaoImple {
     private FragmentActivity fragmentActivity;
     private String newDate;
     private Context ChattingActivity;
+    private ClusterManager<ClusterItem> clusterManager;
 
     public UserDataTable getMyPageUserData() {
         return myPageUserData;
+    }
+
+    public ClusterManager<ClusterItem> getClusterManager() {
+        return clusterManager;
+    }
+
+    public void setClusterManager(ClusterManager<ClusterItem> clusterManager) {
+        this.clusterManager = clusterManager;
     }
 
     public void setMyPageUserData(UserDataTable myPageUserData) {

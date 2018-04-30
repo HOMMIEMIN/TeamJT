@@ -222,7 +222,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("dd4434", "MapsActivity onCreate");
         setContentView(R.layout.activity_maps);
+
         rootView = findViewById(R.id.container);//Snackbar위한 View member변수
         Intent intent = new Intent(this, ClosingServics.class);
         startService(intent);
@@ -482,6 +484,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         init();
+        Log.i("dd4434", "MapsActivity onMapReady");
         email = DaoImple.getInstance().getLoginEmail();
         mMap = googleMap;
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(com.example.homin.test1.MapsActivity.this));
@@ -490,6 +493,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         if (clusterManager == null) {
+            Log.i("dd4432", "MapsActivity:" + MapsActivity.this);
+
             clusterManager = new ClusterManager<>(com.example.homin.test1.MapsActivity.this, mMap);
             clusterManager.setRenderer(new PersonItemRenderer(com.example.homin.test1.MapsActivity.this, mMap, clusterManager));
             clusterManager.setAlgorithm(new CustomAlgorithm<ClusterItem>());
@@ -1032,7 +1037,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     DaoImple.getInstance().setContact(contact);
                     List<Double> lastLocation = contact.getUserLocation();
                     LatLng latLng = new LatLng(lastLocation.get(0), lastLocation.get(1));
-                    myLatLng = latLng;
+                    if(myLatLng == null) {
+                        myLatLng = latLng;
+                    }
                 }
                 if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                     if (contact.getFriendList() != null) {
@@ -1533,6 +1540,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
+
+   
 
 
     @Override
