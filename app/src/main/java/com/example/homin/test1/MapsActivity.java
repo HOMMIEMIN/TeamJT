@@ -5,6 +5,9 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -87,6 +90,7 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,6 +98,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static com.example.homin.test1.WriteActivity.*;
 import static com.example.homin.test1.ReadMemoActivity.*;
@@ -150,6 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static String MARKER_LIST = "markerList";
     private boolean checkLocation;
     private boolean destoryCheck;
+    private boolean memoAddCheck;
 
     // MyPage에 이용
     private static final int CAMERA_CODE = 1000;
@@ -161,7 +168,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Boolean albumPick = false;
 
     private String key;
-    public static final String TAG = "mini";
     public static final String MEMOLIST = "memolistkeys";
 
     //자기위치로 되돌리는 버튼
@@ -172,6 +178,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PlaceAutoCompleteAdapter placeAutoCompleteAdapter;
     private GoogleApiClient mGoogleApiClient;
     private PlaceInfo mPlace; // 자동검색창 각 리스트아이템 대한 정보
+    private Button blutoothBtn;
 
     //목적지 설정
     private Marker mMarker; //목적지 마커(롱클릭시)
@@ -223,6 +230,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        blutoothBtn = findViewById(R.id.button_blueTooth);
         rootView = findViewById(R.id.container);//Snackbar위한 View member변수
         Intent intent = new Intent(this, ClosingServics.class);
         startService(intent);
@@ -514,6 +523,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 if (mMarker != null) {
                                     mMarker.remove();
                                     mMarker = null;
+//                                    blutoothBtn.setVisibility(View.VISIBLE);
                                 }
 
                                 destinationClicked = true;
@@ -1006,7 +1016,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     DaoImple.getInstance().setContact(contact);
                     List<Double> lastLocation = contact.getUserLocation();
                     LatLng latLng = new LatLng(lastLocation.get(0), lastLocation.get(1));
-                    myLatLng = latLng;
+                    if(myLatLng == null) {
+                        myLatLng = latLng;
+                    }
                 }
                 if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                     if (contact.getFriendList() != null) {
@@ -1020,13 +1032,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         myFriendList.add(DaoImple.getInstance().getLoginEmail());
-                        for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
-
-                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
-                            friendMemeList(key); // 친구들 메모 가져오는 메소드
-
-
-                        }
+//                        for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
+//
+//                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
+//                            friendMemeList(key); // 친구들 메모 가져오는 메소드
+//
+//
+//                        }
 
 
                     }
@@ -1051,11 +1063,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         realFriendList.add(DaoImple.getInstance().getLoginEmail());
                         clusterManager.clearItems();
-                        for (int a = 0; a < realFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
-                            String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
-                            friendMemeList(key); // 친구들 메모 가져오는 메소드
+                        if(!memoAddCheck) {
+                            Log.i("dd4432","메모 반복문 들어감");
+                            for (int a = 0; a < realFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
+                                String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
+                                friendMemeList(key); // 친구들 메모 가져오는 메소드
 
 
+                            }
+                            memoAddCheck = true;
                         }
                     }
                 }
@@ -1148,7 +1164,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         yourMemoLocation.setLatitude(friendMemo.getPosition().longitude);
 
 //         나와 메모의 거리가 300m 미만이라면 메모 add
-        float distance = yourMemoLocation.distanceTo(myMemoLocation);
+        float distance = myMemoLocation.distanceTo(yourMemoLocation);
         if (distance < 300) {
             clusterManager.addItem(friendMemo);
             Collection<ClusterItem> clusterItems = clusterManager.getAlgorithm().getItems();
@@ -1210,7 +1226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 // 내 위치를 myLatLng로 생성
                 myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
+                memoAddCheck = false;
 
                 if (!zoomCheck) {
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));
@@ -1315,7 +1331,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.i("ggv", "onActivityResult 들어옴");
         // WriteActivity에서 받아온 글 정보들을 마커로 생성
         if (resultCode == RESULT_OK) {
-            Log.i(TAG, "RESULT_OK");
+
             switch (requestCode) {
                 case RESULT_CODE:
                     Log.i("ggv", "onActivityResult");
@@ -1399,6 +1415,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                        actionButton.setImageResource(R.drawable.ic_notifications_black_24dp);
 //                    }
 
+                    break;
+
+                case REQUEST_ENABLE_BT:
+                    if(resultCode == RESULT_OK){
+                        // 블루투스가 활성 상태로 변경됨
+                        selectDevice();
+                    }
+                    else if(resultCode == RESULT_CANCELED){
+                        // 블루투스가 비활성 상태임
+                        Toast.makeText(context, "블루투스가 비활성화 상태 입니다.", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
+                    }
                     break;
 
             } // end switch
@@ -1508,11 +1535,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+
+
     @Override
     protected void onDestroy() {
-
         reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
 
+        try{
+//            mWorkerThread.interrupt();	// 데이터 수신 쓰레드 종료
+//            mInputStream.close();
+            mOutputStream.close();
+            mSocket.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         super.onDestroy();
     }
 
@@ -1705,4 +1741,154 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+
+
+    // 블루투스 용 메소드와 멤버 변수
+    private static final String TAG = "bluetooth.led";
+
+    private static final int REQUEST_ENABLE_BT = 10;
+    private static final String STRING_DELIMITER = "\n";
+//    private static final char CHAR_DELIMITER = '\n';
+
+    private BluetoothAdapter mBluetoothAdapter;
+    private int mPairedDeviceCount = 0;
+    private Set<BluetoothDevice> mDevices;
+    private BluetoothDevice mRemoteDevice;
+    private BluetoothSocket mSocket = null;
+    private OutputStream mOutputStream = null;
+
+
+
+    void checkBluetooth(){
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(mBluetoothAdapter == null){
+            // 장치가 블루투스를 지원하지 않는 경우
+            Toast.makeText(context, "블루투스를 지원하지 않습니다.", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
+        }
+        else {
+            // 장치가 블루투스를 지원하는 경우
+            if (!mBluetoothAdapter.isEnabled()) {
+                // 블루투스를 지원하지만 비활성 상태인 경우
+                // 블루투스를 활성 상태로 바꾸기 위해 사용자 동의 요청
+                Intent enableBtIntent =
+                        new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            }
+            else {
+                // 블루투스를 지원하며 활성 상태인 경우
+                // 페어링 된 기기 목록을 보여주고 연결할 장치를 선택
+                selectDevice();
+            }
+        }
+    }
+
+    void selectDevice(){
+        mDevices = mBluetoothAdapter.getBondedDevices();
+        mPairedDeviceCount = mDevices.size();
+
+        if(mPairedDeviceCount == 0){
+            // 페어링 된 장치가 없는 경우
+            Toast.makeText(context, "페어링 된 장치가 없습니다.", Toast.LENGTH_SHORT).show();		// 어플리케이션 종료
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("블루투스 장치 선택");
+
+        // 페어링 된 블루투스 장치의 이름 목록 작성
+        List<String> listItems = new ArrayList<String>();
+        for (BluetoothDevice device : mDevices) {
+            listItems.add(device.getName());
+        }
+        listItems.add("취소");		// 취소 항목 추가
+
+        final CharSequence[] items =
+                listItems.toArray(new CharSequence[listItems.size()]);
+
+        builder.setItems(items, new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int item){
+                if(item == mPairedDeviceCount){
+                    // 연결할 장치를 선택하지 않고 ‘취소’를 누른 경우
+                    finish();
+                }
+                else{
+                    // 연결할 장치를 선택한 경우
+                    // 선택한 장치와 연결을 시도함
+                    connectToSelectedDevice(items[item].toString());
+                }
+            }
+        });
+
+        builder.setCancelable(false);	// 뒤로 가기 버튼 사용 금지
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    void sendData(String msg){
+        msg += STRING_DELIMITER;	// 문자열 종료 표시
+        try{
+            mOutputStream.write(msg.getBytes());		// 문자열 전송
+        }catch(Exception e){
+            e.printStackTrace();
+            // 문자열 전송 도중 오류가 발생한 경우
+            Toast.makeText(context, "블루투스 데이터 전송 오류 발생", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
+        }
+    }
+
+    BluetoothDevice getDeviceFromBondedList(String name){
+        BluetoothDevice selectedDevice = null;
+
+        for (BluetoothDevice device : mDevices) {
+            if(name.equals(device.getName())){
+                selectedDevice = device;
+                break;
+            }
+        }
+
+        return selectedDevice;
+    }
+
+    void connectToSelectedDevice(String selectedDeviceName){
+        mRemoteDevice = getDeviceFromBondedList(selectedDeviceName);
+        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+
+        try{
+            // 소켓 생성
+            mSocket = mRemoteDevice.createRfcommSocketToServiceRecord(uuid);
+            // RFCOMM 채널을 통한 연결
+            mSocket.connect();
+
+            // 데이터 송수신을 위한 스트림 얻기
+            mOutputStream = mSocket.getOutputStream();
+//            mInputStream = mSocket.getInputStream();
+
+            // 데이터 수신 준비
+//            beginListenForData();
+        }catch(Exception e){
+            e.printStackTrace();
+            // 블루투스 연결 중 오류 발생
+            Toast.makeText(context, "블루투스 연결 중 오류 발생", Toast.LENGTH_SHORT).show();		// 어플리케이션 종료
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    public void blueToothOnclick(View view) {
+        checkBluetooth();
+    }
 }

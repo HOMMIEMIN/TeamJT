@@ -256,8 +256,8 @@ public class LoginActivity extends AppCompatActivity {
         List<Double> myLocation = myContact.getUserLocation();
         double lat = myLocation.get(0);
         double lon = myLocation.get(1);
-        lat+=0.01;
-        lon+=0.01;
+        lat+=0.0001;
+        lon+=0.0001;
         myLocation.clear();
         myLocation.add(lat);
         myLocation.add(lon);
