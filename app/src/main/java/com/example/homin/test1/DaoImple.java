@@ -41,26 +41,17 @@ public class DaoImple {
     private FragmentActivity fragmentActivity;
     private String newDate;
     private Context ChattingActivity;
-    private ClusterManager<ClusterItem> clusterManager;
 
     public UserDataTable getMyPageUserData() {
         return myPageUserData;
     }
 
-    public ClusterManager<ClusterItem> getClusterManager() {
-        return clusterManager;
-    }
 
-    public void setClusterManager(ClusterManager<ClusterItem> clusterManager) {
-        this.clusterManager = clusterManager;
-    }
 
     public void setMyPageUserData(UserDataTable myPageUserData) {
         this.myPageUserData = myPageUserData;
     }
-
-
-
+    
     public List<ItemMemo> getItemMemoList() {
         return itemMemoList;
     }
