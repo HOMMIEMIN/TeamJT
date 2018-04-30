@@ -149,6 +149,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static String MARKER_LIST = "markerList";
     private boolean checkLocation;
     private boolean destoryCheck;
+    private boolean memoAddCheck;
 
     // MyPage에 이용
     private static final int CAMERA_CODE = 1000;
@@ -1045,13 +1046,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         myFriendList.add(DaoImple.getInstance().getLoginEmail());
-                        for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
-
-                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
-                            friendMemeList(key); // 친구들 메모 가져오는 메소드
-
-
-                        }
+//                        for (int a = 0; a < myFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
+//
+//                            String key = DaoImple.getInstance().getFirebaseKey(myFriendList.get(a));
+//                            friendMemeList(key); // 친구들 메모 가져오는 메소드
+//
+//
+//                        }
 
 
                     }
@@ -1076,11 +1077,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         realFriendList.add(DaoImple.getInstance().getLoginEmail());
                         clusterManager.clearItems();
-                        for (int a = 0; a < realFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
-                            String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
-                            friendMemeList(key); // 친구들 메모 가져오는 메소드
+                        if(!memoAddCheck) {
+                            Log.i("dd4432","메모 반복문 들어감");
+                            for (int a = 0; a < realFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
+                                String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
+                                friendMemeList(key); // 친구들 메모 가져오는 메소드
 
 
+                            }
+                            memoAddCheck = true;
                         }
                     }
                 }
@@ -1235,7 +1240,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 // 내 위치를 myLatLng로 생성
                 myLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
+                memoAddCheck = false;
 
                 if (!zoomCheck) {
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLatLng, cameraZoom));
@@ -1661,7 +1666,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String stringDistance = Double.toString(distance);
             int index = stringDistance.indexOf(".");
             String m = stringDistance.substring(0, index);
-            Toast.makeText(context, index + "", Toast.LENGTH_SHORT).show();
             String cm = stringDistance.substring(index+1,index+3);
             Log.i("KSJ", "distance: " + distance);
             distanceIndicator.setText("목적지까지의 거리: " +m + "M " + cm + "CM");
