@@ -1185,7 +1185,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         yourMemoLocation.setLatitude(friendMemo.getPosition().longitude);
 
 //         나와 메모의 거리가 300m 미만이라면 메모 add
-        float distance = yourMemoLocation.distanceTo(myMemoLocation);
+        float distance = myMemoLocation.distanceTo(yourMemoLocation);
         if (distance < 300) {
             clusterManager.addItem(friendMemo);
             Collection<ClusterItem> clusterItems = clusterManager.getAlgorithm().getItems();
@@ -1694,7 +1694,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String stringDistance = Double.toString(distance);
             int index = stringDistance.indexOf(".");
             String m = stringDistance.substring(0, index);
-            Toast.makeText(context, index + "", Toast.LENGTH_SHORT).show();
             String cm = stringDistance.substring(index+1,index+3);
             Log.i("KSJ", "distance: " + distance);
             distanceIndicator.setText("목적지까지의 거리: " +m + "M " + cm + "CM");

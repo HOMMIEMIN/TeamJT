@@ -25,6 +25,7 @@ public class ItemDetailActivity extends Activity {
     private List<ItemMemo> memoList;
     private List<ItemPerson> personList;
     private RecyclerView recyclerView;
+    private TextView tv;
 
     class CustomDetailAdapter extends RecyclerView.Adapter<CustomDetailAdapter.CustomHolder>{
 
@@ -51,6 +52,7 @@ public class ItemDetailActivity extends Activity {
                 Glide.with(ItemDetailActivity.this).load(personList.get(position).getImage())
                         .bitmapTransform(new CropCircleTransformation(ItemDetailActivity.this)).centerCrop()
                         .into(holder.iv);
+                String person = String.format("이름 : %s\n, 아이디 : : %s\n",personList.get(position).getUserId(), personList.get(position).getUserName());
                 holder.tv.setText(personList.get(position).getUserName());
             }
 
@@ -86,14 +88,18 @@ public class ItemDetailActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_item_detail);
         recyclerView = findViewById(R.id.recyclerView);
+        tv = findViewById(R.id.textView_detail);
+
 
 
         Intent intent = getIntent();
         String key = intent.getStringExtra(MapsActivity.MARKER_LIST);
         if(key.equals("memo")){
             memoList = DaoImple.getInstance().getItemMemoList();
+            tv.setText("메모 목록");
         }else{
             personList = DaoImple.getInstance().getItemPersonList();
+            tv.setText("유저 목록");
         }
 
 
