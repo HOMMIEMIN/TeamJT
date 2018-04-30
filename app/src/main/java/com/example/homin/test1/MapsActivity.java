@@ -168,7 +168,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Boolean albumPick = false;
 
     private String key;
-    public static final String TAG = "mini";
+
     public static final String MEMOLIST = "memolistkeys";
 
     //자기위치로 되돌리는 버튼
