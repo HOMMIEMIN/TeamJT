@@ -343,10 +343,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 MarkerOptions options = new MarkerOptions().position(latLng).title(placeInfo.getName()).snippet(snippet);
                 if (mMarker != null) {
                     mMarker.remove();
+                    mMarker = null;
                 }
 
                 if (targetMarker != null) {
                     clusterManager.removeItem(targetMarker);
+                    targetMarker = null;
                 }
                 targetMarker = new ItemDestination(latLng, placeInfo.getName(), snippet);
                 clusterManager.addItem(targetMarker);
@@ -576,6 +578,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
                                 if (mMarker != null) {
                                     mMarker.remove();
+                                    mMarker = null;
                                 }
 
                                 destinationClicked = false;
@@ -659,11 +662,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         MarkerOptions options = new MarkerOptions().position(latLng).title("목적지").snippet("위도:" + latLng.latitude + "/n" + "경도: " + latLng.longitude);
                         if (mMarker != null) {
                             mMarker.remove();
+                            mMarker = null;
                         }
 
                         if (targetMarker != null) {
                             clusterManager.removeItem(targetMarker);
                             clusterManager.cluster();
+                            targetMarker = null;
                         }
                         mMarker = mMap.addMarker(options);
                         setDestination();
@@ -845,6 +850,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 Log.i("asdqwe", "3   " + contact.getUserId());
                                                                 Log.i("asdqwe", "체인지 : 위치 바뀜");
                                                                 // 서로 다른 Location이 저장되 있다면, clusterManager에 저장된 마커 삭제
+
                                                                 clusterManager.removeItem(ip);
                                                                 personList.remove(contact.getUserId());
                                                                 // 다시 마커 생성 후, clusterManager과 personList에 저장
@@ -1016,7 +1022,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     DaoImple.getInstance().setContact(contact);
                     List<Double> lastLocation = contact.getUserLocation();
                     LatLng latLng = new LatLng(lastLocation.get(0), lastLocation.get(1));
-                    if(myLatLng == null) {
+                    if (myLatLng == null) {
                         myLatLng = latLng;
                     }
                 }
@@ -1063,8 +1069,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         realFriendList.add(DaoImple.getInstance().getLoginEmail());
                         clusterManager.clearItems();
-                        if(!memoAddCheck) {
-                            Log.i("dd4432","메모 반복문 들어감");
+                        if (!memoAddCheck) {
+                            Log.i("dd4432", "메모 반복문 들어감");
                             for (int a = 0; a < realFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
                                 String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
                                 friendMemeList(key); // 친구들 메모 가져오는 메소드
@@ -1418,13 +1424,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     break;
 
                 case REQUEST_ENABLE_BT:
-                    if(resultCode == RESULT_OK){
+                    if (resultCode == RESULT_OK) {
                         // 블루투스가 활성 상태로 변경됨
                         selectDevice();
-                    }
-                    else if(resultCode == RESULT_CANCELED){
+                    } else if (resultCode == RESULT_CANCELED) {
                         // 블루투스가 비활성 상태임
-                        Toast.makeText(context, "블루투스가 비활성화 상태 입니다.", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
+                        Toast.makeText(context, "블루투스가 비활성화 상태 입니다.", Toast.LENGTH_SHORT).show();    // 어플리케이션 종료
                     }
                     break;
 
@@ -1445,6 +1450,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (targetMarker != null) {
                 clusterManager.removeItem(targetMarker);
                 clusterManager.cluster();
+                targetMarker = null;
             }
             mMarker = mMap.addMarker(options);
             setDestination();
@@ -1477,41 +1483,43 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .setMessage("선택된 목적지를 취소하시겠습니까?")
                     .setPositiveButton("예", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialoginterface, int i) {
-                          if(myMarker != null && mMarker != null){
-                              shapeView.setBackground(null);
-                              distanceIndicator.setVisibility(View.GONE);
-                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
-                              destinationClicked = false;
+                            arrow.remove();
+                            arrow = null;
+                            if (myMarker != null && mMarker != null) {
+                                shapeView.setBackground(null);
+                                distanceIndicator.setVisibility(View.GONE);
+                                Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+                                destinationClicked = false;
 
-                              mMarker.remove();
-                              mMarker =null;
-                          }else if(myMarker != null && targetMarker != null){
-                              shapeView.setBackground(null);
-                              distanceIndicator.setVisibility(View.GONE);
-                              distanceIndicator.setText("");
-                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
-                              destinationClicked = false;
-                              clusterManager.removeItem(targetMarker);
-                              clusterManager.cluster();
-                              targetMarker = null;
+                                mMarker.remove();
+                                mMarker = null;
+                            } else if (myMarker != null && targetMarker != null) {
+                                shapeView.setBackground(null);
+                                distanceIndicator.setVisibility(View.GONE);
+                                distanceIndicator.setText("");
+                                Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+                                destinationClicked = false;
+                                clusterManager.removeItem(targetMarker);
+                                clusterManager.cluster();
+                                targetMarker = null;
 
-                          }else if(myMarker != null && targetId != null){
-                              shapeView.setBackground(null);
-                              distanceIndicator.setVisibility(View.GONE);
-                              distanceIndicator.setText("");
-                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
-                              destinationClicked = false;
-                              targetId = null;
-                              targetIdMarker = null;
+                            } else if (myMarker != null && targetId != null) {
+                                shapeView.setBackground(null);
+                                distanceIndicator.setVisibility(View.GONE);
+                                distanceIndicator.setText("");
+                                Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+                                destinationClicked = false;
+                                targetId = null;
+                                targetIdMarker = null;
 
-                          }
+                            }
                         }
                     }).setNegativeButton("아니요", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialoginterface, int i) {
                     dialoginterface.cancel();
                 }
             });
-                dialog.create().show();
+            dialog.create().show();
 
         } else {
             // 백키를 두번 눌렀을때, 그 간격이 2초 이하면 어플 종료
@@ -1535,18 +1543,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
-
     @Override
     protected void onDestroy() {
         reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
 
-        try{
+        try {
 //            mWorkerThread.interrupt();	// 데이터 수신 쓰레드 종료
 //            mInputStream.close();
             mOutputStream.close();
             mSocket.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         super.onDestroy();
@@ -1665,14 +1671,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.rotation((float)degree-90.0f);
+        markerOptions.rotation((float) degree - 90.0f);
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
 
         markerOptions.position(myMarker.getPosition());
-        markerOptions.anchor(0.0f,0.5f);
-        Toast.makeText(context, "U:" +markerOptions.getAnchorU()+"V: " + markerOptions.getAnchorV(), Toast.LENGTH_SHORT).show();
+        markerOptions.anchor(0.0f, 0.5f);
         arrow = mMap.addMarker(markerOptions);
-
+        if(targetMarker!= null){
+            clusterManager.addItem(targetMarker);
+            clusterManager.cluster();
+        }
         shapeView.setBackground(getDrawable(R.drawable.shape));
         distanceIndicator.setVisibility(View.VISIBLE);
 //        Log.i("KSJ", myMarker.getPosition() + "||"+ mMarker.getPosition() + "");
@@ -1681,18 +1689,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String stringDistance = Double.toString(distance);
             int index = stringDistance.indexOf(".");
             String m = stringDistance.substring(0, index);
-            Toast.makeText(context, index + "", Toast.LENGTH_SHORT).show();
             String cm = stringDistance.substring(index + 1, index + 3);
-            Log.i("KSJ", "distance: " + distance);
+
             distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
 
             if (distance < 100) {
+                if(arrow!= null){
+                    arrow.remove();
+                    arrow = null;
+                }
                 shapeView.setBackground(null);
                 distanceIndicator.setVisibility(View.GONE);
                 Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
                 destinationClicked = false;
 
                 mMarker.remove();
+                mMarker = null;
 
             }
         } else if (myMarker != null && targetMarker != null) {
@@ -1706,6 +1718,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
 
             if (distance < 100) {
+                if(arrow!= null){
+                    arrow.remove();
+                    arrow = null;
+                }
                 shapeView.setBackground(null);
                 distanceIndicator.setVisibility(View.GONE);
                 distanceIndicator.setText("");
@@ -1714,33 +1730,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 clusterManager.removeItem(targetMarker);
                 clusterManager.cluster();
+                targetMarker = null;
 
             }
 
         } else if (myMarker != null && targetId != null && targetIdMarker != null) {
 
-                double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetIdMarker.getPosition());
-                String stringDistance = Double.toString(distance);
-                int index = stringDistance.indexOf(".");
-                String m = stringDistance.substring(0, index);
-                String cm = stringDistance.substring(index + 1, index + 3);
-                Log.i("KSJ", "distance: " + distance);
-                distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
+            double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetIdMarker.getPosition());
+            String stringDistance = Double.toString(distance);
+            int index = stringDistance.indexOf(".");
+            String m = stringDistance.substring(0, index);
+            String cm = stringDistance.substring(index + 1, index + 3);
+            Log.i("KSJ", "distance: " + distance);
+            distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
 
-                if (distance < 100) {
-                    shapeView.setBackground(null);
-                    distanceIndicator.setVisibility(View.GONE);
-                    distanceIndicator.setText("");
-                    Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
-                    destinationClicked = false;
-                    targetId = null;
-                    targetIdMarker = null;
+            if (distance < 100) {
+                if(arrow!= null){
+                    arrow.remove();
+                    arrow = null;
                 }
-
+                shapeView.setBackground(null);
+                distanceIndicator.setVisibility(View.GONE);
+                distanceIndicator.setText("");
+                Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
+                destinationClicked = false;
+                targetId = null;
+                targetIdMarker = null;
+            }
         }
     }
-
-
 
 
     // 블루투스 용 메소드와 멤버 변수
@@ -1758,14 +1776,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private OutputStream mOutputStream = null;
 
 
-
-    void checkBluetooth(){
+    void checkBluetooth() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(mBluetoothAdapter == null){
+        if (mBluetoothAdapter == null) {
             // 장치가 블루투스를 지원하지 않는 경우
-            Toast.makeText(context, "블루투스를 지원하지 않습니다.", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
-        }
-        else {
+            Toast.makeText(context, "블루투스를 지원하지 않습니다.", Toast.LENGTH_SHORT).show();    // 어플리케이션 종료
+        } else {
             // 장치가 블루투스를 지원하는 경우
             if (!mBluetoothAdapter.isEnabled()) {
                 // 블루투스를 지원하지만 비활성 상태인 경우
@@ -1773,8 +1789,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Intent enableBtIntent =
                         new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            }
-            else {
+            } else {
                 // 블루투스를 지원하며 활성 상태인 경우
                 // 페어링 된 기기 목록을 보여주고 연결할 장치를 선택
                 selectDevice();
@@ -1782,13 +1797,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    void selectDevice(){
+    void selectDevice() {
         mDevices = mBluetoothAdapter.getBondedDevices();
         mPairedDeviceCount = mDevices.size();
 
-        if(mPairedDeviceCount == 0){
+        if (mPairedDeviceCount == 0) {
             // 페어링 된 장치가 없는 경우
-            Toast.makeText(context, "페어링 된 장치가 없습니다.", Toast.LENGTH_SHORT).show();		// 어플리케이션 종료
+            Toast.makeText(context, "페어링 된 장치가 없습니다.", Toast.LENGTH_SHORT).show();        // 어플리케이션 종료
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1799,18 +1814,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (BluetoothDevice device : mDevices) {
             listItems.add(device.getName());
         }
-        listItems.add("취소");		// 취소 항목 추가
+        listItems.add("취소");        // 취소 항목 추가
 
         final CharSequence[] items =
                 listItems.toArray(new CharSequence[listItems.size()]);
 
-        builder.setItems(items, new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int item){
-                if(item == mPairedDeviceCount){
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                if (item == mPairedDeviceCount) {
                     // 연결할 장치를 선택하지 않고 ‘취소’를 누른 경우
                     finish();
-                }
-                else{
+                } else {
                     // 연결할 장치를 선택한 경우
                     // 선택한 장치와 연결을 시도함
                     connectToSelectedDevice(items[item].toString());
@@ -1818,27 +1832,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        builder.setCancelable(false);	// 뒤로 가기 버튼 사용 금지
+        builder.setCancelable(false);    // 뒤로 가기 버튼 사용 금지
         AlertDialog alert = builder.create();
         alert.show();
     }
 
-    void sendData(String msg){
-        msg += STRING_DELIMITER;	// 문자열 종료 표시
-        try{
-            mOutputStream.write(msg.getBytes());		// 문자열 전송
-        }catch(Exception e){
+    void sendData(String msg) {
+        msg += STRING_DELIMITER;    // 문자열 종료 표시
+        try {
+            mOutputStream.write(msg.getBytes());        // 문자열 전송
+        } catch (Exception e) {
             e.printStackTrace();
             // 문자열 전송 도중 오류가 발생한 경우
-            Toast.makeText(context, "블루투스 데이터 전송 오류 발생", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
+            Toast.makeText(context, "블루투스 데이터 전송 오류 발생", Toast.LENGTH_SHORT).show();    // 어플리케이션 종료
         }
     }
 
-    BluetoothDevice getDeviceFromBondedList(String name){
+    BluetoothDevice getDeviceFromBondedList(String name) {
         BluetoothDevice selectedDevice = null;
 
         for (BluetoothDevice device : mDevices) {
-            if(name.equals(device.getName())){
+            if (name.equals(device.getName())) {
                 selectedDevice = device;
                 break;
             }
@@ -1847,11 +1861,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return selectedDevice;
     }
 
-    void connectToSelectedDevice(String selectedDeviceName){
+    void connectToSelectedDevice(String selectedDeviceName) {
         mRemoteDevice = getDeviceFromBondedList(selectedDeviceName);
         UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
-        try{
+        try {
             // 소켓 생성
             mSocket = mRemoteDevice.createRfcommSocketToServiceRecord(uuid);
             // RFCOMM 채널을 통한 연결
@@ -1863,10 +1877,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             // 데이터 수신 준비
 //            beginListenForData();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             // 블루투스 연결 중 오류 발생
-            Toast.makeText(context, "블루투스 연결 중 오류 발생", Toast.LENGTH_SHORT).show();		// 어플리케이션 종료
+            Toast.makeText(context, "블루투스 연결 중 오류 발생", Toast.LENGTH_SHORT).show();        // 어플리케이션 종료
         }
     }
 
@@ -1891,4 +1905,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void blueToothOnclick(View view) {
         checkBluetooth();
     }
+
+
 }
+
