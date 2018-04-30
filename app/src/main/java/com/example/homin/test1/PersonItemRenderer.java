@@ -42,6 +42,7 @@ import jp.wasabeef.glide.transformations.CropCircleTransformation;
 public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     Context context;
     GoogleMap googleMap;
+    private ClusterManager<ClusterItem> clusterManager;
     boolean imageCheck;
 
     private static Activity getActivity(Context context) {
@@ -58,18 +59,25 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     }
 
     @Override
-    protected void onClusterItemRendered(ClusterItem clusterItem, final Marker marker) {
+    protected void onClusterItemRendered(final ClusterItem clusterItem, final Marker marker) {
 
+        Log.i("dd4432", "context: " + context);
 
         Context get = getActivity(context);
         if (clusterItem instanceof ItemPerson) {
             if (get != null) {
                 Glide.with(get).load(((ItemPerson) clusterItem).getImage()).asBitmap().fitCenter().into(new SimpleTarget<Bitmap>() {
-
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                         Bitmap roundBitmap = getCircleBitmap(resource);
-                        marker.setIcon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+
+                        PersonItemRenderer renderer = (PersonItemRenderer) clusterManager.getRenderer();
+                        Marker marker1 = renderer.getMarker(clusterItem);
+                        if(marker1 != null) {
+                            marker1.setIcon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
+                        }
+
+
 //                Log.i("asdfg","다운로드 완료 : " + ((ItemPerson) clusterItem).getUserId());
                     }
                 });
@@ -91,6 +99,7 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         super(context, map, clusterManager);
         this.context = context;
         this.googleMap = map;
+        this.clusterManager = clusterManager;
     }
 
 

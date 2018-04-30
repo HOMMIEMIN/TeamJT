@@ -10,6 +10,8 @@ import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,12 +46,12 @@ public class DaoImple {
         return myPageUserData;
     }
 
+
+
     public void setMyPageUserData(UserDataTable myPageUserData) {
         this.myPageUserData = myPageUserData;
     }
-
-
-
+    
     public List<ItemMemo> getItemMemoList() {
         return itemMemoList;
     }
