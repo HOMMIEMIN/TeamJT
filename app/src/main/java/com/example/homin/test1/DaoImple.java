@@ -51,7 +51,7 @@ public class DaoImple {
     public void setMyPageUserData(UserDataTable myPageUserData) {
         this.myPageUserData = myPageUserData;
     }
-    
+
     public List<ItemMemo> getItemMemoList() {
         return itemMemoList;
     }
