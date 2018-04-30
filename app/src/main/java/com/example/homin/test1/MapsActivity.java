@@ -1280,29 +1280,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-//    // 갤러리에서 사진 선택하는 메소드
-//    public void clickedProImgBotton() {
-//        Intent intent = new Intent(Intent.ACTION_PICK);
-//        //TODO: ACTION_PICK(이미지가 저장되어있는 폴더를 선택) ACTION_GET_CONTENT(전체 이미지를 폴더 구분없이 최신 이미지 순)랑 둘 비교
-//        intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        intent.setType("image/*");
-//        startActivityForResult(intent, GALLERY_CODE);
-//        Log.i(TAG, "갤러리 코드: " + intent);
-//    } // end clickedProImgBotton()
-//
-//
-//    // 팝업뜰때 카메라 눌렀을때 발생하는 메소드  속에 내부메소드!
-//    public void popupCameraInCameraMethod() {
-//        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        if (intent.resolveActivity(getPackageManager()) != null) {
-//            Log.i(TAG, "intent.getData(): " + intent.getData());
-//            startActivityForResult(intent, CAMERA_CODE);
-//
-//            Log.i(TAG, "팝업창에서 카메라 눌른후");
-//        }
-//    }
-
-
     @SuppressLint("MissingPermission")
     void writeMyLocation() {
         // 현재 내 위치 가져오기
@@ -1402,7 +1379,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                    progressDialog.setMessage("처리 중...");
 //                    progressDialog.show();
 
-                    cropImage();
+
 
 //                    progressDialog.dismiss();
                     break;
@@ -1478,19 +1455,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (bottomSheetBehavior.getState() == 3) {
             bottomSheetBehavior.setState(bottomSheetBehavior.STATE_COLLAPSED);
             pressedTime = 0;
-        } else if((myMarker != null && mMarker != null)|| (myMarker != null && targetMarker != null)||(myMarker != null && targetId != null && targetIdMarker != null)){
-
-            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-
-            dialog.setTitle( "목적지 취소여부" )
-                    .setMessage("선택된 목적지를 취소하시겠습니까?")
-                    .setNegativeButton("아니요", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialoginterface, int i) {
-                            dialoginterface.cancel();
-                        }
-                    })
-                    .setPositiveButton("예", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialoginterface, int i) {
+        }
+//        } else if((myMarker != null && mMarker != null)|| (myMarker != null && targetMarker != null)||(myMarker != null && targetId != null && targetIdMarker != null)){
+//
+//            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+//
+//            dialog.setTitle( "목적지 취소여부" )
+//                    .setMessage("선택된 목적지를 취소하시겠습니까?")
+//                    .setNegativeButton("아니요", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialoginterface, int i) {
+//                            dialoginterface.cancel();
+//                        }
+//                    })
+//                    .setPositiveButton("예", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialoginterface, int i) {
 //                          if(myMarker != null && mMarker != null){
 ////                              shapeView.setBackground(null);
 //                              distanceIndicator.setVisibility(View.GONE);
@@ -1517,10 +1495,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                              targetIdMarker = null;
 //
 //                          }
-                        }
-                    }).show();
-
-        } else {
+//                        }
+//                    }).show();
+//
+//        }
+        else {
             // 백키를 두번 눌렀을때, 그 간격이 2초 이하면 어플 종료
             if (pressedTime == 0) {
                 Toast.makeText(context, "한번 더 누르면 종료 됩니다.", Toast.LENGTH_SHORT).show();
