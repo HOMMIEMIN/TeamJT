@@ -1480,45 +1480,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             pressedTime = 0;
         } else if((myMarker != null && mMarker != null)|| (myMarker != null && targetMarker != null)||(myMarker != null && targetId != null && targetIdMarker != null)){
 
-            AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(MapsActivity.this);
 
             dialog.setTitle( "목적지 취소여부" )
                     .setMessage("선택된 목적지를 취소하시겠습니까?")
-                    .setNegativeButton("아니요", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialoginterface, int i) {
-                            dialoginterface.cancel();
-                        }
-                    })
                     .setPositiveButton("예", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialoginterface, int i) {
-//                          if(myMarker != null && mMarker != null){
-////                              shapeView.setBackground(null);
-//                              distanceIndicator.setVisibility(View.GONE);
-//                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
-//                              destinationClicked = false;
-//
-//                              mMarker.remove();
-//                          }else if(myMarker != null && targetMarker != null){
-////                              shapeView.setBackground(null);
-//                              distanceIndicator.setVisibility(View.GONE);
-//                              distanceIndicator.setText("");
-//                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
-//                              destinationClicked = false;
-//                              clusterManager.removeItem(targetMarker);
-//                              clusterManager.cluster();
-//
-//                          }else if(myMarker != null && targetId != null && targetIdMarker != null){
-////                              shapeView.setBackground(null);
-//                              distanceIndicator.setVisibility(View.GONE);
-//                              distanceIndicator.setText("");
-//                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
-//                              destinationClicked = false;
-//                              targetId = null;
-//                              targetIdMarker = null;
-//
-//                          }
+                          if(myMarker != null && mMarker != null){
+                              shapeView.setBackground(null);
+                              distanceIndicator.setVisibility(View.GONE);
+                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+                              destinationClicked = false;
+
+                              mMarker.remove();
+                          }else if(myMarker != null && targetMarker != null){
+                              shapeView.setBackground(null);
+                              distanceIndicator.setVisibility(View.GONE);
+                              distanceIndicator.setText("");
+                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+                              destinationClicked = false;
+                              clusterManager.removeItem(targetMarker);
+                              clusterManager.cluster();
+
+                          }else if(myMarker != null && targetId != null && targetIdMarker != null){
+                              shapeView.setBackground(null);
+                              distanceIndicator.setVisibility(View.GONE);
+                              distanceIndicator.setText("");
+                              Toast.makeText(context, "목적지를 취소합니다", Toast.LENGTH_SHORT).show();
+                              destinationClicked = false;
+                              targetId = null;
+                              targetIdMarker = null;
+
+                          }
                         }
-                    }).show();
+                    }).setNegativeButton("아니요", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialoginterface, int i) {
+                    dialoginterface.cancel();
+                }
+            });
+            AlertDialog b = dialog.create();
+            b.show();
 
         } else {
             // 백키를 두번 눌렀을때, 그 간격이 2초 이하면 어플 종료
@@ -1546,9 +1547,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onDestroy() {
-
         reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
-
         super.onDestroy();
     }
 
@@ -1690,7 +1689,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         } else if (myMarker != null && targetMarker != null) {
             Log.i("KSJ", myMarker.getPosition() + "||" + targetMarker.getPosition() + "target?");
-            double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetIdMarker.getPosition());
+            double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetMarker.getPosition());
+            Log.i("11qq","marKer"+targetIdMarker+"");
             String stringDistance = Double.toString(distance);
             int index = stringDistance.indexOf(".");
             String m = stringDistance.substring(0, index);
