@@ -20,6 +20,13 @@ import java.util.List;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 
+import static com.example.homin.test1.ReadMemoActivity.MEMO_CONTENT;
+import static com.example.homin.test1.ReadMemoActivity.MEMO_ID;
+import static com.example.homin.test1.ReadMemoActivity.MEMO_NAME;
+import static com.example.homin.test1.ReadMemoActivity.MEMO_TIME;
+import static com.example.homin.test1.ReadMemoActivity.MEMO_TITLE;
+import static com.example.homin.test1.ReadMemoActivity.MEMO_URL;
+
 public class ItemDetailActivity extends Activity {
 
     private List<ItemMemo> memoList;
@@ -40,14 +47,35 @@ public class ItemDetailActivity extends Activity {
         }
 
         @Override
-        public void onBindViewHolder(CustomHolder holder, int position) {
+        public void onBindViewHolder(CustomHolder holder, final int position) {
             if(type == 0){
                 Glide.with(ItemDetailActivity.this).load(memoList.get(position).getImageUrl())
                         .bitmapTransform(new CropCircleTransformation(ItemDetailActivity.this)).centerCrop()
                         .into(holder.iv);
+                String content = memoList.get(position).getContent();
+                String content2 = null;
+                if(content.length() > 10){
+                    content2 = content.substring(0,10) + "...";
+                }else{
+                    content2 = memoList.get(position).getContent();
+                }
                 String a = String.format("이름: %s\n제목 : %s\n내용 : %s\n시간 : %s\n",memoList.get(position).getUserName(),memoList.get(position).getTitle(),
-                        memoList.get(position).getContent(),memoList.get(position).getTime());
+                       content2 ,memoList.get(position).getTime());
                 holder.tv.setText(a);
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(ItemDetailActivity.this, ReadMemoActivity.class);
+                        intent.putExtra(MEMO_NAME, memoList.get(position).getUserName());
+                        intent.putExtra(MEMO_ID, memoList.get(position).getUserId());
+                        intent.putExtra(MEMO_TITLE, memoList.get(position).getTitle());
+                        intent.putExtra(MEMO_CONTENT, memoList.get(position).getContent());
+                        intent.putExtra(MEMO_URL, memoList.get(position).getImageUrl());
+                        intent.putExtra(MEMO_TIME, memoList.get(position).getTime());
+                        startActivity(intent);
+
+                    }
+                });
             }else{
                 Glide.with(ItemDetailActivity.this).load(personList.get(position).getImage())
                         .bitmapTransform(new CropCircleTransformation(ItemDetailActivity.this)).centerCrop()
