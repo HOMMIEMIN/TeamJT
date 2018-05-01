@@ -160,6 +160,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean checkLocation;
     private boolean destoryCheck;
     private boolean memoAddCheck;
+    private boolean blueToothCheck;
 
     // MyPage에 이용
     private static final int CAMERA_CODE = 1000;
@@ -1509,6 +1510,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         public void onClick(DialogInterface dialoginterface, int i) {
                             arrow.remove();
                             arrow = null;
+                            blutoothBtn.setVisibility(View.GONE);
                             if (myMarker != null && mMarker != null) {
                                 shapeView.setBackground(null);
                                 distanceIndicator.setVisibility(View.GONE);
@@ -1676,7 +1678,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //클릭을 했으면 작동 백키를 눌렀으면 취소
     // 검색한 주소, 내가 임의로 설정한 위치, 내글에 대한 목적지 설정
-    private void setDestination() {
+    private void
+    setDestination() {
+
+        blutoothBtn.setVisibility(View.VISIBLE);
+
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow_final);
 //        Bitmap bitmap1 = PersonItemRenderer.getCircleBitmap(bitmap);
 
@@ -1712,7 +1718,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
 
+
+
             distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
+            if(degree < 0) {
+                degree = 360+degree;
+            }
+
+            String blueTooth = m + "\n" + degree;
+            Log.i("1234","1 : " + blueTooth);
+            sendData(blueTooth);
 
             if (distance < 100) {
                 if(arrow!= null){
@@ -1723,7 +1738,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 distanceIndicator.setVisibility(View.GONE);
                 Toast.makeText(context, "도착하였습니다", Toast.LENGTH_SHORT).show();
                 destinationClicked = false;
-
+                blutoothBtn.setVisibility(View.GONE);
                 mMarker.remove();
                 mMarker = null;
 
@@ -1741,6 +1756,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String cm = stringDistance.substring(index + 1, index + 3);
             Log.i("KSJ", "distance: " + distance);
             distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
+
+            if(degree < 0) {
+                degree = 360+degree;
+            }
+
+            String blueTooth = m + "\n" + degree;
+            Log.i("1234","1 : " + blueTooth);
+            sendData(blueTooth);
 
             if (distance < 100) {
                 if(arrow!= null){
@@ -1769,6 +1792,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.i("KSJ", "distance: " + distance);
             distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
 
+            if(degree < 0) {
+                degree = 360+degree;
+            }
+
+            String blueTooth = m + "\n" + degree;
+            Log.i("1234","1 : " + blueTooth);
+            sendData(blueTooth);
+
             if (distance < 100) {
                 if(arrow!= null){
                     arrow.remove();
@@ -1782,7 +1813,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 targetId = null;
                 targetIdMarker = null;
             }
+
         }
+
+
     }
 
 
@@ -1836,7 +1870,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(context, "페어링 된 장치가 없습니다.", Toast.LENGTH_SHORT).show();		// 어플리케이션 종료
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("블루투스 장치 선택");
 
         // 페어링 된 블루투스 장치의 이름 목록 작성
@@ -1853,7 +1887,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(DialogInterface dialog, int item){
                 if(item == mPairedDeviceCount){
                     // 연결할 장치를 선택하지 않고 ‘취소’를 누른 경우
-                    finish();
+                    dialog.dismiss();
                 }
                 else{
                     // 연결할 장치를 선택한 경우
@@ -1868,17 +1902,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         alert.show();
     }
 
-    void sendData(String[] msg){
+    void sendData(String msg){
         try{
+                msg += "\n";
+                mOutputStream.write(msg.getBytes());
 
-            for(int a = 0 ; a < msg.length ; a++) {
-                msg[a] = msg[a] + "\n";
-                outputStream.write(msg[a].getBytes());
-            }// 문자열 전송
+
         }catch(Exception e){
             e.printStackTrace();
             // 문자열 전송 도중 오류가 발생한 경우
-//            Toast.makeText(context, "블루투스 데이터 전송 오류 발생", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
+            Toast.makeText(context, "블루투스 데이터 전송 오류 발생", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
         }
     }
 
@@ -1942,7 +1975,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             checkBluetooth();
             checkBlue = true;
         }
-        String[] a = {"1234.111","443"};
-        sendData(a);
+
     }
 }

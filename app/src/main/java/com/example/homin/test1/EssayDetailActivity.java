@@ -61,7 +61,7 @@ public class EssayDetailActivity extends AppCompatActivity {
         textView2 = findViewById(R.id.Detali_textgul);
         textView3 = findViewById(R.id.Detali_textNaljja);
         TextView textAddress = findViewById(R.id.textAddress);
-        ImageButton closeBtn = findViewById(R.id.closeBtn);
+        ImageView closeBtn = findViewById(R.id.closeBtn);
 
         // 위치 좌표
         Double lat = userDataTable.getLocation().get(0);
