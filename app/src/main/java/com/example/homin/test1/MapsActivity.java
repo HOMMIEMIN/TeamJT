@@ -88,6 +88,8 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -507,7 +509,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             clusterManager.setRenderer(new PersonItemRenderer(com.example.homin.test1.MapsActivity.this, mMap, clusterManager));
             clusterManager.setAlgorithm(new CustomAlgorithm<ClusterItem>());
             mMap.setOnCameraIdleListener(clusterManager);
-//            mMap.setOnMarkerClickListener(clusterManager);
+            mMap.setOnMarkerClickListener(clusterManager);
             mMap.setOnInfoWindowClickListener(clusterManager);
 
         }
@@ -610,10 +612,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 for (ClusterItem m : clusters) {
                     if (m instanceof ItemMemo) {
                         itemMemos.add((ItemMemo) m);
-                        Log.i("ggqs", "메모 클릭");
+
                     } else {
                         itemPeople.add((ItemPerson) m);
-                        Log.i("ggqs", "사람 클릭");
                     }
                 }
                 if (itemMemos.size() != 0) {
@@ -1078,13 +1079,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         realFriendList.add(DaoImple.getInstance().getLoginEmail());
-                        clusterManager.clearItems();
-                        //호민이형!!!!! 여기 클리어 써져서 자꾸 없어졌자나영 !!
+
                         if(targetIdMarker!= null) {
                             clusterManager.addItem(targetMarker);
                             clusterManager.cluster();
                         }
                         if (!memoAddCheck) {
+                            clusterManager.clearItems();
                             Log.i("dd4432", "메모 반복문 들어감");
                             for (int a = 0; a < realFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
                                 String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
@@ -1193,13 +1194,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         float distance = myMemoLocation.distanceTo(yourMemoLocation);
         if (distance < 300) {
             clusterManager.addItem(friendMemo);
-            Collection<ClusterItem> clusterItems = clusterManager.getAlgorithm().getItems();
-            for (ClusterItem a : clusterItems) {
-                if (a instanceof ItemMemo) {
-                    Log.i("bbv", ((ItemMemo) a).getContent());
-                    Log.i("bbv", ((ItemMemo) a).getUserId());
-                }
-            }
+
             clusterManager.cluster();
         }
 
@@ -1795,6 +1790,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private BluetoothDevice mRemoteDevice;
     private BluetoothSocket mSocket = null;
     private OutputStream mOutputStream = null;
+    private ByteArrayOutputStream outputStream = null;
+    private boolean checkBlue;
 
 
 
@@ -1862,14 +1859,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         alert.show();
     }
 
-    void sendData(String msg){
-        msg += STRING_DELIMITER;	// 문자열 종료 표시
+    void sendData(String[] msg){
         try{
-            mOutputStream.write(msg.getBytes());		// 문자열 전송
+
+            for(int a = 0 ; a < msg.length ; a++) {
+                msg[a] = msg[a] + "\n";
+                outputStream.write(msg[a].getBytes());
+            }// 문자열 전송
         }catch(Exception e){
             e.printStackTrace();
             // 문자열 전송 도중 오류가 발생한 경우
-            Toast.makeText(context, "블루투스 데이터 전송 오류 발생", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
+//            Toast.makeText(context, "블루투스 데이터 전송 오류 발생", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
         }
     }
 
@@ -1898,6 +1898,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             // 데이터 송수신을 위한 스트림 얻기
             mOutputStream = mSocket.getOutputStream();
+//            mBufferedOutputStream = new BufferedOutputStream(mOutputStream);
 //            mInputStream = mSocket.getInputStream();
 
             // 데이터 수신 준비
@@ -1928,6 +1929,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public void blueToothOnclick(View view) {
-        checkBluetooth();
+        if(!checkBlue) {
+            checkBluetooth();
+            checkBlue = true;
+        }
+        String[] a = {"1234.111","443"};
+        sendData(a);
     }
 }
