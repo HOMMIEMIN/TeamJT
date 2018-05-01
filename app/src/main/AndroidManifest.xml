@@ -12,14 +12,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
-    <uses-feature android:name = "android.hardware.camera"/>
-    <uses-feature android:name = "android.hardware.camera2"/>
-
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera2" />
 
     <application
         android:allowBackup="true"
@@ -51,23 +49,22 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_maps"
             android:exported="true"
-            >
+            android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WriteActivity" android:exported="true"></activity>
+        <activity
+            android:name=".WriteActivity"
+            android:exported="true" />
         <activity
             android:name=".MapsActivity"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity android:name=".SignUpActivity" />
         <activity
             android:name=".ChattingActivity"
@@ -76,11 +73,16 @@
         <activity
             android:name=".ReadMemoActivity"
             android:theme="@android:style/Theme.Dialog" />
-        <activity android:name=".ItemDetailActivity" android:theme="@android:style/Theme.Dialog"></activity>
-        <activity android:name=".EssayDetailActivity"></activity>
-        <service android:name=".ClosingServics"
+        <activity
+            android:name=".ItemDetailActivity"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity android:name=".EssayDetailActivity" />
+
+        <service
+            android:name=".ClosingServics"
             android:stopWithTask="false" />
 
+        <activity android:name=".ReadMemoPlusUrlActivity"></activity>
     </application>
 
 </manifest>
