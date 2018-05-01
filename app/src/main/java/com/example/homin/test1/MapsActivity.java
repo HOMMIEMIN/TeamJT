@@ -207,6 +207,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     FriendFragment friendFragment = new FriendFragment();
                     transaction.replace(R.id.container_main, friendFragment);
                     transaction.commit();
+                    bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
                     return true;
 
                 case R.id.navigation_dashboard:
@@ -215,6 +216,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     ChatListFragment chatListFragment = new ChatListFragment();
                     transaction1.replace(R.id.container_main, chatListFragment);
                     transaction1.commit();
+                    bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
                     return true;
 
                 case R.id.navigation_notifications:
@@ -223,6 +225,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     MypageFragment mypageFragment = new MypageFragment();
                     transaction2.replace(R.id.container_main, mypageFragment);
                     transaction2.commit();
+                    bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
                     return true;
             }
             return false;
@@ -287,7 +290,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         transaction.replace(R.id.container_main, friendFragment);
         transaction.commit();
 
-        registerForContextMenu(findViewById(R.id.map));
 
         bottomview = findViewById(R.id.bottom_sheet);
         actionLayout = findViewById(R.id.action_sheet);
@@ -315,7 +317,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-    }
+
+
+  }
 
 
     /********************************검색창을 위한 메소드들****************************************/
