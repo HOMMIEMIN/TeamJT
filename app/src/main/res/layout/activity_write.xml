@@ -118,8 +118,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:src="@drawable/insert_pic"
         android:onClick="showBottomSheetDialog"
+        android:src="@drawable/insert_pic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.375"
@@ -128,28 +128,41 @@
         app:layout_constraintVertical_bias="0.375" />
 
 
-
     <ImageView
         android:id="@+id/imageFrame"
-        android:visibility="invisible"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        android:scaleType="centerCrop"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="26dp"
         android:src="@drawable/common_google_signin_btn_icon_light_normal_background"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+
+    <ImageView
+        android:id="@+id/realImageView"
+        android:layout_width="76dp"
+        android:layout_height="76dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_launcher_foreground"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/imageFrame"
+        app:layout_constraintEnd_toEndOf="@+id/closeImgBtn"
+        app:layout_constraintStart_toStartOf="@+id/imageFrame"
+        app:layout_constraintTop_toTopOf="@+id/closeImgBtn" />
+
     <ImageView
         android:id="@+id/closeImgBtn"
-        android:onClick="onClickImgClose"
-        android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:onClick="onClickImgClose"
         android:src="@drawable/img_close"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/imageFrame"
         app:layout_constraintTop_toTopOf="@+id/imageFrame" />
 
 
