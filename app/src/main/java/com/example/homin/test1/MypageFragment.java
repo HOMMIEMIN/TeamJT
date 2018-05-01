@@ -431,8 +431,7 @@ public class MypageFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
-            Log.i(TAG, "onBindViewHolder");
-            UserDataTable userData = userDataTList.get(position);
+            UserDataTable userData = userDataTList.get((userDataTList.size()-1)-position);
             holder.textTitle.setText(userData.getTitle());  // 글제목
             //TODO: 글 내용살짝 보기
             String content = userData.getContent();
@@ -458,8 +457,8 @@ public class MypageFragment extends Fragment {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DaoImple.getInstance().setMyPageUserData(userDataTList.get(position));
-                    callback.onessaySetlected(position);
+                    DaoImple.getInstance().setMyPageUserData(userDataTList.get((userDataTList.size()-1)-position));
+                    callback.onessaySetlected((userDataTList.size()-1)-position);
                 }
             });
         }

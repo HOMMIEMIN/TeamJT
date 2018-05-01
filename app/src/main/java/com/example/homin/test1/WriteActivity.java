@@ -45,7 +45,7 @@ public class WriteActivity extends Activity {
     public static final String IMAGE_KEY = "image";
     public static final String TIME_KEY = "time";
     public static final String IMAGEURL_KEY = "imageUrl";
-    private ImageView preview, closeImg, insertPic;
+    private ImageView preview, closeImg, insertPic, imgFrame;
     private Bitmap image;
 //    private Uri uri;
     private StorageReference storageReference;
@@ -68,7 +68,8 @@ public class WriteActivity extends Activity {
 
         et1 = findViewById(R.id.editTitle);
         et2 = findViewById(R.id.editContent);
-        preview = findViewById(R.id.imageFrame);
+        imgFrame = findViewById(R.id.imageFrame);
+        preview = findViewById(R.id.realImageView);
         closeImg = findViewById(R.id.closeImgBtn);
         insertPic = findViewById(R.id.imageInsertPic);
 //        cameraBtn = findViewById(R.id.imageInsertPic);
@@ -186,16 +187,18 @@ public class WriteActivity extends Activity {
                     }
                     this.sendBroadcast(mediaScanIntent);
 
+                    imgFrame.setVisibility(View.VISIBLE);
                     preview.setVisibility(View.VISIBLE);
-                    closeImg.setVisibility(View.VISIBLE);
                     try {
                         image = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedUri);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                     preview.setImageBitmap(image);
-                    preview.setBackgroundResource(R.drawable.common_google_signin_btn_icon_light_normal_background);
+//                    preview.setBackgroundResource(R.drawable.common_google_signin_btn_icon_light_normal_background);
                     preview.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//                    preview.setScaleType(ImageView.ScaleType.FIT_XY);
+                    closeImg.setVisibility(View.VISIBLE);
 
                     break;
 
@@ -209,6 +212,7 @@ public class WriteActivity extends Activity {
         selectedUri = null;
         preview.setVisibility(View.INVISIBLE);
         closeImg.setVisibility(View.INVISIBLE);
+        imgFrame.setVisibility(View.INVISIBLE);
     }
 
     // 사진 버튼 누르면 불러오는 하단 메뉴
