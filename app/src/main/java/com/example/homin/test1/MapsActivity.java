@@ -26,6 +26,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.service.notification.StatusBarNotification;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
@@ -300,10 +301,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     actionLayout.setVisibility(View.VISIBLE);
+                    getWindow().setStatusBarColor(getResources().getColor(R.color.colorRealWhite, getResources().newTheme()));
+                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
                 }
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     actionLayout.setVisibility(View.GONE);
+                    getWindow().setStatusBarColor(getResources().getColor(R.color.colorMint, getResources().newTheme()));
+                    getWindow().getDecorView().setSystemUiVisibility(0);
                 }
 
                 if (newState == BottomSheetBehavior.STATE_DRAGGING) {
