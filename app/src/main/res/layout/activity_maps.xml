@@ -181,7 +181,6 @@
                 android:id="@+id/navigation"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:paddingTop="12dp"
                 android:paddingLeft="50dp"
                 android:paddingRight="50dp"
                 android:background="#167C80"
