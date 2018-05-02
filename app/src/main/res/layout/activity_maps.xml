@@ -62,12 +62,13 @@
 
                 <Button
                     android:id="@+id/AddIndicator"
-                    android:text="친구추가"
-                    android:layout_marginTop="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/input_search"
-                    />
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:textSize="18sp"
+                    android:background="@drawable/wattingn"
+                     />
 
             </RelativeLayout>
 

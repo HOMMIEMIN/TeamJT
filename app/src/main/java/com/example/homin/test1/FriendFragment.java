@@ -130,8 +130,6 @@ public class FriendFragment extends Fragment {
                 if (activity != null) {
                     if (list2.size() != 0) {
                         if (list2.get(position).getResizePictureUrl() != null) {
-//                            Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
-//                                    .centerCrop().into(holder.iv);
                             Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity)).into(holder.iv);
                             holder.tv1.setText(list2.get(position).getUserName());
                             Log.i("zxzxzx",list2.get(position).getUserName());

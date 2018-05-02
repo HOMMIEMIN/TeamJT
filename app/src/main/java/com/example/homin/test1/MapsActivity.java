@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.location.Address;
 import android.location.Criteria;
@@ -711,6 +712,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         myContact = contact;
                         Log.i("ddd3333", "콘텍트 생성");
                         DaoImple.getInstance().setContact(myContact);
+                        if(contact.getWattingList() != null) {
+                            Log.i("vv44","친구 신청");
+                            actionButton.setText(String.valueOf(contact.getWattingList().size()));
+                            actionButton.setBackgroundResource(R.drawable.wattingy);
+
+                        }else{
+                            Log.i("vv44","친구 신청 없음");
+                            Drawable drawable = context.getDrawable(R.drawable.wattingn);
+                            actionButton.setText("");
+                            actionButton.setBackground(drawable);
+                        }
                     }
                     for (int a = 0; a < myFriendList.size(); a++) {
                         // 친구들 위치정보 받아와서 구글맵에 갱신
@@ -783,7 +795,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Contact contact = dataSnapshot.getValue(Contact.class);
                         if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                             myContact = contact;
-//                            wattingCount = contact.getWattingList().size();
+                            if(contact.getWattingList() != null) {
+                                Log.i("vv44","친구 신청");
+                                actionButton.setText(String.valueOf(contact.getWattingList().size()));
+                                actionButton.setBackgroundResource(R.drawable.wattingy);
+
+                            }else{
+                                Log.i("vv44","친구 신청 없음");
+                                Drawable drawable = context.getDrawable(R.drawable.wattingn);
+                                actionButton.setBackground(drawable);
+                            }
                             List<String> realFriendList = contact.getFriendList();
                             myFriendList = new ArrayList<>();
 
@@ -817,15 +838,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                             ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                                                     friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
 
-                                                            Log.i("fffff", "체인지 : 바뀐위치 저장");
                                                             clusterManager.addItem(friendMarker);
                                                             personList.put(contact.getUserId(), friendMarker);
-                                                            Log.i("asdasd", "마커 생성");
-                                                            Log.i("asdasd ", contact.getUserId());
 
-                                                            Log.i("fffff", contact.getUserId());
-                                                            Log.i("fffff", "체인지 : 친구위치 마커생성");
-                                                            Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
                                                         } else {
                                                             BitmapFactory.Options options = new BitmapFactory.Options();
                                                             options.inSampleSize = 1;
@@ -835,20 +850,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                     friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
                                                             clusterManager.addItem(friendMarker);
                                                             personList.put(contact.getUserId(), friendMarker);
-                                                            Log.i("asdasd", "마커 생성");
-                                                            Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
-                                                            Log.i("fffff", "체인지 else : " + contact.getUserId());
                                                         }
 
                                                     } else {
-                                                        Log.i("asdqwe", "사람임");
-                                                        Log.i("asdqwe", "0   " + contact.getUserId());
                                                         if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
                                                             ItemPerson ip = personList.get(contact.getUserId());
-                                                            Log.i("asdqwe", "1   " + contact.getUserId());
                                                             // 저장 되있는 Location 정보와 firebase에 저장된 Location 비교
                                                             LatLng saveLatLng = ip.getPosition();
-                                                            String saveImage = ip.getImage();
+                                                            String saveImage = "NoImage";
+                                                            if(ip.getImage() != null) {
+                                                                saveImage = ip.getImage();
+                                                            }
+
+
+
                                                             if (targetId != null) {
                                                                 if (contact.getUserId().equals(targetId)) {
                                                                     targetIdMarker = ip;
@@ -862,17 +877,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                     setDestination();
                                                                 }
                                                             }
-                                                            Log.i("fffff", "리스트 크기 : " + personList.size());
-                                                            Log.i("fffff", "저장 : " + ip.getUserName());
+
                                                             LatLng newLatLng = new LatLng(contact.getUserLocation().get(0),
                                                                     contact.getUserLocation().get(1));
-                                                            Log.i("asdqwe", "2   " + contact.getUserId());
-                                                            Log.i("qweasd", saveLatLng.toString() + contact.getUserId());
-                                                            Log.i("qweasd", newLatLng.toString());
                                                             if (saveLatLng.longitude != newLatLng.longitude ||
                                                                     saveLatLng.latitude != newLatLng.latitude || !saveImage.equals(contact.getPictureUrl())){
-                                                                Log.i("asdqwe", "3   " + contact.getUserId());
-                                                                Log.i("asdqwe", "체인지 : 위치 바뀜");
                                                                 // 서로 다른 Location이 저장되 있다면, clusterManager에 저장된 마커 삭제
 
                                                                 clusterManager.removeItem(ip);
@@ -880,19 +889,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 // 다시 마커 생성 후, clusterManager과 personList에 저장
                                                                 List<Double> friendLocation = contact.getUserLocation();
                                                                 if (contact.getResizePictureUrl() != null) {
-
                                                                     ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                                                             friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
 
-                                                                    Log.i("fffff", "체인지 : 바뀐위치 저장");
                                                                     clusterManager.addItem(friendMarker);
                                                                     personList.put(contact.getUserId(), friendMarker);
-                                                                    Log.i("asdasd", "마커 생성");
-                                                                    Log.i("asdasd ", contact.getUserId());
-
-                                                                    Log.i("fffff", contact.getUserId());
-                                                                    Log.i("fffff", "체인지 : 친구위치 마커생성");
-                                                                    Log.i("fdfd", "마커 생성 체인지 : " + contact.getUserId());
                                                                 } else {
                                                                     BitmapFactory.Options options = new BitmapFactory.Options();
                                                                     options.inSampleSize = 1;
@@ -902,10 +903,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                             friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
                                                                     clusterManager.addItem(friendMarker);
                                                                     personList.put(contact.getUserId(), friendMarker);
-                                                                    Log.i("asdasd", "마커 생성");
-                                                                    Log.i("fdfd", "마커 생성 add : " + contact.getUserId());
-                                                                    Log.i("fffff", "체인지 else : " + contact.getUserId());
-
 
                                                                 }
 
@@ -923,7 +920,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                     if (((ItemPerson) m).getUserId().equals(contact.getUserId())) {
                                                         ItemPerson ip = personList.get(contact.getUserId());
                                                         clusterManager.removeItem(ip);
-
                                                     }
                                                 }
                                             }
