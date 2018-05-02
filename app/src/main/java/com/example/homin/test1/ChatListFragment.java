@@ -4,6 +4,8 @@ package com.example.homin.test1;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,9 +16,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,6 +28,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static android.net.sip.SipErrorCode.TIME_OUT;
@@ -34,6 +39,8 @@ import static android.net.sip.SipErrorCode.TIME_OUT;
  */
 public class ChatListFragment extends Fragment {
 
+
+
     private Handler mhandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -43,6 +50,8 @@ public class ChatListFragment extends Fragment {
             }
         }
     };
+
+
 
     class ListAdapter extends RecyclerView.Adapter<ListAdapter.ListHolder>{
 
@@ -58,11 +67,22 @@ public class ChatListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ListHolder holder, final int position) {
-//            holder.iv.setImageResource(list.get(position).getImageId());
+
+
             final boolean check = true;
             for(int a = 0 ; a < list2.size() ; a++){
                 if(list2.get(a).getUserId().equals(list.get(position))){
                     holder.tv.setText(list2.get(a).getUserName() + " 님과의 대화창");
+
+//TODO:-----------------------------호민이형 여기요 !! 여깁니다 !!!!------------------------------------
+
+                    //상대방이랑 대화한글 마지막 내용 불러오기 보류...
+//                   holder.tv2.setText( 상대방이랑 쳇한 마지막 대화 받기);
+                    // 대화목록 동그란 이미지 커스텀
+                    holder.iv.setBackground(new ShapeDrawable(new OvalShape()));
+                    holder.iv.setClipToOutline(true);
+                    // centerCrop() 이미지 원형에 맞추기
+                    Glide.with(context).load(list2.get(a).getPictureUrl()).centerCrop().into(holder.iv);
                 }
             }
 
@@ -92,12 +112,14 @@ public class ChatListFragment extends Fragment {
 
         class ListHolder extends RecyclerView.ViewHolder{
             ImageView iv;
-            TextView tv;
+            TextView tv,tv2;
 
             public ListHolder(View itemView) {
                 super(itemView);
                 iv = itemView.findViewById(R.id.imageView_listLayout);
                 tv = itemView.findViewById(R.id.textView_listLayout);
+                tv2 = itemView.findViewById(R.id.textView_listLayoutendchat);
+
             }
         }
     }

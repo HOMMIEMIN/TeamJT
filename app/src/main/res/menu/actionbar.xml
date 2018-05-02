@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ChattingActivity">
+
+    <item
+        android:id="@+id/actionbar_close"
+        android:icon="@drawable/close_btn"
+        android:iconTint="#FFFFFF"
+        android:title="닫기"
+        app:showAsAction="always" />
+</menu>

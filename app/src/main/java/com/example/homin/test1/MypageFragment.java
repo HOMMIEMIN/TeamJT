@@ -79,8 +79,8 @@ public class MypageFragment extends Fragment {
     private static Context context;
     private static String key;
     private static DatabaseReference reference;
-    private static ImageView imageView;
-    private TextView textView;
+    private static ImageView imageView, imageView2;
+    private TextView textView,textView2;
 
     private RecyclerView recycler;
     private List<UserDataTable> userDataTList;
@@ -255,12 +255,17 @@ public class MypageFragment extends Fragment {
         });
         userDataTList = new ArrayList<>();
 
-        recycler = view.findViewById(R.id.essay_listview);
-        recycler.setHasFixedSize(true);
+            recycler = view.findViewById(R.id.essay_listview);
+            recycler.setHasFixedSize(true);
 
-        recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new userDataTableAdapter();
-        recycler.setAdapter(adapter);
+            recycler.setLayoutManager(new LinearLayoutManager(getContext()));
+            adapter = new userDataTableAdapter();
+            recycler.setAdapter(adapter);
+
+
+
+
+
 
         return view;
 
@@ -336,6 +341,8 @@ public class MypageFragment extends Fragment {
 
         //TODO: 공개여부
 
+        textView2= getView().findViewById(R.id.textNot_recycle);
+        imageView2 = getView().findViewById(R.id.imageNot_recycle);
         swich = getView().findViewById(R.id.switchBtn);
         key = DaoImple.getInstance().getKey();
         Gong_ge = DaoImple.getInstance().getContact().isPublic();
@@ -364,7 +371,7 @@ public class MypageFragment extends Fragment {
         });
 
 
-        //TODO: 리사이클러 뷰
+        // TODO: 리사이클러 뷰
 
         if (userDataTList.size()== 0) {
             key = DaoImple.getInstance().getKey();
@@ -381,15 +388,23 @@ public class MypageFragment extends Fragment {
                     String snapshot = String.valueOf(obj);
                     Log.i(TAG, "온스타트_온차이드 String snapshot" + snapshot);
                     UserDataTable data = dataSnapshot.getValue(UserDataTable.class);
+
                     Log.i(TAG, "온스타트_온차이드 UserDtaTable data" + data);
 //                Log.i(TAG, "line302) userDtaTlist.add(data) :" + userDataTList.add(data));
                     userDataTList.add(data);
                     Log.i(TAG, "온스타트_온차이드....여기까지만 나와도 행복하것다...");
 //                Log.i(TAG, "data.getName(): " + data.getTitle());
                     int size = userDataTList.size();
+
                     Log.i(TAG, "온차일드 userDataTList.size() " + size);
 //                Log.i(TAG, "userDataTList.size(): " + size);
 //                Log.i("ggg","데이터 받아옴");
+                    if (userDataTList.size() != 0){
+                        textView2.setVisibility(View.GONE);
+                        imageView2.setVisibility(View.GONE);
+                    }
+
+
 
 
                     if (!userDataTList.isEmpty()) {
@@ -438,37 +453,40 @@ public class MypageFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
+
             UserDataTable userData = userDataTList.get((userDataTList.size()-1)-position);
-            holder.textTitle.setText(userData.getTitle());  // 글제목
-            //TODO: 글 내용살짝 보기
-            String content = userData.getContent();
-            Log.i(TAG, "onBindViewHolder: " + userData.getContent());
-            String cutcontent = "";
-            if(userData.getContent().length()>30){
-                cutcontent = content.substring(0,28);
-                cutcontent += "...";
-            }else {
-                cutcontent = userData.getContent();
-            }
-            holder.tectContent.setText(cutcontent); // 저장 글 짤라서 보이기!
 
-            /**위도,경도를 주고값으로 가져오는 코드 */
-            Double lat = userData.getLocation().get(0);
-            Double lng = userData.getLocation().get(1);
-            String address = getAddress(getContext(), lat, lng);
-            holder.textLocation.setText(address);
-
-            String dateFormat = userData.getData();
-            String najjanaom = DaoImple.getInstance().getDateFormat(dateFormat);
-            holder.textDate.setText(najjanaom); // 글 날짜
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    DaoImple.getInstance().setMyPageUserData(userDataTList.get((userDataTList.size()-1)-position));
-                    callback.onessaySetlected((userDataTList.size()-1)-position);
+                holder.textTitle.setText(userData.getTitle());  // 글제목
+                //TODO: 글 내용살짝 보기
+                String content = userData.getContent();
+                Log.i(TAG, "onBindViewHolder: " + userData.getContent());
+                String cutcontent = "";
+                if (userData.getContent().length() > 30) {
+                    cutcontent = content.substring(0, 28);
+                    cutcontent += "...";
+                } else {
+                    cutcontent = userData.getContent();
                 }
-            });
-        }
+                holder.tectContent.setText(cutcontent); // 저장 글 짤라서 보이기!
+
+                /**위도,경도를 주고값으로 가져오는 코드 */
+                Double lat = userData.getLocation().get(0);
+                Double lng = userData.getLocation().get(1);
+                String address = getAddress(getContext(), lat, lng);
+                holder.textLocation.setText(address);
+
+                String dateFormat = userData.getData();
+                String najjanaom = DaoImple.getInstance().getDateFormat(dateFormat);
+                holder.textDate.setText(najjanaom); // 글 날짜
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DaoImple.getInstance().setMyPageUserData(userDataTList.get((userDataTList.size() - 1) - position));
+                        callback.onessaySetlected((userDataTList.size() - 1) - position);
+                    }
+                });
+
+        }//end onBindViewHolder()
 
         @Override
         public int getItemCount() {
