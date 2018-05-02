@@ -161,6 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean destoryCheck;
     private boolean memoAddCheck;
     private boolean blueToothCheck;
+    private int wattingCount;
 
     // MyPage에 이용
     private static final int CAMERA_CODE = 1000;
@@ -782,6 +783,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Contact contact = dataSnapshot.getValue(Contact.class);
                         if (contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())) {
                             myContact = contact;
+//                            wattingCount = contact.getWattingList().size();
                             List<String> realFriendList = contact.getFriendList();
                             myFriendList = new ArrayList<>();
 
@@ -846,6 +848,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                             Log.i("asdqwe", "1   " + contact.getUserId());
                                                             // 저장 되있는 Location 정보와 firebase에 저장된 Location 비교
                                                             LatLng saveLatLng = ip.getPosition();
+                                                            String saveImage = ip.getImage();
                                                             if (targetId != null) {
                                                                 if (contact.getUserId().equals(targetId)) {
                                                                     targetIdMarker = ip;
@@ -867,7 +870,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                             Log.i("qweasd", saveLatLng.toString() + contact.getUserId());
                                                             Log.i("qweasd", newLatLng.toString());
                                                             if (saveLatLng.longitude != newLatLng.longitude ||
-                                                                    saveLatLng.latitude != newLatLng.latitude) {
+                                                                    saveLatLng.latitude != newLatLng.latitude || !saveImage.equals(contact.getPictureUrl())){
                                                                 Log.i("asdqwe", "3   " + contact.getUserId());
                                                                 Log.i("asdqwe", "체인지 : 위치 바뀜");
                                                                 // 서로 다른 Location이 저장되 있다면, clusterManager에 저장된 마커 삭제
@@ -1519,6 +1522,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 mMarker.remove();
                                 mMarker = null;
+
+                                String blueTooth = "0" + "\n" + "0";
+                                sendData(blueTooth);
                             } else if (myMarker != null && targetMarker != null) {
                                 shapeView.setBackground(null);
                                 distanceIndicator.setVisibility(View.GONE);
@@ -1529,6 +1535,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 clusterManager.cluster();
                                 targetMarker = null;
 
+                                String blueTooth = "0" + "\n" + "0";
+                                sendData(blueTooth);
+
                             } else if (myMarker != null && targetId != null) {
                                 shapeView.setBackground(null);
                                 distanceIndicator.setVisibility(View.GONE);
@@ -1538,6 +1547,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 targetId = null;
                                 targetIdMarker = null;
 
+                                String blueTooth = "0" + "\n" + "0";
+                                sendData(blueTooth);
                             }
                         }
                     }).setNegativeButton("아니요", new DialogInterface.OnClickListener() {
@@ -1742,6 +1753,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMarker.remove();
                 mMarker = null;
 
+                String blueTooth1 = "0" + "\n" + "0";
+                sendData(blueTooth1);
+
             }
         } else if (myMarker != null && targetMarker != null) {
 //                clusterManager.addItem(targetMarker);
@@ -1780,6 +1794,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 clusterManager.cluster();
                 targetMarker = null;
 
+                String blueTooth1 = "0" + "\n" + "0";
+                sendData(blueTooth1);
+
             }
 
         } else if (myMarker != null && targetId != null && targetIdMarker != null) {
@@ -1812,6 +1829,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 destinationClicked = false;
                 targetId = null;
                 targetIdMarker = null;
+
+                String blueTooth1 = "0" + "\n" + "0";
+                sendData(blueTooth1);
             }
 
         }
@@ -1911,7 +1931,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }catch(Exception e){
             e.printStackTrace();
             // 문자열 전송 도중 오류가 발생한 경우
-            Toast.makeText(context, "블루투스 데이터 전송 오류 발생", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
+//            Toast.makeText(context, "블루투스 데이터 전송 오류 발생", Toast.LENGTH_SHORT).show();	// 어플리케이션 종료
         }
     }
 
