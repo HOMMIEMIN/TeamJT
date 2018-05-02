@@ -62,8 +62,10 @@
 
                 <Button
                     android:id="@+id/AddIndicator"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:textSize="18sp"
@@ -79,7 +81,7 @@
             android:id="@+id/shapeView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="50dp"
+            android:layout_marginBottom="48dp"
             android:layout_marginTop="50dp"
             android:orientation="vertical">
 
@@ -168,7 +170,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        app:behavior_peekHeight="50dp"
+        app:behavior_peekHeight="48dp"
         app:layout_behavior="@string/bottom_sheet_behavior">
 
         <LinearLayout
@@ -181,13 +183,62 @@
             <android.support.design.widget.BottomNavigationView
                 android:id="@+id/navigation"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:paddingLeft="50dp"
-                android:paddingRight="50dp"
+                android:layout_height="48dp"
                 android:background="#167C80"
-                app:itemIconTint="@color/color"
-                app:itemTextColor="@color/color"
-                app:menu="@menu/navigation" />
+                android:paddingLeft="80dp"
+                android:paddingRight="80dp"
+                android:paddingTop="4dp"
+                app:itemIconTint="@color/navi_color_light"
+                app:itemTextColor="@color/navi_color_light"
+                app:menu="@menu/navigation">
+
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="240dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center">
+
+
+                    <ImageView
+                        android:id="@+id/imageFriendsLine"
+                        android:visibility="visible"
+                        android:layout_width="30dp"
+                        android:layout_height="3dp"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="39dp"
+                        android:src="@color/colorRealWhite"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageChatListLine"
+                        android:visibility="invisible"
+                        android:layout_width="30dp"
+                        android:layout_height="3dp"
+                        android:layout_marginTop="39dp"
+                        android:src="@color/colorRealWhite"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageMyPageLine"
+                        android:visibility="invisible"
+                        android:layout_width="30dp"
+                        android:layout_height="3dp"
+                        android:layout_marginEnd="30dp"
+                        android:layout_marginTop="39dp"
+                        android:src="@color/colorRealWhite"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </android.support.constraint.ConstraintLayout>
+            </android.support.design.widget.BottomNavigationView>
+
+
 
             <FrameLayout
                 android:id="@+id/container_main"

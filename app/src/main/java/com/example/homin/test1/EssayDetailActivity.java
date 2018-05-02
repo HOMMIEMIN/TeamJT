@@ -72,17 +72,17 @@ public class EssayDetailActivity extends AppCompatActivity {
 //        Glide.with(getApplicationContext())
 ////                .load(
 ////                        "http://maps.googleapis.com/maps/api/staticmap?center=" + lat +","+ lng + "&zoom=14&size=400x220&maptype=roadmap%20" +
-////                                "&markers=color:blue|label:A|" + lat +","+ lng + "&sensor=false")
+////                                "&markers=navi_color_light:blue|label:A|" + lat +","+ lng + "&sensor=false")
 //                .load("http://maps.googleapis.com/maps/api/staticmap?center=" +
 //                        (lat + 0.0005) + "," + (lng + 0.004) +
-//                        "&zoom=14&size=380x200&scale=2&maptype=roadmap&markers=color:red|label:A|" +
+//                        "&zoom=14&size=380x200&scale=2&maptype=roadmap&markers=navi_color_light:red|label:A|" +
 //                        lat + ","+ lng + "&sensor=false")
 //                .into(imageView2);
 
         Glide.with(getApplicationContext())
 //                .load(
 //                        "http://maps.googleapis.com/maps/api/staticmap?center=" + lat +","+ lng + "&zoom=14&size=400x220&maptype=roadmap%20" +
-//                                "&markers=color:blue|label:A|" + lat +","+ lng + "&sensor=false")
+//                                "&markers=navi_color_light:blue|label:A|" + lat +","+ lng + "&sensor=false")
                 .load("http://maps.googleapis.com/maps/api/staticmap?center=" +
                         (lat + 0.0005) + "," + (lng + 0.004) +
                         "&zoom=14&size=380x200&scale=2&maptype=roadmap&" +

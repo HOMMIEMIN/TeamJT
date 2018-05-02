@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -38,11 +39,13 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -50,6 +53,7 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -203,6 +207,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+            ImageView selectedFriends = findViewById(R.id.imageFriendsLine);
+            ImageView selectedChatList = findViewById(R.id.imageChatListLine);
+            ImageView selectedMyPage = findViewById(R.id.imageMyPageLine);
+
             switch (item.getItemId()) {
 
                 case R.id.navigation_home:
@@ -212,6 +221,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction.replace(R.id.container_main, friendFragment);
                     transaction.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
+                    selectedFriends.setVisibility(View.VISIBLE);
+                    selectedChatList.setVisibility(View.INVISIBLE);
+                    selectedMyPage.setVisibility(View.INVISIBLE);
                     return true;
 
                 case R.id.navigation_dashboard:
@@ -221,6 +233,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction1.replace(R.id.container_main, chatListFragment);
                     transaction1.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
+                    selectedFriends.setVisibility(View.INVISIBLE);
+                    selectedChatList.setVisibility(View.VISIBLE);
+                    selectedMyPage.setVisibility(View.INVISIBLE);
                     return true;
 
                 case R.id.navigation_notifications:
@@ -230,6 +245,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction2.replace(R.id.container_main, mypageFragment);
                     transaction2.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
+                    selectedFriends.setVisibility(View.INVISIBLE);
+                    selectedChatList.setVisibility(View.INVISIBLE);
+                    selectedMyPage.setVisibility(View.VISIBLE);
                     return true;
             }
             return false;
@@ -284,7 +302,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        BottomNavigationView navigationView = findViewById(R.id.navigation);
+        final BottomNavigationView navigationView = findViewById(R.id.navigation);
         navigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         actionButton = findViewById(R.id.AddIndicator);
 
@@ -297,15 +315,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         bottomview = findViewById(R.id.bottom_sheet);
         actionLayout = findViewById(R.id.action_sheet);
+        final ImageView friendLine = findViewById(R.id.imageFriendsLine);
+        ImageView chatLine = findViewById(R.id.imageChatListLine);
+        ImageView myPageLine = findViewById(R.id.imageMyPageLine);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomview);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @SuppressLint("ResourceAsColor")
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     actionLayout.setVisibility(View.VISIBLE);
                     getWindow().setStatusBarColor(getResources().getColor(R.color.colorRealWhite, getResources().newTheme()));
                     getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                    bottomview.setBackgroundColor(R.color.colorRealWhite);
 
                 }
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {

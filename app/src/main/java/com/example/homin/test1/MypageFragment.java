@@ -71,6 +71,8 @@ public class MypageFragment extends Fragment {
 
     private static final String TAG = "changeImage";
     private static final String TAG1 = "alstjrdl";
+    private static final String TAG2 = "mini";
+
 
     public static userDataTableAdapter adapter;
 
@@ -260,9 +262,6 @@ public class MypageFragment extends Fragment {
         adapter = new userDataTableAdapter();
         recycler.setAdapter(adapter);
 
-
-
-
         return view;
 
 
@@ -391,6 +390,12 @@ public class MypageFragment extends Fragment {
                     Log.i(TAG, "온차일드 userDataTList.size() " + size);
 //                Log.i(TAG, "userDataTList.size(): " + size);
 //                Log.i("ggg","데이터 받아옴");
+
+
+                    if (!userDataTList.isEmpty()) {
+
+                    }
+
                     adapter.notifyDataSetChanged();
 
 
