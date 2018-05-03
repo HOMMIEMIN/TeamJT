@@ -49,28 +49,37 @@
                 <AutoCompleteTextView
                     android:id="@+id/input_search"
                     android:layout_width="270dp"
-                    android:layout_marginLeft="8dp"
-                    android:paddingTop="10dp"
                     android:layout_height="match_parent"
-                    android:background="@null"
                     android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
                     android:layout_toRightOf="@id/ic_magnify"
+                    android:background="@null"
                     android:hint="가고 싶은 곳을 입력하세요"
                     android:imeOptions="actionSearch"
+                    android:paddingTop="10dp"
                     android:textColor="#000"
                     android:textSize="15sp" />
 
-                <Button
+                <ImageView
                     android:id="@+id/AddIndicator"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="12dp"
+                    android:background="@color/colorRealWhite"
+                    android:src="@drawable/wattingn" />
+
+                <TextView
+                    android:id="@+id/textView_watting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:textSize="18sp"
-                    android:background="@drawable/wattingn"
-                     />
+                    android:layout_marginStart="-20dp"
+                    android:layout_marginTop="13dp"
+                    android:layout_toEndOf="@+id/AddIndicator"
+                    android:text="1"
+                    android:textSize="8sp" />
 
             </RelativeLayout>
 

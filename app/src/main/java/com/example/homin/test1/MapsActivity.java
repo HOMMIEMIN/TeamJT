@@ -138,7 +138,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private BottomSheetBehavior bottomSheetBehavior;
     private View bottomview;
     private Menu mMenu;
-    private Button actionButton;
+    private ImageView actionButton;
+    private TextView wattingText;
     private DatabaseReference reference;
     private List<String> myFriendList;
     private List<String> memoFriendList;
@@ -264,6 +265,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         rootView = findViewById(R.id.container);//Snackbar위한 View member변수
         Intent intent = new Intent(this, ClosingServics.class);
         startService(intent);
+
         context = getApplicationContext();
         Log.i("qq23q", "onCreate");
         memoList = new ArrayList<>();
@@ -271,6 +273,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         personList = new HashMap<>();
         distanceIndicator = findViewById(R.id.distanceIndicator);
         shapeView = findViewById(R.id.shapeView);
+        wattingText = findViewById(R.id.textView_watting);
 
 
         //검색창 editText
@@ -738,14 +741,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         DaoImple.getInstance().setContact(myContact);
                         if(contact.getWattingList() != null) {
                             Log.i("vv44","친구 신청");
-                            actionButton.setText(String.valueOf(contact.getWattingList().size()));
-                            actionButton.setBackgroundResource(R.drawable.wattingy);
+                            wattingText.setText(String.valueOf(contact.getWattingList().size()));
+                            actionButton.setImageResource(R.drawable.wattingy);
 
                         }else{
                             Log.i("vv44","친구 신청 없음");
-                            Drawable drawable = context.getDrawable(R.drawable.wattingn);
-                            actionButton.setText("");
-                            actionButton.setBackground(drawable);
+                            wattingText.setText("");
+                            actionButton.setImageResource(R.drawable.wattingn);
                         }
                     }
                     for (int a = 0; a < myFriendList.size(); a++) {
@@ -821,13 +823,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             myContact = contact;
                             if(contact.getWattingList() != null) {
                                 Log.i("vv44","친구 신청");
-                                actionButton.setText(String.valueOf(contact.getWattingList().size()));
-                                actionButton.setBackgroundResource(R.drawable.wattingy);
+                                wattingText.setText(String.valueOf(contact.getWattingList().size()));
+                                actionButton.setImageResource(R.drawable.wattingy);
 
                             }else{
                                 Log.i("vv44","친구 신청 없음");
-                                Drawable drawable = context.getDrawable(R.drawable.wattingn);
-                                actionButton.setBackground(drawable);
+                                wattingText.setText("");
+                                actionButton.setImageResource(R.drawable.wattingn);
                             }
                             List<String> realFriendList = contact.getFriendList();
                             myFriendList = new ArrayList<>();
