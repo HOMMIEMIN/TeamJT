@@ -236,6 +236,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
+    private boolean isOnStop = false;
+    @Override
+    protected void onStop() {
+        isOnStop = true;
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        isOnStop = false;
+        super.onResume();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -625,7 +638,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (m instanceof ItemMemo) {
                         itemMemos.add((ItemMemo) m);
 
-                    } else {
+                    } else if(m instanceof  ItemPerson) {
                         itemPeople.add((ItemPerson) m);
                     }
                 }
@@ -999,8 +1012,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 Context activityCheck = DaoImple.getInstance().getChattingActivity();
                                 if (activityCheck == null) {
                                     Log.i("ddd66", "체크" + activityCheck + "");
-                                    Toast.makeText(context, chat.getName() + " : " + chat.getChat(), Toast.LENGTH_SHORT).show();
-                                    chatCheck = 0;
+                                    if(isOnStop == true){
+                                        Intent intent = new Intent(MapsActivity.this,NotificationService.class);
+                                        intent.putExtra("name",chat.getName());
+                                        intent.putExtra("chat",chat.getChat());
+                                        intent.putExtra("id",chat.getId());
+                                        intent.putExtra("type","msg");
+                                        startService(intent);
+                                    }else {
+
+                                        Toast.makeText(context, chat.getName() + " : " + chat.getChat(), Toast.LENGTH_SHORT).show();
+                                        chatCheck = 0;
+                                    }
                                 }
                             }
                         }
@@ -1578,6 +1601,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onDestroy() {
+        Intent intent = new Intent(MapsActivity.this,NotificationService.class);
+        stopService(intent);
+
+
         reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
 
         try {
@@ -1708,15 +1735,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.rotation((float) degree - 90.0f);
+        markerOptions.rotation((float) degree);
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
 
         markerOptions.position(myMarker.getPosition());
-        markerOptions.anchor(0.0f, 0.5f);
+        markerOptions.anchor(0.5f, 1.0f);
         arrow = mMap.addMarker(markerOptions);
 
         shapeView.setBackground(getDrawable(R.drawable.shape));
         distanceIndicator.setVisibility(View.VISIBLE);
+        double km = 0;
 //        Log.i("KSJ", myMarker.getPosition() + "||"+ mMarker.getPosition() + "");
         if (myMarker != null && mMarker != null) {
             double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), mMarker.getPosition());
@@ -1724,10 +1752,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int index = stringDistance.indexOf(".");
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
+            km = Integer.parseInt(m) * 0.001;
 
 
 
-            distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
+            distanceIndicator.setText("목적지까지의 거리: " + km + "KM ");
             if(degree < 0) {
                 degree = 360+degree;
             }
@@ -1765,7 +1794,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
             Log.i("KSJ", "distance: " + distance);
-            distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
+            km = Integer.parseInt(m) * 0.001;
+
+
+
+            distanceIndicator.setText("목적지까지의 거리: " + km + "KM ");
 
             if(degree < 0) {
                 degree = 360+degree;
@@ -1803,7 +1836,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
             Log.i("KSJ", "distance: " + distance);
-            distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
+            km = Integer.parseInt(m) * 0.001;
+
+
+
+            distanceIndicator.setText("목적지까지의 거리: " + km + "KM ");
 
             if(degree < 0) {
                 degree = 360+degree;
@@ -1829,6 +1866,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String blueTooth1 = "0" + "\n" + "0";
                 sendData(blueTooth1);
             }
+
+        }
+
+        if(isOnStop == true){
+            Log.i("KIMMY" , "들어옴?");
+            Intent intent = new Intent(MapsActivity.this,NotificationService.class);
+            intent.putExtra("name","목적지와의 거리");
+            intent.putExtra("chat",km + "KM ");
+            intent.putExtra("type","distance");
+            startService(intent);
 
         }
 

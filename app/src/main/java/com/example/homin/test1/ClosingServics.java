@@ -29,8 +29,11 @@ public class ClosingServics extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
+        if(reference!= null) {
+            reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
+        }
         stopSelf();
+
     }
 
 

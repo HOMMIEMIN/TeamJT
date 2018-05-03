@@ -64,7 +64,7 @@
             android:exported="true" />
         <activity
             android:name=".MapsActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity android:name=".SignUpActivity" />
         <activity
             android:name=".ChattingActivity"
@@ -82,7 +82,18 @@
             android:name=".ClosingServics"
             android:stopWithTask="false" />
 
-        <activity android:name=".ReadMemoPlusUrlActivity"></activity>
+        <activity android:name=".ReadMemoPlusUrlActivity" />
+
+        <service
+            android:name=".NotificationService"
+            android:stopWithTask="false"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".ServiceThread"
+            android:stopWithTask="false"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

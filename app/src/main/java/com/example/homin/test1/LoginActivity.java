@@ -92,6 +92,9 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        Intent intent = new Intent(this,NotificationService.class);
+//        stopService(intent);
+
         intent = new Intent(LoginActivity.this, MapsActivity.class);
         pictureList = new HashMap();
         setContentView(R.layout.activity_login);

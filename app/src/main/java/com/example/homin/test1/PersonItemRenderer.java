@@ -31,10 +31,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.ClusterRenderer;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 import com.google.maps.android.ui.SquareTextView;
 
+import java.lang.reflect.Array;
+import java.util.Iterator;
 import java.util.Set;
 
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
@@ -44,6 +47,7 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
     GoogleMap googleMap;
     private ClusterManager<ClusterItem> clusterManager;
     boolean imageCheck;
+    private IconGenerator mClusterIconGenerator;
 
     private static Activity getActivity(Context context) {
         if (context == null) {
@@ -63,7 +67,10 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         super.onClusterRendered(cluster, marker);
         marker.setAnchor(0.5f,0.5f);
 
+
     }
+
+
 
     @Override
     protected void onClusterItemRendered(final ClusterItem clusterItem, final Marker marker) {
@@ -107,13 +114,34 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         this.context = context;
         this.googleMap = map;
         this.clusterManager = clusterManager;
+        mClusterIconGenerator = new IconGenerator(context);
     }
+
+    @Override
+    protected void onBeforeClusterRendered(Cluster<ClusterItem> cluster, MarkerOptions markerOptions) {
+        super.onBeforeClusterRendered(cluster, markerOptions);
+        final Drawable memoClusterIcon = context.getDrawable(R.drawable.stack);
+        final Drawable personClusterIcon = context.getDrawable(R.drawable.group);
+//        clusterIcon.setColorFilter(context.getColor(android.R.color.holo_orange_light), PorterDuff.Mode.SRC_ATOP);
+        Object obj = cluster.getItems().toArray();
+        Iterator<ClusterItem> itemIterator = cluster.getItems().iterator();
+        if(itemIterator.next() instanceof ItemMemo) {
+            mClusterIconGenerator.setBackground(memoClusterIcon);
+        }else{
+            mClusterIconGenerator.setBackground(personClusterIcon);
+        }
+
+        Bitmap icon = mClusterIconGenerator.makeIcon("");
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
+    }
+
+
 
 
     @Override
     protected void onBeforeClusterItemRendered(final ClusterItem item, final MarkerOptions markerOptions) {
         super.onBeforeClusterItemRendered(item, markerOptions);
-
+        setMinClusterSize(3);
         if (item instanceof ItemPerson) {
 
             if (((ItemPerson) item).getImage() != null) {
@@ -144,6 +172,8 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         }
 
     }
+
+
 
     //직사각형 비트맵을 원형으로 변환하는 메소드
     public static Bitmap getCircleBitmap(Bitmap bitmap) {
