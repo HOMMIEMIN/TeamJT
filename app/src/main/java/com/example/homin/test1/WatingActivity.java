@@ -3,12 +3,15 @@ package com.example.homin.test1;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -324,6 +327,11 @@ public class WatingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wating);
+
+        // 액션바
+        ActionBar ab = getSupportActionBar() ;
+        ab.setTitle("친구요청 알림") ;
+
         list = new ArrayList<>();
         keyList = new ArrayList<>();
         conList = new ArrayList<>();
@@ -384,5 +392,28 @@ public class WatingActivity extends AppCompatActivity {
         String key = key1+key2+key3;
 
         return key;
+    }
+
+    // 액션바 적용1
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.actionbar, menu);
+
+        return true;
+    }
+
+    // 액션바 적용2(닫기아이콘 리스너)
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.actionbar_close:
+                Toast.makeText(this, "닫기", Toast.LENGTH_SHORT).show();
+                finish();
+                return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
+
     }
 }

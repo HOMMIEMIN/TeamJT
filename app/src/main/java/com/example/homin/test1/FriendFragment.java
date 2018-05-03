@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -221,6 +222,7 @@ public class FriendFragment extends Fragment {
                 holder.btn2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
                         if(myFriendList == null) {
                             myFriendList = new ArrayList<>();
                         }
@@ -264,13 +266,15 @@ public class FriendFragment extends Fragment {
                             Log.i("vv1","너아이디 : " + yourContact.getUserName());
                             String yourKey = getKey(id);
                             List<String> yourList = yourContact.getWattingList();
-                            for(int a = 0 ; a < myWattingList.size() ; a++){
-                                Log.i("ghals55","wattingList : " + myWattingList.get(a));
-                                Log.i("ghals55","list2 : " + list2.get(position).getUserId());
-                                if(myWattingList.get(a).equals(list2.get(position).getUserId())){
-                                    listCheck = true;
-                                    Log.i("ghals55","listCheck : true");
-                                    break;
+                            if(myWattingList != null) {
+                                for (int a = 0; a < myWattingList.size(); a++) {
+                                    Log.i("ghals55", "wattingList : " + myWattingList.get(a));
+                                    Log.i("ghals55", "list2 : " + list2.get(position).getUserId());
+                                    if (myWattingList.get(a).equals(list2.get(position).getUserId())) {
+                                        listCheck = true;
+                                        Log.i("ghals55", "listCheck : true");
+                                        break;
+                                    }
                                 }
                             }
 
@@ -309,8 +313,8 @@ public class FriendFragment extends Fragment {
         class FriendHolder extends RecyclerView.ViewHolder{
             ImageView iv;
             TextView tv1;
-            TextView tv3;
-            Button btn2;
+            TextView tv2, tv3;
+            ImageButton btn2;
 
             public FriendHolder(View itemView) {
                 super(itemView);
