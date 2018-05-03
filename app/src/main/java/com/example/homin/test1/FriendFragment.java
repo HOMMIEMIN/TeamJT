@@ -266,13 +266,15 @@ public class FriendFragment extends Fragment {
                             Log.i("vv1","너아이디 : " + yourContact.getUserName());
                             String yourKey = getKey(id);
                             List<String> yourList = yourContact.getWattingList();
-                            for(int a = 0 ; a < myWattingList.size() ; a++){
-                                Log.i("ghals55","wattingList : " + myWattingList.get(a));
-                                Log.i("ghals55","list2 : " + list2.get(position).getUserId());
-                                if(myWattingList.get(a).equals(list2.get(position).getUserId())){
-                                    listCheck = true;
-                                    Log.i("ghals55","listCheck : true");
-                                    break;
+                            if(myWattingList != null) {
+                                for (int a = 0; a < myWattingList.size(); a++) {
+                                    Log.i("ghals55", "wattingList : " + myWattingList.get(a));
+                                    Log.i("ghals55", "list2 : " + list2.get(position).getUserId());
+                                    if (myWattingList.get(a).equals(list2.get(position).getUserId())) {
+                                        listCheck = true;
+                                        Log.i("ghals55", "listCheck : true");
+                                        break;
+                                    }
                                 }
                             }
 

@@ -20,6 +20,7 @@ public class ClosingServics extends Service {
     private DatabaseReference reference;
 
 
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
