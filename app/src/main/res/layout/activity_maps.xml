@@ -193,7 +193,7 @@
                 android:id="@+id/navigation"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:background="#167C80"
+                android:background="@color/colorLightBlack"
                 android:paddingLeft="80dp"
                 android:paddingRight="80dp"
                 android:paddingTop="4dp"

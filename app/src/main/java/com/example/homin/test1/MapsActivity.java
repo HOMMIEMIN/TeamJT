@@ -209,9 +209,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-            ImageView selectedFriends = findViewById(R.id.imageFriendsLine);
-            ImageView selectedChatList = findViewById(R.id.imageChatListLine);
-            ImageView selectedMyPage = findViewById(R.id.imageMyPageLine);
+//            ImageView selectedFriends = findViewById(R.id.imageFriendsLine);
+//            ImageView selectedChatList = findViewById(R.id.imageChatListLine);
+//            ImageView selectedMyPage = findViewById(R.id.imageMyPageLine);
 
             switch (item.getItemId()) {
 
@@ -222,9 +222,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction.replace(R.id.container_main, friendFragment);
                     transaction.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                    selectedFriends.setVisibility(View.VISIBLE);
-                    selectedChatList.setVisibility(View.INVISIBLE);
-                    selectedMyPage.setVisibility(View.INVISIBLE);
+//                    selectedFriends.setVisibility(View.VISIBLE);
+//                    selectedChatList.setVisibility(View.INVISIBLE);
+//                    selectedMyPage.setVisibility(View.INVISIBLE);
                     return true;
 
                 case R.id.navigation_dashboard:
@@ -234,9 +234,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction1.replace(R.id.container_main, chatListFragment);
                     transaction1.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                    selectedFriends.setVisibility(View.INVISIBLE);
-                    selectedChatList.setVisibility(View.VISIBLE);
-                    selectedMyPage.setVisibility(View.INVISIBLE);
+//                    selectedFriends.setVisibility(View.INVISIBLE);
+//                    selectedChatList.setVisibility(View.VISIBLE);
+//                    selectedMyPage.setVisibility(View.INVISIBLE);
                     return true;
 
                 case R.id.navigation_notifications:
@@ -246,9 +246,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction2.replace(R.id.container_main, mypageFragment);
                     transaction2.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                    selectedFriends.setVisibility(View.INVISIBLE);
-                    selectedChatList.setVisibility(View.INVISIBLE);
-                    selectedMyPage.setVisibility(View.VISIBLE);
+//                    selectedFriends.setVisibility(View.INVISIBLE);
+//                    selectedChatList.setVisibility(View.INVISIBLE);
+//                    selectedMyPage.setVisibility(View.VISIBLE);
                     return true;
             }
             return false;
@@ -260,6 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         Log.i("dd4434", "MapsActivity onCreate");
         setContentView(R.layout.activity_maps);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         blutoothBtn = findViewById(R.id.button_blueTooth);
         rootView = findViewById(R.id.container);//Snackbar위한 View member변수
@@ -318,9 +319,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         bottomview = findViewById(R.id.bottom_sheet);
         actionLayout = findViewById(R.id.action_sheet);
-        final ImageView friendLine = findViewById(R.id.imageFriendsLine);
-        ImageView chatLine = findViewById(R.id.imageChatListLine);
-        ImageView myPageLine = findViewById(R.id.imageMyPageLine);
+//        final ImageView friendLine = findViewById(R.id.imageFriendsLine);
+//        ImageView chatLine = findViewById(R.id.imageChatListLine);
+//        ImageView myPageLine = findViewById(R.id.imageMyPageLine);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomview);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
@@ -332,12 +333,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     actionLayout.setVisibility(View.VISIBLE);
                     getWindow().setStatusBarColor(getResources().getColor(R.color.colorRealWhite, getResources().newTheme()));
                     getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-                    bottomview.setBackgroundColor(R.color.colorRealWhite);
 
                 }
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     actionLayout.setVisibility(View.GONE);
-                    getWindow().setStatusBarColor(getResources().getColor(R.color.colorMint, getResources().newTheme()));
+                    getWindow().setStatusBarColor(getResources().getColor(R.color.colorLightBlack, getResources().newTheme()));
                     getWindow().getDecorView().setSystemUiVisibility(0);
                 }
 

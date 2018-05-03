@@ -45,6 +45,7 @@ public class EssayDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_essay_detail);
+        getWindow().setStatusBarColor(getResources().getColor(R.color.colorLightBlack, getResources().newTheme()));
 
         myView = findViewById(R.id.mypageView);
         // 어플 위에 뜨는 액션바 숨기는 코드!
@@ -78,6 +79,7 @@ public class EssayDetailActivity extends AppCompatActivity {
 //                        "&zoom=14&size=380x200&scale=2&maptype=roadmap&markers=navi_color_light:red|label:A|" +
 //                        lat + ","+ lng + "&sensor=false")
 //                .into(imageView2);
+        imageView2.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         Glide.with(getApplicationContext())
 //                .load(

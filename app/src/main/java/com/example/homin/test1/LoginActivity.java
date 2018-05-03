@@ -102,7 +102,7 @@ public class LoginActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        getWindow().setStatusBarColor(getResources().getColor(R.color.colorMint, getResources().newTheme()));
+        getWindow().setStatusBarColor(getResources().getColor(R.color.colorLightBlack, getResources().newTheme()));
         getWindow().getDecorView().setSystemUiVisibility(0);
 
         intent = new Intent(LoginActivity.this, MapsActivity.class);

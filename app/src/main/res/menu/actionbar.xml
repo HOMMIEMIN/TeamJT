@@ -6,8 +6,7 @@
 
     <item
         android:id="@+id/actionbar_close"
-        android:icon="@drawable/close_btn"
-        android:iconTint="#FFFFFF"
+        android:icon="@drawable/close_btn_1"
         android:title="닫기"
         app:showAsAction="always" />
 </menu>

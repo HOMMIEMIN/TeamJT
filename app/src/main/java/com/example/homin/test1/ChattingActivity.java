@@ -105,7 +105,7 @@ public class ChattingActivity extends AppCompatActivity {
                     }else{
                         holder.iv.setImageResource(R.drawable.p1);
                     }
-                    holder.tv2.setBackground(getDrawable(R.drawable.ddd1));
+                    holder.tv2.setBackground(getDrawable(R.drawable.talk_mine));
                 }
             }else {
                 if (activity != null) {
@@ -126,7 +126,7 @@ public class ChattingActivity extends AppCompatActivity {
                         holder.iv.setImageResource(R.drawable.p1);
                     }
                 }
-                holder.tv2.setBackground(getDrawable(R.drawable.ddd));
+                holder.tv2.setBackground(getDrawable(R.drawable.talk_yours));
             }
 
 
@@ -172,6 +172,8 @@ public class ChattingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chatting);
+        getWindow().setStatusBarColor(getResources().getColor(R.color.colorLightBlack, getResources().newTheme()));
+
 
 //        DaoImple.getInstance().getcList().get(cList.size()-1).getChat();
 
