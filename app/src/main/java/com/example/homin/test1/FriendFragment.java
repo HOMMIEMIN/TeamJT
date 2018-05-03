@@ -112,17 +112,19 @@ public class FriendFragment extends Fragment {
             nameCheck = false;
             FragmentActivity activity = DaoImple.getActivity(getActivity());
 
-            if(realFriendList.size() != 0){
+            if(realFriendList != null){
             if(holder.getItemViewType() == 0) {
                 if (activity != null) {
-                    if (realFriendList.get(position).getResizePictureUrl() != null) {
+                    if (realFriendList.size() != 0) {
+                        if (realFriendList.get(position).getResizePictureUrl() != null) {
 //                        Glide.with(activity).load(realFriendList.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity))
 //                                .centerCrop().into(holder.iv);
-                        Glide.with(activity).load(realFriendList.get(position).getResizePictureUrl()).into(holder.iv);
-                        holder.tv1.setText(realFriendList.get(position).getUserName());
-                    } else {
-                        holder.iv.setImageResource(R.drawable.p1);
-                        holder.tv1.setText(realFriendList.get(position).getUserName());
+                            Glide.with(activity).load(realFriendList.get(position).getResizePictureUrl()).into(holder.iv);
+                            holder.tv1.setText(realFriendList.get(position).getUserName());
+                        } else {
+                            holder.iv.setImageResource(R.drawable.p1);
+                            holder.tv1.setText(realFriendList.get(position).getUserName());
+                        }
                     }
                 }
             }else{
@@ -132,10 +134,32 @@ public class FriendFragment extends Fragment {
                             Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity)).into(holder.iv);
                             holder.tv1.setText(list2.get(position).getUserName());
                             holder.tv3.setText(list2.get(position).getUserId());
+
+                            for(int a = 0 ; a < realFriendList.size() ; a++){
+                                if(list2.get(position).getUserId().equals(realFriendList.get(a).getUserId()) ||
+                                        DaoImple.getInstance().getLoginEmail().equals(list2.get(position).getUserId())){
+                                    holder.btn2.setVisibility(View.GONE);
+                                    break;
+                                }else{
+                                    holder.btn2.setVisibility(View.VISIBLE);
+                                }
+
+                            }
+
                         } else {
                             holder.iv.setImageResource(R.drawable.p1);
                             holder.tv1.setText(list2.get(position).getUserName());
                             holder.tv3.setText(list2.get(position).getUserId());
+                            Log.i("ghals44","사이즈 : " + realFriendList.size());
+                            for(int a = 0 ; a < realFriendList.size() ; a++){
+                                if(list2.get(position).getUserId().equals(realFriendList.get(a).getUserId()) ||
+                                        DaoImple.getInstance().getLoginEmail().equals(list2.get(position).getUserId())){
+                                    holder.btn2.setVisibility(View.GONE);
+                                    break;
+                                }else{
+                                    holder.btn2.setVisibility(View.VISIBLE);
+                                }
+                            }
 
                         }
                     }
@@ -167,11 +191,33 @@ public class FriendFragment extends Fragment {
                         }
                         size = 0;
                         startActivity(intent);
+                    }else {
+                        for (int a = 0; a < realFriendList.size(); a++) {
+                            if (list2.get(position).getUserId().equals(realFriendList.get(a).getUserId())) {
+                                Intent intent = new Intent(context, ChattingActivity.class);
+                                chatId = list2.get(position).getUserId();
+                                chatName = list2.get(position).getUserName();
+
+                                intent.putExtra(CHAT_YOURID, chatId);
+                                intent.putExtra(CHAT_YOURNAME, chatName);
+                                if(list2.get(position).getResizePictureUrl() != null) {
+                                    intent.putExtra(CHAT_YOURIMAGE, list2.get(position).getResizePictureUrl());
+                                }
+                                size = 0;
+                                startActivity(intent);
+                                break;
+                            }else if(DaoImple.getInstance().getLoginEmail().equals(list2.get(position).getUserId())){
+                                Toast.makeText(context, "자신과 대화할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                                break;
+                            }
+                        }
                     }
                 }
             });
 
+
             if(holder.btn2 != null) {
+
                 holder.btn2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -202,6 +248,7 @@ public class FriendFragment extends Fragment {
                                 }
                             }
                         }
+                        boolean listCheck = false;
 
                         if(nameCheck){
                             Toast.makeText(context, "이미 추가 되어 있습니다.", Toast.LENGTH_SHORT).show();
@@ -212,12 +259,26 @@ public class FriendFragment extends Fragment {
                             Toast.makeText(context, "자신을 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
                         }else{
                             String id = list2.get(position).getUserId();
+                            List<String> myWattingList = DaoImple.getInstance().getContact().getWattingList();
                             Contact yourContact = list2.get(position);
                             Log.i("vv1","너아이디 : " + yourContact.getUserName());
                             String yourKey = getKey(id);
                             List<String> yourList = yourContact.getWattingList();
+                            for(int a = 0 ; a < myWattingList.size() ; a++){
+                                Log.i("ghals55","wattingList : " + myWattingList.get(a));
+                                Log.i("ghals55","list2 : " + list2.get(position).getUserId());
+                                if(myWattingList.get(a).equals(list2.get(position).getUserId())){
+                                    listCheck = true;
+                                    Log.i("ghals55","listCheck : true");
+                                    break;
+                                }
+                            }
 
-                            if(yourList != null) {
+                            Log.i("ghals55","listCheck : " + listCheck);
+                            if(listCheck){
+                                Toast.makeText(context, "상대방의 친구 요청이 와있습니다.", Toast.LENGTH_SHORT).show();
+
+                            }else if(!listCheck && yourList != null) {
                                 yourList.add(DaoImple.getInstance().getContact().getUserId());
                                 yourContact.setWattingList(yourList);
                                 reference.child("Contact").child(yourKey).setValue(yourContact);
@@ -248,7 +309,7 @@ public class FriendFragment extends Fragment {
         class FriendHolder extends RecyclerView.ViewHolder{
             ImageView iv;
             TextView tv1;
-            TextView tv2, tv3;
+            TextView tv3;
             Button btn2;
 
             public FriendHolder(View itemView) {
@@ -257,7 +318,6 @@ public class FriendFragment extends Fragment {
                 iv.setBackground(new ShapeDrawable(new OvalShape()));
                 iv.setClipToOutline(true);
                 tv1 = itemView.findViewById(R.id.textView_FriendLayout1);
-                tv2 = itemView.findViewById(R.id.textView_FriendLayou2);
                 btn2 = itemView.findViewById(R.id.btn_addFriend);
                 tv3 = itemView.findViewById(R.id.textView_findId);
 
@@ -359,7 +419,8 @@ public class FriendFragment extends Fragment {
                 }
                 mHandle2.sendEmptyMessageDelayed(TIME_OUT,1000);
                 if(et.getText().toString().equals("")) {
-                    Toast.makeText(context, "검색어를 입력 하세요", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "검색어를 입력 하세요.", Toast.LENGTH_SHORT).show();
+                    Log.i("ghals33",DaoImple.getInstance().getLoginEmail());
                     et.setText("");
                 }else{
                     searshName = et.getText().toString();

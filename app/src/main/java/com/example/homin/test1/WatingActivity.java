@@ -1,5 +1,7 @@
 package com.example.homin.test1;
 
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -50,7 +53,7 @@ public class WatingActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(CustomHolder holder, final int position) {
+        public void onBindViewHolder(final CustomHolder holder, final int position) {
             listPosition = position;
             final List<String> listReset = list;
             Log.i("ggg34","position : " + position);
@@ -65,13 +68,25 @@ public class WatingActivity extends AppCompatActivity {
 
 
             yourKey = getKey(list.get(position));
-            Log.i("ggg1", "리스트 : "+yourKey);
+            Log.i("ggg1", "리스트 : " + yourKey);
 
             reference.child("Contact").addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Contact contact = dataSnapshot.getValue(Contact.class);
                     contactList.add(contact);
+                    Log.i("ghals33",contactList.size() +"개");
+                    if(list.get(position).equals(contact.getUserId())) {
+                        holder.textView.setText(contact.getUserName());
+                        holder.imageView.setBackground(new ShapeDrawable(new OvalShape()));
+                        holder.imageView.setClipToOutline(true);
+                        if(contact.getResizePictureUrl() != null) {
+                            Glide.with(getApplicationContext()).load(contact.getResizePictureUrl()).into(holder.imageView);
+                        }else{
+                            holder.imageView.setImageResource(R.drawable.p1);
+                        }
+                        holder.textName.setText(contact.getUserId());
+                    }
 
                     if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                         myContact = dataSnapshot.getValue(Contact.class);
@@ -109,9 +124,8 @@ public class WatingActivity extends AppCompatActivity {
 
                 }
             });
+            Log.i("ghals33","콘텍트 사이즈 : "+contactList.size());
 
-
-            holder.textView.setText(list.get(position));
 //            holder.imageView.setImageResource(list.get(position).getPicture());
 
             holder.btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -276,6 +290,7 @@ public class WatingActivity extends AppCompatActivity {
             ImageView imageView;
             Button btnAdd;
             Button btnCancle;
+            TextView textName;
 
 
             public CustomHolder(View itemView) {
@@ -284,12 +299,14 @@ public class WatingActivity extends AppCompatActivity {
                 btnCancle = itemView.findViewById(R.id.btnAddWating);
                 imageView = itemView.findViewById(R.id.imageView_WaittingLayout);
                 textView = itemView.findViewById(R.id.textView_WaittingLayout1);
+                textName = itemView.findViewById(R.id.textView_WattingName);
             }
         }
     }
 
     private RecyclerView recyclerView;
     private List<String> list;
+    private List<Contact> conList;
     private DatabaseReference reference;
     private List<String> keyList;
     private CustomAdapter adapter;
@@ -300,6 +317,7 @@ public class WatingActivity extends AppCompatActivity {
     private List<Contact> myList;
     private String myKey;
     private String youKey;
+    private int count;
 
 
     @Override
@@ -308,6 +326,7 @@ public class WatingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wating);
         list = new ArrayList<>();
         keyList = new ArrayList<>();
+        conList = new ArrayList<>();
         recyclerView = findViewById(R.id.recyler);
         reference = FirebaseDatabase.getInstance().getReference();
 
@@ -326,10 +345,8 @@ public class WatingActivity extends AppCompatActivity {
                     Contact c = dataSnapshot.getValue(Contact.class);
                     Log.i("vv", "이름이당이름 : " + c.getUserName());
                     list = c.getWattingList();
-                    if (list == null) {
-                        list = new ArrayList<>();
-                    }
-                    adapter.notifyDataSetChanged();
+
+
                 }
 
             }
