@@ -209,9 +209,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-            ImageView selectedFriends = findViewById(R.id.imageFriendsLine);
-            ImageView selectedChatList = findViewById(R.id.imageChatListLine);
-            ImageView selectedMyPage = findViewById(R.id.imageMyPageLine);
+
 
             switch (item.getItemId()) {
 
@@ -222,9 +220,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction.replace(R.id.container_main, friendFragment);
                     transaction.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                    selectedFriends.setVisibility(View.VISIBLE);
-                    selectedChatList.setVisibility(View.INVISIBLE);
-                    selectedMyPage.setVisibility(View.INVISIBLE);
+
                     return true;
 
                 case R.id.navigation_dashboard:
@@ -234,9 +230,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction1.replace(R.id.container_main, chatListFragment);
                     transaction1.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                    selectedFriends.setVisibility(View.INVISIBLE);
-                    selectedChatList.setVisibility(View.VISIBLE);
-                    selectedMyPage.setVisibility(View.INVISIBLE);
+
                     return true;
 
                 case R.id.navigation_notifications:
@@ -246,9 +240,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction2.replace(R.id.container_main, mypageFragment);
                     transaction2.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                    selectedFriends.setVisibility(View.INVISIBLE);
-                    selectedChatList.setVisibility(View.INVISIBLE);
-                    selectedMyPage.setVisibility(View.VISIBLE);
                     return true;
             }
             return false;
@@ -331,9 +322,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         bottomview = findViewById(R.id.bottom_sheet);
         actionLayout = findViewById(R.id.action_sheet);
-        final ImageView friendLine = findViewById(R.id.imageFriendsLine);
-        ImageView chatLine = findViewById(R.id.imageChatListLine);
-        ImageView myPageLine = findViewById(R.id.imageMyPageLine);
+
         bottomSheetBehavior = BottomSheetBehavior.from(bottomview);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
@@ -901,8 +890,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 saveImage = ip.getImage();
                                                             }
 
-
-
                                                             if (targetId != null) {
                                                                 if (contact.getUserId().equals(targetId)) {
                                                                     targetIdMarker = ip;
@@ -930,7 +917,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 if (contact.getResizePictureUrl() != null) {
                                                                     ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                                                             friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
-
+                                                                    Log.i("dd44322", "친구 마커 : " + friendMarker.getUserId());
                                                                     clusterManager.addItem(friendMarker);
                                                                     personList.put(contact.getUserId(), friendMarker);
                                                                 } else {
@@ -941,6 +928,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                     ItemPerson friendMarker = new ItemPerson(friendLocation.get(0),
                                                                             friendLocation.get(1), contact.getUserId(), contact.getUserName(), contact.getResizePictureUrl());
                                                                     clusterManager.addItem(friendMarker);
+                                                                    Log.i("dd44322", "친구 마커 : " + friendMarker.getUserId());
                                                                     personList.put(contact.getUserId(), friendMarker);
 
                                                                 }
@@ -1144,9 +1132,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         if (!memoAddCheck) {
                             clusterManager.clearItems();
-                            Log.i("dd4432", "메모 반복문 들어감");
+
                             for (int a = 0; a < realFriendList.size(); a++) { //  친구 목록으로 메모 가져오기
                                 String key = DaoImple.getInstance().getFirebaseKey(realFriendList.get(a));
+
                                 friendMemeList(key); // 친구들 메모 가져오는 메소드
 
 
@@ -1434,6 +1423,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         UserDataTable table = new UserDataTable(DaoImple.getInstance().getLoginEmail(), DaoImple.getInstance().getLoginId()
                                 , imageUrl, tableLocation, title, body, time);
                         reference.child("userData").child(DaoImple.getInstance().getKey()).push().setValue(table);
+                        reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(true);
                         Log.i("ggv", "onActivityResult 파이어베이스 push()");
 
                     }
@@ -1632,7 +1622,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
-        
+
         try {
 //            mWorkerThread.interrupt();	// 데이터 수신 쓰레드 종료
 //            mInputStream.close();
