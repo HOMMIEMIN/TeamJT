@@ -165,7 +165,7 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
         }
 
         if (item instanceof ItemMemo) {
-            Bitmap roundBitmap = getCircleBitmap(((ItemMemo) item).getIcon());
+            Bitmap roundBitmap = ((ItemMemo) item).getIcon();
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
             markerOptions.title(((ItemMemo) item).getTitle());
             markerOptions.snippet(((ItemMemo) item).getUserName());

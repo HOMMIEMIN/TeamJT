@@ -15,8 +15,8 @@
 
         <ImageView
             android:id="@+id/imageView_WaittingLayout"
-            android:layout_width="70dp"
-            android:layout_height="61dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
@@ -33,48 +33,69 @@
             android:id="@+id/textView_WaittingLayout1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="208dp"
+            android:layout_marginBottom="36dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:text="TextView"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="15sp"
+            android:textColor="#1c1c1c"
+            android:textSize="17sp"
+            android:textStyle="bold"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.016"
-            app:layout_constraintStart_toEndOf="@+id/imageView_frindLayout"
+            app:layout_constraintHorizontal_bias="0.014"
+            app:layout_constraintStart_toEndOf="@+id/imageView_WaittingLayout" />
+
+        <TextView
+            android:id="@+id/textView_WattingName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+
+
+            android:text="TextView"
+            android:textColor="#828282"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.013"
+            app:layout_constraintStart_toEndOf="@+id/imageView_WaittingLayout"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.509" />
+            app:layout_constraintVertical_bias="0.818" />
 
 
         <Button
             android:id="@+id/btnAddWating"
             android:layout_width="54dp"
             android:layout_height="37dp"
-            android:layout_marginBottom="37dp"
-            android:layout_marginStart="26dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
             android:text="거절"
+            android:textStyle="bold"
+            android:textColor="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btncancleWating"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/btncancleWating"
             android:layout_width="54dp"
             android:layout_height="37dp"
-            android:layout_marginBottom="37dp"
-            android:layout_marginEnd="80dp"
-            android:layout_marginStart="73dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="152dp"
+            android:layout_marginTop="8dp"
             android:text="수락"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView_WaittingLayout1"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintEnd_toStartOf="@+id/btnAddWating"
+            app:layout_constraintStart_toEndOf="@+id/imageView_WaittingLayout"
+            app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
 </android.support.v7.widget.CardView>

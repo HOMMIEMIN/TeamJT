@@ -1,12 +1,17 @@
 package com.example.homin.test1;
 
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -50,7 +56,7 @@ public class WatingActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(CustomHolder holder, final int position) {
+        public void onBindViewHolder(final CustomHolder holder, final int position) {
             listPosition = position;
             final List<String> listReset = list;
             Log.i("ggg34","position : " + position);
@@ -65,13 +71,25 @@ public class WatingActivity extends AppCompatActivity {
 
 
             yourKey = getKey(list.get(position));
-            Log.i("ggg1", "리스트 : "+yourKey);
+            Log.i("ggg1", "리스트 : " + yourKey);
 
             reference.child("Contact").addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Contact contact = dataSnapshot.getValue(Contact.class);
                     contactList.add(contact);
+                    Log.i("ghals33",contactList.size() +"개");
+                    if(list.get(position).equals(contact.getUserId())) {
+                        holder.textView.setText(contact.getUserName());
+                        holder.imageView.setBackground(new ShapeDrawable(new OvalShape()));
+                        holder.imageView.setClipToOutline(true);
+                        if(contact.getResizePictureUrl() != null) {
+                            Glide.with(getApplicationContext()).load(contact.getResizePictureUrl()).into(holder.imageView);
+                        }else{
+                            holder.imageView.setImageResource(R.drawable.p1);
+                        }
+                        holder.textName.setText(contact.getUserId());
+                    }
 
                     if(contact.getUserId().equals(DaoImple.getInstance().getLoginEmail())){
                         myContact = dataSnapshot.getValue(Contact.class);
@@ -109,9 +127,8 @@ public class WatingActivity extends AppCompatActivity {
 
                 }
             });
+            Log.i("ghals33","콘텍트 사이즈 : "+contactList.size());
 
-
-            holder.textView.setText(list.get(position));
 //            holder.imageView.setImageResource(list.get(position).getPicture());
 
             holder.btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -276,6 +293,7 @@ public class WatingActivity extends AppCompatActivity {
             ImageView imageView;
             Button btnAdd;
             Button btnCancle;
+            TextView textName;
 
 
             public CustomHolder(View itemView) {
@@ -284,12 +302,14 @@ public class WatingActivity extends AppCompatActivity {
                 btnCancle = itemView.findViewById(R.id.btnAddWating);
                 imageView = itemView.findViewById(R.id.imageView_WaittingLayout);
                 textView = itemView.findViewById(R.id.textView_WaittingLayout1);
+                textName = itemView.findViewById(R.id.textView_WattingName);
             }
         }
     }
 
     private RecyclerView recyclerView;
     private List<String> list;
+    private List<Contact> conList;
     private DatabaseReference reference;
     private List<String> keyList;
     private CustomAdapter adapter;
@@ -300,14 +320,21 @@ public class WatingActivity extends AppCompatActivity {
     private List<Contact> myList;
     private String myKey;
     private String youKey;
+    private int count;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wating);
+
+        // 액션바
+        ActionBar ab = getSupportActionBar() ;
+        ab.setTitle("친구요청 알림") ;
+
         list = new ArrayList<>();
         keyList = new ArrayList<>();
+        conList = new ArrayList<>();
         recyclerView = findViewById(R.id.recyler);
         reference = FirebaseDatabase.getInstance().getReference();
 
@@ -326,10 +353,8 @@ public class WatingActivity extends AppCompatActivity {
                     Contact c = dataSnapshot.getValue(Contact.class);
                     Log.i("vv", "이름이당이름 : " + c.getUserName());
                     list = c.getWattingList();
-                    if (list == null) {
-                        list = new ArrayList<>();
-                    }
-                    adapter.notifyDataSetChanged();
+
+
                 }
 
             }
@@ -367,5 +392,28 @@ public class WatingActivity extends AppCompatActivity {
         String key = key1+key2+key3;
 
         return key;
+    }
+
+    // 액션바 적용1
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.actionbar, menu);
+
+        return true;
+    }
+
+    // 액션바 적용2(닫기아이콘 리스너)
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.actionbar_close:
+                Toast.makeText(this, "닫기", Toast.LENGTH_SHORT).show();
+                finish();
+                return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
+
     }
 }

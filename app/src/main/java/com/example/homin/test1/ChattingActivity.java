@@ -1,19 +1,26 @@
 package com.example.homin.test1;
 
 import android.content.Intent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
@@ -33,6 +40,12 @@ import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import static com.example.homin.test1.FriendFragment.*;
 
 public class ChattingActivity extends AppCompatActivity {
+
+    private static final String TAG = "action";
+
+    public void chattingbackkey(View view) {
+        finish();
+    }
 
     class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatHolder>{
 
@@ -80,9 +93,15 @@ public class ChattingActivity extends AppCompatActivity {
             if(holder.getItemViewType() == 0) {
                 if (activity != null) {
                     if(DaoImple.getInstance().getContact().getResizePictureUrl() != null) {
-                        Glide.with(activity).load(DaoImple.getInstance().getContact().getResizePictureUrl())
-                                .bitmapTransform(new CropCircleTransformation(ChattingActivity.this)).centerCrop()
-                                .into(holder.iv);
+//                        대화창 네모난 이미지
+//                        Glide.with(activity).load(DaoImple.getInstance().getContact().getResizePictureUrl())
+//                                .bitmapTransform(new CropCircleTransformation(ChattingActivity.this)).centerCrop()
+//                                .into(holder.iv);
+//                      대화창 동그란 이미지
+                        holder.iv.setBackground(new ShapeDrawable(new OvalShape()));
+                        holder.iv.setClipToOutline(true);
+                        Glide.with(activity).load(DaoImple.getInstance().getContact().getResizePictureUrl()).into(holder.iv);
+
                     }else{
                         holder.iv.setImageResource(R.drawable.p1);
                     }
@@ -91,10 +110,18 @@ public class ChattingActivity extends AppCompatActivity {
             }else {
                 if (activity != null) {
                     if (yourImage != null) {
-                        Glide.with(activity).load(yourImage)
-                                .bitmapTransform(new CropCircleTransformation(ChattingActivity.this)).centerCrop()
-                                .into(holder.iv);
-                        Log.i("zxcasd", yourImage);
+//                      대화창 네모난 이미지
+//                        Glide.with(activity).load(yourImage)
+//                                .bitmapTransform(new CropCircleTransformation(ChattingActivity.this)).centerCrop()
+//                                .into(holder.iv);
+
+//                      대화창 동그란 이미지
+                        holder.iv.setBackground(new ShapeDrawable(new OvalShape()));
+                        holder.iv.setClipToOutline(true);
+                        Glide.with(activity).load(yourImage).into(holder.iv);
+
+
+                        Log.i(TAG,"리싸이클러뷰"+ yourImage);
                     } else {
                         holder.iv.setImageResource(R.drawable.p1);
                     }
@@ -138,20 +165,24 @@ public class ChattingActivity extends AppCompatActivity {
     private boolean check;
     private String putKey;
     private String yourImage;
-
+    private TextView textView;
+    private Chat chat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chatting);
+
+//        DaoImple.getInstance().getcList().get(cList.size()-1).getChat();
+
         et = findViewById(R.id.editText_sends);
         btn = findViewById(R.id.button_sends);
         recyclerView = findViewById(R.id.recyclerView_chatting);
         DaoImple.getInstance().setChattingActivity(this);
         if (cList != null) {
-            Log.i("kaka", "cList: " + cList);
+            Log.i(TAG, "(onCreate)cList" + cList);
         } else {
-            Log.i("kaka", "cList is null");
+            Log.i(TAG, "cList is null");
         }
 
         cList = new ArrayList<>();
@@ -160,7 +191,7 @@ public class ChattingActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         youId = intent.getStringExtra(CHAT_YOURID);
-        Log.i("gg1",youId);
+        Log.i(TAG,"gg1_youId"+youId);
         yourName = intent.getStringExtra(CHAT_YOURNAME);
         check = intent.getBooleanExtra("check",false);
         yourImage = intent.getStringExtra(CHAT_YOURIMAGE);
@@ -178,21 +209,25 @@ public class ChattingActivity extends AppCompatActivity {
             putKey = getPutKey(DaoImple.getInstance().getKey(),getKey(youId));
         }
 
-        Log.i("kaka",youId);
+        Log.i(TAG,"kaka"+youId);
 
-
+        // 액션바
+        ActionBar ab = getSupportActionBar() ;
+        ab.setTitle(getkey2(youId)+" 님과 대화창") ;
 
         cList.clear();
+
 
         reference.child("Chat").child(putKey).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Chat chat = dataSnapshot.getValue(Chat.class);
                 cList.add(chat);
-                adapter.notifyDataSetChanged();
 
                int a = cList.size();
-               recyclerView.scrollToPosition(cList.size()-1);
+               recyclerView.scrollToPosition(adapter.getItemCount()-1);
+                adapter.notifyDataSetChanged();
+                Log.i("ghals1","리스트 사이즈 : " + cList.size());
 
 
             }
@@ -230,8 +265,10 @@ public class ChattingActivity extends AppCompatActivity {
 
                 Chat c = new Chat(DaoImple.getInstance().getLoginId(),DaoImple.getInstance().getLoginEmail(),
                         et.getText().toString(),time.format(date).toString());
+
                 et.setText("");
                 reference.child("Chat").child(putKey).push().setValue(c);
+
 
             }
         });
@@ -246,6 +283,13 @@ public class ChattingActivity extends AppCompatActivity {
         String key2 = id.substring(b + 1,d);
         String key3 = id.substring(d + 1,id.length());
         String key = key1+key2+key3;
+
+        return key;
+    }
+
+    public String getkey2 (String id){
+        int b = id.indexOf("@");
+        String key = id.substring(0,b);
 
         return key;
     }
@@ -294,4 +338,28 @@ public class ChattingActivity extends AppCompatActivity {
         DaoImple.getInstance().setChattingActivity(null);
         super.onDestroy();
     }
+
+    // 액션바 적용1
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.actionbar, menu);
+
+        return true;
+    }
+
+    // 액션바 적용2(닫기아이콘 리스너)
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.actionbar_close:
+                Toast.makeText(this, "닫기", Toast.LENGTH_SHORT).show();
+                finish();
+                return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
+
+    }
+
 }

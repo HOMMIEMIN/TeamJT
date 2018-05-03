@@ -29,11 +29,10 @@ public class ClosingServics extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        if(reference!= null) {
-            reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
-        }
+        reference = FirebaseDatabase.getInstance().getReference();
+        Log.i("ghals",DaoImple.getInstance().getKey());
+        reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
         stopSelf();
-
     }
 
 
