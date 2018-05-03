@@ -168,8 +168,6 @@ public class ChattingActivity extends AppCompatActivity {
     private TextView textView;
     private Chat chat;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

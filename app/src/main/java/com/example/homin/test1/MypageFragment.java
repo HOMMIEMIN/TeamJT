@@ -325,7 +325,7 @@ public class MypageFragment extends Fragment {
 //        Log.i(TAG, "curProImgUrl: " + curProImgUrl);
 //        Log.i(TAG, "imageView.getDrawable(): " + imageView.getDrawable());
 
-        //TODO: 프로필 이미지 이슈 해결되면 아래 주석 풀기
+        // 프로필 이미지 이슈 해결되면 아래 주석 풀기
         if (curProImgUrl != null) { // Firebase에 저장된 파일이 있을 때
             Glide.with(this).load(curProImgUrl).into(imageView);
 
@@ -339,7 +339,7 @@ public class MypageFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        //TODO: 공개여부
+        // 공개여부
 
         textView2= getView().findViewById(R.id.textNot_recycle);
         imageView2 = getView().findViewById(R.id.imageNot_recycle);
@@ -371,7 +371,7 @@ public class MypageFragment extends Fragment {
         });
 
 
-        // TODO: 리사이클러 뷰
+        // 리사이클러 뷰
 
         if (userDataTList.size()== 0) {
             key = DaoImple.getInstance().getKey();
@@ -439,7 +439,7 @@ public class MypageFragment extends Fragment {
         }
     }
 
-    //TODO: Adapter 클래스
+    // Adapter 클래스
     class userDataTableAdapter extends RecyclerView.Adapter<userDataTableAdapter.ViewHolder> {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -513,7 +513,7 @@ public class MypageFragment extends Fragment {
         }
     }
 
-//  TODO: 위도, 경도를 주소값으로 가져오는 메소드!!!!
+// 위도, 경도를 주소값으로 가져오는 메소드!!!!
 public static String getAddress(Context context,double lat, double lng) {
     String nowAddress ="현재 위치를 확인 할 수 없습니다.";
     Geocoder geocoder = new Geocoder(context,Locale.KOREA);
