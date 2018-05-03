@@ -93,7 +93,7 @@ public class NotificationService extends Service {
 
             }else if(type != null && type.equals("distance")){
                 Log.i("KIMMY","notification");
-                
+
                 if(user_chat!= null && user_name!= null) {
                     if (Notifi == null) {
                         Notifi = new Notification.Builder(getApplicationContext())

@@ -209,9 +209,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-            ImageView selectedFriends = findViewById(R.id.imageFriendsLine);
-            ImageView selectedChatList = findViewById(R.id.imageChatListLine);
-            ImageView selectedMyPage = findViewById(R.id.imageMyPageLine);
+
 
             switch (item.getItemId()) {
 
@@ -221,10 +219,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     FriendFragment friendFragment = new FriendFragment();
                     transaction.replace(R.id.container_main, friendFragment);
                     transaction.commit();
-                    bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                    selectedFriends.setVisibility(View.VISIBLE);
-                    selectedChatList.setVisibility(View.INVISIBLE);
-                    selectedMyPage.setVisibility(View.INVISIBLE);
+
                     return true;
 
                 case R.id.navigation_dashboard:
@@ -234,9 +229,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction1.replace(R.id.container_main, chatListFragment);
                     transaction1.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                    selectedFriends.setVisibility(View.INVISIBLE);
-                    selectedChatList.setVisibility(View.VISIBLE);
-                    selectedMyPage.setVisibility(View.INVISIBLE);
+
                     return true;
 
                 case R.id.navigation_notifications:
@@ -246,9 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     transaction2.replace(R.id.container_main, mypageFragment);
                     transaction2.commit();
                     bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
-                    selectedFriends.setVisibility(View.INVISIBLE);
-                    selectedChatList.setVisibility(View.INVISIBLE);
-                    selectedMyPage.setVisibility(View.VISIBLE);
+
                     return true;
             }
             return false;
@@ -331,9 +322,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         bottomview = findViewById(R.id.bottom_sheet);
         actionLayout = findViewById(R.id.action_sheet);
-        final ImageView friendLine = findViewById(R.id.imageFriendsLine);
-        ImageView chatLine = findViewById(R.id.imageChatListLine);
-        ImageView myPageLine = findViewById(R.id.imageMyPageLine);
         bottomSheetBehavior = BottomSheetBehavior.from(bottomview);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
@@ -1787,7 +1775,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 degree = 360+degree;
             }
 
-            String blueTooth = m + "\n" + degree;
+            String blueTooth = km + "\n" + degree;
             Log.i("1234","1 : " + blueTooth);
             sendData(blueTooth);
 
@@ -1830,7 +1818,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 degree = 360+degree;
             }
 
-            String blueTooth = m + "\n" + degree;
+            String blueTooth = km + "\n" + degree;
             Log.i("1234","1 : " + blueTooth);
             sendData(blueTooth);
 
@@ -1862,7 +1850,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
             Log.i("KSJ", "distance: " + distance);
-            km = Integer.parseInt(m) * 0.001;
+            km = Integer.parseInt(m) * 0.001f;
 
 
 
@@ -1872,7 +1860,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 degree = 360+degree;
             }
 
-            String blueTooth = m + "\n" + degree;
+            String blueTooth = km + "\n" + degree;
             Log.i("1234","1 : " + blueTooth);
             sendData(blueTooth);
 

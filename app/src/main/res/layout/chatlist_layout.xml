@@ -39,7 +39,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageView_listLayout"
-            app:layout_constraintTop_toTopOf="0.0" />
+            />
 
         <TextView
             android:id="@+id/textView_listLayoutendchat"
