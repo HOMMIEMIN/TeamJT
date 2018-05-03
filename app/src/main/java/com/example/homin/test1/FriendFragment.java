@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -221,6 +222,7 @@ public class FriendFragment extends Fragment {
                 holder.btn2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
                         if(myFriendList == null) {
                             myFriendList = new ArrayList<>();
                         }
@@ -309,8 +311,8 @@ public class FriendFragment extends Fragment {
         class FriendHolder extends RecyclerView.ViewHolder{
             ImageView iv;
             TextView tv1;
-            TextView tv3;
-            Button btn2;
+            TextView tv2, tv3;
+            ImageButton btn2;
 
             public FriendHolder(View itemView) {
                 super(itemView);
