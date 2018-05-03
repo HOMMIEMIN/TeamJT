@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="edu.android.testmessenger.ChattingActivity">
+    tools:context=".ChattingActivity">
 
     <Button
         android:id="@+id/button_sends"
@@ -38,8 +38,9 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:text=""
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button_sends"
         app:layout_constraintHorizontal_bias="0.012"
-        app:layout_constraintStart_toStartOf="parent" />
+         />
 </android.support.constraint.ConstraintLayout>

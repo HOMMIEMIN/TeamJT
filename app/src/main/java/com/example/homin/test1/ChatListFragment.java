@@ -77,7 +77,7 @@ public class ChatListFragment extends Fragment {
 //TODO:-----------------------------호민이형 여기요 !! 여깁니다 !!!!------------------------------------
 
                     //상대방이랑 대화한글 마지막 내용 불러오기 보류...
-//                   holder.tv2.setText( 상대방이랑 쳇한 마지막 대화 받기);
+                   holder.tv2.setText(lastChatList.get(position));
                     // 대화목록 동그란 이미지 커스텀
                     holder.iv.setBackground(new ShapeDrawable(new OvalShape()));
                     holder.iv.setClipToOutline(true);
@@ -128,6 +128,7 @@ public class ChatListFragment extends Fragment {
     private Context context;
     private List<String> list;
     private List<Contact> list2;
+    private List<String> lastChatList;
     private DatabaseReference reference;
     private String name;
     private String chatName;
@@ -160,6 +161,7 @@ public class ChatListFragment extends Fragment {
         recyclerView = getView().findViewById(R.id.recyclerView_ChatList);
         list2 = new ArrayList<>();
         list = new ArrayList<>();
+        lastChatList = new ArrayList<>();
         name = DaoImple.getInstance().getLoginId();
         recyclerView.hasFixedSize();
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -188,13 +190,27 @@ public class ChatListFragment extends Fragment {
                         String yourKey = getKey(yourId);
 
                         final String yourPutKey = getPutKey(myKey,yourKey);
-
+                        final List<Chat> chatList = new ArrayList<>();
                         reference.child("Chat").addChildEventListener(new ChildEventListener() {
                             @Override
                             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                                 if(dataSnapshot.getKey().equals(yourPutKey)) {
+                                    for(DataSnapshot d : dataSnapshot.getChildren()) {
+                                        long a = dataSnapshot.getChildrenCount();
+                                        Chat c = d.getValue(Chat.class);
+                                        Log.i("ghals", "카운트" + d.getChildrenCount());
+                                        Log.i("ghals", "채팅 : " + c.getChat());
+                                        chatList.add(c);
+                                        if (chatList.size() == (a)) {
+                                            lastChatList.add(c.getChat());
+                                            Log.i("ghals", c.getChat());
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+
+
                                     list.add(yourId);
-                                    adapter.notifyDataSetChanged();
+
                                 }
                             }
 

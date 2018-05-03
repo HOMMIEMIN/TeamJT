@@ -112,7 +112,6 @@ public class FriendFragment extends Fragment {
             nameCheck = false;
             FragmentActivity activity = DaoImple.getActivity(getActivity());
 
-            Log.i("kaka","뷰타입33 : " + holder.getItemViewType());
             if(realFriendList.size() != 0){
             if(holder.getItemViewType() == 0) {
                 if (activity != null) {
@@ -132,15 +131,12 @@ public class FriendFragment extends Fragment {
                         if (list2.get(position).getResizePictureUrl() != null) {
                             Glide.with(activity).load(list2.get(position).getResizePictureUrl()).bitmapTransform(new CropCircleTransformation(activity)).into(holder.iv);
                             holder.tv1.setText(list2.get(position).getUserName());
-                            Log.i("zxzxzx",list2.get(position).getUserName());
                             holder.tv3.setText(list2.get(position).getUserId());
-                            Log.i("zxzxzx",list2.get(position).getUserId());
                         } else {
                             holder.iv.setImageResource(R.drawable.p1);
                             holder.tv1.setText(list2.get(position).getUserName());
-                            Log.i("zxzxzx",list2.get(position).getUserName());
                             holder.tv3.setText(list2.get(position).getUserId());
-                            Log.i("zxzxzx",list2.get(position).getUserId());
+
                         }
                     }
                 }
@@ -157,8 +153,6 @@ public class FriendFragment extends Fragment {
 
                     if(holder.getItemViewType() == 0) {
                        for(int a = 0 ; a < friendList.size() ; a++){
-                           Log.i("gg1",friendList.get(a).getUserName());
-                           Log.i("gg1",list.get(position));
                            if(friendList.get(a).getUserId().equals(list.get(position))){
                                chatId = realFriendList.get(position).getUserId();
                                chatName = realFriendList.get(position).getUserName();
@@ -191,7 +185,6 @@ public class FriendFragment extends Fragment {
                     }
                         for(int a = 0 ; a < myFriendList.size() ; a++){
                             if(myFriendList.get(a).equals(list2.get(0).getUserId())) {
-                                Log.i("zz7", myFriendList.get(a));
                                 nameCheck = true;
                             }
                         }

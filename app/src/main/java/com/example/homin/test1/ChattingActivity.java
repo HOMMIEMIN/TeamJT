@@ -225,10 +225,11 @@ public class ChattingActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Chat chat = dataSnapshot.getValue(Chat.class);
                 cList.add(chat);
-                adapter.notifyDataSetChanged();
 
                int a = cList.size();
-               recyclerView.scrollToPosition(cList.size()-1);
+               recyclerView.scrollToPosition(adapter.getItemCount()-1);
+                adapter.notifyDataSetChanged();
+                Log.i("ghals1","리스트 사이즈 : " + cList.size());
 
 
             }
