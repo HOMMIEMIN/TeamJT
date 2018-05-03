@@ -262,8 +262,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Log.i("dd4434", "MapsActivity onCreate");
         setContentView(R.layout.activity_maps);
+        getWindow().setStatusBarColor(getResources().getColor(R.color.colorRealWhite, getResources().newTheme()));
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         blutoothBtn = findViewById(R.id.button_blueTooth);

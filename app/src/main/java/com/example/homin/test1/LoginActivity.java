@@ -102,8 +102,6 @@ public class LoginActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-        getWindow().setStatusBarColor(getResources().getColor(R.color.colorLightBlack, getResources().newTheme()));
-        getWindow().getDecorView().setSystemUiVisibility(0);
 
         intent = new Intent(LoginActivity.this, MapsActivity.class);
         pictureList = new HashMap();
@@ -125,8 +123,8 @@ public class LoginActivity extends AppCompatActivity {
 //        alpha.setAlpha(80);
         imageBackground.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Glide.with(this).load("https://firebasestorage.googleapis.com/v0/b/test33-32739.appspot.com/o/login_background_map_1.jpg?alt=media&token=9a51be1f-9a6e-4ad2-aec8-91cefa9bebd4").into(imageBackground);
-        imageLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        Glide.with(this).load("https://firebasestorage.googleapis.com/v0/b/test33-32739.appspot.com/o/logo_a.gif?alt=media&token=34832ba9-b7b7-4158-bae1-3833feb8a557").into(imageLogo);
+        imageLogo.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        Glide.with(this).load("https://firebasestorage.googleapis.com/v0/b/test33-32739.appspot.com/o/logo_long.gif?alt=media&token=16b97487-8101-4f81-af15-335e3f9b5a39").into(imageLogo);
 
         // 저장한 로그인정보 가져오기
         loginIdLoad();

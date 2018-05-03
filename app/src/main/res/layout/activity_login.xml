@@ -25,12 +25,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/editId"
+        app:layout_constraintVertical_bias="1.0"
         app:srcCompat="@drawable/login_box" />
 
     <EditText
         android:id="@+id/editId"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
         android:background="@null"
         android:ems="10"
         android:hint="이메일"
@@ -38,9 +40,9 @@
         android:padding="10dp"
         android:paddingRight="40dp"
         android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@+id/view2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageLogoBack" />
 
     <View
         android:id="@+id/view2"
@@ -49,13 +51,12 @@
         android:background="#303030"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/editPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/editId" />
 
     <EditText
         android:id="@+id/editPassword"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="120dp"
         android:background="@null"
         android:ems="10"
         android:hint="비밀번호"
@@ -63,9 +64,9 @@
         android:padding="10dp"
         android:paddingRight="40dp"
         android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageBackground"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editId" />
 
     <ImageButton
         android:id="@+id/btnLogin"
@@ -73,7 +74,7 @@
         android:layout_height="0dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:background="@color/colorTomato"
+        android:background="#595959"
         android:scaleType="centerInside"
         app:layout_constraintBottom_toBottomOf="@+id/editPassword"
         app:layout_constraintEnd_toEndOf="@+id/view2"
@@ -94,35 +95,56 @@
         android:id="@+id/checkBox"
         android:layout_width="wrap_content"
         android:layout_height="32dp"
-        android:layout_marginEnd="18dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="로그인 정보 저장"
         android:textColor="#595959"
         app:layout_constraintEnd_toStartOf="@+id/textSignUp"
+        app:layout_constraintStart_toStartOf="@+id/imageLoginBack"
         app:layout_constraintTop_toTopOf="@+id/imageLoginBack" />
 
     <TextView
         android:id="@+id/textSignUp"
         android:layout_width="wrap_content"
         android:layout_height="32dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="12dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/login_box2"
         android:padding="6dp"
         android:text="회원가입"
-        android:textColor="#167C80"
+        android:textColor="@color/colorTomato"
         app:layout_constraintEnd_toEndOf="@+id/imageLoginBack"
         app:layout_constraintTop_toTopOf="@+id/imageLoginBack" />
 
     <ImageView
         android:id="@+id/imageLogo"
-        android:layout_width="300dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="160dp"
+        android:layout_width="240dp"
+        android:layout_height="68dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageLogoBack"
+        app:layout_constraintEnd_toEndOf="@+id/imageLogoBack"
+        app:layout_constraintStart_toStartOf="@+id/imageLogoBack"
+        app:layout_constraintTop_toTopOf="@+id/imageLogoBack"
+        app:srcCompat="@color/cardview_shadow_end_color" />
+
+    <ImageView
+        android:id="@+id/imageLogoBack"
+        android:layout_width="280dp"
+        android:layout_height="80dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="164dp"
+        android:scaleType="centerInside"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageBackground"
-        app:srcCompat="@color/cardview_shadow_end_color" />
+        app:srcCompat="@drawable/logo_long_back" />
 
 
 </android.support.constraint.ConstraintLayout>
