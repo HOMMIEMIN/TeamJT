@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,12 +18,16 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -55,11 +60,12 @@ import java.util.Map;
 public class LoginActivity extends AppCompatActivity {
 
 
+    private ImageView imageBackground, imageLogo;
     private CheckBox checkBox;
     private EditText etEmail;
     private EditText etPwd;
-    private Button btnLogin;
-    private Button btnSignUp;
+    private ImageButton btnLogin;
+    private TextView btnSignUp;
     private FirebaseAuth mAuth;
     private int num;
     private ProgressDialog progressDialog;
@@ -92,18 +98,35 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
+        getWindow().setStatusBarColor(getResources().getColor(R.color.colorMint, getResources().newTheme()));
+        getWindow().getDecorView().setSystemUiVisibility(0);
+
         intent = new Intent(LoginActivity.this, MapsActivity.class);
         pictureList = new HashMap();
         setContentView(R.layout.activity_login);
         stringkey = new ArrayList<>();
 
-        etEmail = findViewById(R.id.editText);
-        etPwd = findViewById(R.id.editText2);
-        btnLogin = findViewById(R.id.button_login);
-        btnSignUp = findViewById(R.id.button_signUp);
+        imageBackground = findViewById(R.id.imageBackground);
+        imageLogo = findViewById(R.id.imageLogo);
+
+        etEmail = findViewById(R.id.editId);
+        etPwd = findViewById(R.id.editPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnSignUp = findViewById(R.id.textSignUp);
         checkBox = findViewById(R.id.checkBox);
         mAuth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference();
+
+//        Drawable alpha = findViewById(R.id.imageLoginBack).getBackground();
+//        alpha.setAlpha(80);
+        imageBackground.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Glide.with(this).load("https://firebasestorage.googleapis.com/v0/b/test33-32739.appspot.com/o/login_background_map_1.jpg?alt=media&token=9a51be1f-9a6e-4ad2-aec8-91cefa9bebd4").into(imageBackground);
+        imageLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        Glide.with(this).load("https://firebasestorage.googleapis.com/v0/b/test33-32739.appspot.com/o/logo_a.gif?alt=media&token=34832ba9-b7b7-4158-bae1-3833feb8a557").into(imageLogo);
 
         // 저장한 로그인정보 가져오기
         loginIdLoad();

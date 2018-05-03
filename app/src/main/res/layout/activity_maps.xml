@@ -201,50 +201,6 @@
                 app:itemTextColor="@color/navi_color_light"
                 app:menu="@menu/navigation">
 
-
-                <android.support.constraint.ConstraintLayout
-                    android:layout_width="240dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center">
-
-
-                    <ImageView
-                        android:id="@+id/imageFriendsLine"
-                        android:visibility="visible"
-                        android:layout_width="30dp"
-                        android:layout_height="3dp"
-                        android:layout_marginStart="30dp"
-                        android:layout_marginTop="39dp"
-                        android:src="@color/colorRealWhite"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/imageChatListLine"
-                        android:visibility="invisible"
-                        android:layout_width="30dp"
-                        android:layout_height="3dp"
-                        android:layout_marginTop="39dp"
-                        android:src="@color/colorRealWhite"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/imageMyPageLine"
-                        android:visibility="invisible"
-                        android:layout_width="30dp"
-                        android:layout_height="3dp"
-                        android:layout_marginEnd="30dp"
-                        android:layout_marginTop="39dp"
-                        android:src="@color/colorRealWhite"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </android.support.constraint.ConstraintLayout>
             </android.support.design.widget.BottomNavigationView>
 
 
