@@ -1764,9 +1764,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), mMarker.getPosition());
             String stringDistance = Double.toString(distance);
             int index = stringDistance.indexOf(".");
+
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
-            km = Integer.parseInt(m) * 0.001;
+            km = Double.parseDouble(m) * 0.001d;
 
 
 
@@ -1777,7 +1778,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             String blueTooth = km + "\n" + degree;
             Log.i("1234","1 : " + blueTooth);
-            sendData(blueTooth);
+            if(index != 1) {
+                sendData(blueTooth);
+            }
 
             if (distance < 100) {
                 if(arrow!= null){
@@ -1808,8 +1811,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
             Log.i("KSJ", "distance: " + distance);
-            km = Integer.parseInt(m) * 0.001;
-
+            km = Double.parseDouble(m) * 0.001d;
+            Log.i("asdasd33",km+"");
+            Log.i("asdasd33","index : " + index);
 
 
             distanceIndicator.setText("목적지까지의 거리: " + km + "KM ");
@@ -1820,7 +1824,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             String blueTooth = km + "\n" + degree;
             Log.i("1234","1 : " + blueTooth);
-            sendData(blueTooth);
+            if(index != 1) {
+                sendData(blueTooth);
+            }
 
             if (distance < 100) {
                 if(arrow!= null){
@@ -1850,7 +1856,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
             Log.i("KSJ", "distance: " + distance);
-            km = Integer.parseInt(m) * 0.001f;
+            km = Double.parseDouble(m) * 0.001d;
+            Log.i("asdasd33",km+"");
 
 
 
@@ -1862,7 +1869,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             String blueTooth = km + "\n" + degree;
             Log.i("1234","1 : " + blueTooth);
-            sendData(blueTooth);
+            if(index != 1) {
+                sendData(blueTooth);
+            }
 
             if (distance < 100) {
                 if(arrow!= null){
