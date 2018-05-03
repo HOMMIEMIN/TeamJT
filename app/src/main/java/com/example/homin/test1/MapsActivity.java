@@ -1225,9 +1225,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         yourMemoLocation.setLatitude(friendMemo.getPosition().latitude);
         yourMemoLocation.setLatitude(friendMemo.getPosition().longitude);
 
-//         나와 메모의 거리가 300m 미만이라면 메모 add
+//         나와 메모의 거리가 3km 미만이라면 메모 add
         float distance = myMemoLocation.distanceTo(yourMemoLocation);
-        if (distance < 300) {
+        if (distance < 3000) {
             clusterManager.addItem(friendMemo);
 
             clusterManager.cluster();
@@ -1605,7 +1605,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onDestroy() {
         reference.child("Contact").child(DaoImple.getInstance().getKey()).child("loginCheck").setValue(false);
-
+        
         try {
 //            mWorkerThread.interrupt();	// 데이터 수신 쓰레드 종료
 //            mInputStream.close();
