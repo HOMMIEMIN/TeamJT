@@ -157,8 +157,9 @@ public class PersonItemRenderer extends DefaultClusterRenderer<ClusterItem> {
                 Bitmap rectBitmap = decodeSampledBitmapFromResource(context.getResources(), R.drawable.what, 35, 35);
                 Bitmap roundBitmap = getCircleBitmap(rectBitmap);
                 markerOptions.icon(BitmapDescriptorFactory.fromBitmap(roundBitmap));
-                markerOptions.title(((ItemPerson) item).getTitle());
-                markerOptions.snippet(((ItemPerson) item).getUserName());
+                markerOptions.title(((ItemPerson) item).getUserName());
+                markerOptions.snippet(((ItemPerson) item).getTitle());
+
             }
 
 
