@@ -1129,7 +1129,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         realFriendList.add(DaoImple.getInstance().getLoginEmail());
 
                         if(targetIdMarker!= null) {
-                            clusterManager.addItem(targetMarker);
+                            clusterManager.addItem(targetIdMarker);
                             clusterManager.cluster();
                         }
                         if (!memoAddCheck) {
