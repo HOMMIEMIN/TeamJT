@@ -61,12 +61,6 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    // 백키 눌를 경우 그전 액티비티로 이전...
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-    }
 
     @Override
     public void onBackPressed() {
