@@ -140,6 +140,9 @@ public class MypageFragment extends Fragment {
         textView.setText(DaoImple.getInstance().getLoginId());
 
 
+
+
+
         // 프로필 이미지 설정
         imageView = view.findViewById(R.id.imageView);
         imageView.setBackground(new ShapeDrawable(new OvalShape()));
@@ -362,10 +365,17 @@ public class MypageFragment extends Fragment {
             Log.i(TAG1,"if가 false 일때 Gong_ge 값:  "+ Gong_ge);
         }
 
+        boolean checkPublic = DaoImple.getInstance().getContact().isPublic();
+        if (checkPublic == true) {
+            wichi.setTextColor(RED);
+            wichi.setText("위치 공유중");
+        }
+
         swich.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @SuppressLint("ResourceAsColor")
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean ischecked) {
+
                 if ( ischecked == true ) {
 
                     wichi.setTextColor(RED);
