@@ -1780,7 +1780,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-            distanceIndicator.setText("목적지까지의 거리: " + km + "KM ");
+            distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
             if(degree < 0) {
                 degree = 360+degree;
             }
