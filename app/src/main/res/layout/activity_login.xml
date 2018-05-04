@@ -19,7 +19,7 @@
 
     <ImageView
         android:id="@+id/imageLoginBox"
-        android:layout_width="220dp"
+        android:layout_width="260dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/editPassword"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,7 +30,7 @@
 
     <EditText
         android:id="@+id/editId"
-        android:layout_width="220dp"
+        android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
         android:background="@null"
@@ -39,14 +39,14 @@
         android:inputType="textEmailAddress"
         android:padding="10dp"
         android:paddingRight="40dp"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageLogoBack" />
 
     <View
         android:id="@+id/view2"
-        android:layout_width="220dp"
+        android:layout_width="260dp"
         android:layout_height="1dp"
         android:background="#303030"
         app:layout_constraintEnd_toEndOf="parent"
@@ -55,7 +55,7 @@
 
     <EditText
         android:id="@+id/editPassword"
-        android:layout_width="220dp"
+        android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:background="@null"
         android:ems="10"
@@ -63,7 +63,7 @@
         android:inputType="textPassword"
         android:padding="10dp"
         android:paddingRight="40dp"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editId" />

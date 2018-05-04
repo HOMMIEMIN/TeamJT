@@ -2,6 +2,7 @@ package com.example.homin.test1;
 
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Picture;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -64,6 +66,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static android.graphics.Color.GRAY;
+import static android.graphics.Color.RED;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -80,7 +85,7 @@ public class MypageFragment extends Fragment {
     private static String key;
     private static DatabaseReference reference;
     private static ImageView imageView, imageView2;
-    private TextView textView,textView2;
+    private TextView textView,textView2, textView5, wichi;
 
     private RecyclerView recycler;
     private List<UserDataTable> userDataTList;
@@ -340,7 +345,8 @@ public class MypageFragment extends Fragment {
         super.onStart();
 
         // 공개여부
-
+        wichi = getView().findViewById(R.id.wichi);
+        textView5 = getView().findViewById(R.id.textNot_recycle_write);
         textView2= getView().findViewById(R.id.textNot_recycle);
         imageView2 = getView().findViewById(R.id.imageNot_recycle);
         swich = getView().findViewById(R.id.switchBtn);
@@ -352,17 +358,27 @@ public class MypageFragment extends Fragment {
             Log.i(TAG1,"if가 ture 일때 Gong_ge 값:  "+ Gong_ge);
         } else {
             swich.setChecked(false);
+
             Log.i(TAG1,"if가 false 일때 Gong_ge 값:  "+ Gong_ge);
         }
 
         swich.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @SuppressLint("ResourceAsColor")
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean ischecked) {
                 if ( ischecked == true ) {
+
+                    wichi.setTextColor(RED);
+                    wichi.setText("위치 공유중");
+                    textView5.setTextColor(RED);
+//                    textView5.setText("내가 쓴 글 목록");
                     reference.child("Contact").child(key).child("public").setValue(true);
                     Log.i(TAG1,"스위치 ture 일때 Gong_ge 값:  "+ ischecked);
                     Toast.makeText(MypageFragment.context, "내정보 공개", Toast.LENGTH_SHORT).show();
                 } else {
+                    wichi.setText("");
+                    textView5.setTextColor(GRAY);
+//                    textView5.setText("내가 쓴 글 목록");
                     reference.child("Contact").child(key).child("public").setValue(false);
                     Log.i(TAG1,"스위치 false 일때 Gong_ge 값:  "+ ischecked);
                     Toast.makeText(MypageFragment.context, "내정보 비공개", Toast.LENGTH_SHORT).show();
@@ -399,11 +415,11 @@ public class MypageFragment extends Fragment {
                     Log.i(TAG, "온차일드 userDataTList.size() " + size);
 //                Log.i(TAG, "userDataTList.size(): " + size);
 //                Log.i("ggg","데이터 받아옴");
-                    if (userDataTList.size() != 0){
+                    if (userDataTList != null){
                         textView2.setVisibility(View.GONE);
                         imageView2.setVisibility(View.GONE);
+                        textView5.setText("내가 쓴 글 목록");
                     }
-
 
 
 
