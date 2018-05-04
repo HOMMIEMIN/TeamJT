@@ -36,15 +36,17 @@
             android:layout_marginBottom="36dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
             android:text="TextView"
             android:textColor="#1c1c1c"
             android:textSize="17sp"
-            android:textStyle="bold"
 
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.014"
-            app:layout_constraintStart_toEndOf="@+id/imageView_WaittingLayout" />
+            app:layout_constraintStart_toEndOf="@+id/imageView_WaittingLayout"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView_WattingName"
@@ -77,7 +79,6 @@
             android:layout_marginTop="8dp"
             android:text="거절"
             android:textStyle="bold"
-            android:textColor="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -92,7 +93,7 @@
             android:layout_marginTop="8dp"
             android:text="수락"
             android:textStyle="bold"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorTomato"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnAddWating"
             app:layout_constraintStart_toEndOf="@+id/imageView_WaittingLayout"

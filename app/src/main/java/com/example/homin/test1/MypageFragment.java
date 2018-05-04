@@ -80,7 +80,7 @@ public class MypageFragment extends Fragment {
     private static String key;
     private static DatabaseReference reference;
     private static ImageView imageView, imageView2;
-    private TextView textView,textView2;
+    private TextView textView,textView2, textView5;
 
     private RecyclerView recycler;
     private List<UserDataTable> userDataTList;
@@ -341,6 +341,7 @@ public class MypageFragment extends Fragment {
 
         // 공개여부
 
+        textView5 = getView().findViewById(R.id.textNot_recycle_write);
         textView2= getView().findViewById(R.id.textNot_recycle);
         imageView2 = getView().findViewById(R.id.imageNot_recycle);
         swich = getView().findViewById(R.id.switchBtn);
@@ -402,8 +403,8 @@ public class MypageFragment extends Fragment {
                     if (userDataTList.size() != 0){
                         textView2.setVisibility(View.GONE);
                         imageView2.setVisibility(View.GONE);
+                        textView5.setVisibility(View.GONE);
                     }
-
 
 
 
