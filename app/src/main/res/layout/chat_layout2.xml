@@ -14,6 +14,7 @@
 
         <ImageView
             android:id="@+id/imageView_chatLaout"
+            android:layout_marginEnd="10dp"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="0dp"
@@ -31,7 +32,7 @@
             android:layout_height="wrap_content"
             android:text="TextView"
             android:textStyle="bold"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="#1c1c1c"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/imageView_chatLaout"
             app:layout_constraintHorizontal_bias="0.957"
@@ -45,6 +46,7 @@
             android:layout_height="wrap_content"
             android:text="대화내용"
             android:textSize="15sp"
+            android:textColor="@color/colorRealWhite"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/imageView_chatLaout"
             app:layout_constraintTop_toBottomOf="@+id/textView_chatLayout1"

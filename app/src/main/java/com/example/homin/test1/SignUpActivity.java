@@ -39,6 +39,7 @@ public class SignUpActivity extends AppCompatActivity {
         actionBar.hide();
         setContentView(R.layout.activity_sign_up);
 
+
         etSignUpEmail = findViewById(R.id.editText_signEmail);
         etSignUpName = findViewById(R.id.editText_signName);
         etSignUpPwd = findViewById(R.id.editText_signPwd);
@@ -56,6 +57,14 @@ public class SignUpActivity extends AppCompatActivity {
                 clickSignUp();
             }
         });
+
+
+    }
+
+    // 백키 눌를 경우 그전 액티비티로 이전...
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
     }
 
