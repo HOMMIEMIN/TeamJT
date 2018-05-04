@@ -2,6 +2,9 @@ package com.example.homin.test1;
 
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Icon;
 import android.os.IBinder;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -12,6 +15,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.maps.android.ui.IconGenerator;
+
 import static com.example.homin.test1.FriendFragment.*;
 
 
@@ -33,6 +40,7 @@ public class NotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("KIMMY","onStartCommand");
+
         user_name = intent.getStringExtra("name");
         user_chat = intent.getStringExtra("chat");
         user_id = intent.getStringExtra("id");
@@ -64,6 +72,8 @@ public class NotificationService extends Service {
     class myServiceHandler extends Handler {
         @Override
         public void handleMessage(android.os.Message msg) {
+//            Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_logo_1);
+
             PendingIntent pendingIntent = null;
             if(type!= null && type.equals("msg")) {
                 Intent intent = new Intent(NotificationService.this, ChattingActivity.class);
@@ -78,7 +88,7 @@ public class NotificationService extends Service {
                         Notifi = new Notification.Builder(getApplicationContext())
                                 .setContentTitle(user_name)
                                 .setContentText(user_chat)
-                                .setSmallIcon(R.drawable.jt_logo)
+                                .setSmallIcon(R.mipmap.ic_logo_1)
                                 .setTicker("TAM notification")
                                 .setContentIntent(pendingIntent)
                                 .build();
@@ -99,7 +109,7 @@ public class NotificationService extends Service {
                         Notifi = new Notification.Builder(getApplicationContext())
                                 .setContentTitle(user_name)
                                 .setContentText(user_chat)
-                                .setSmallIcon(R.drawable.jt_logo)
+                                .setSmallIcon(R.mipmap.ic_logo_1)
                                 .setTicker("TAM notification")
                                 .setContentIntent(pendingIntent)
                                 .build();

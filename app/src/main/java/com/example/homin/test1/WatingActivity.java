@@ -284,7 +284,14 @@ public class WatingActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return list.size();
+            int size = 0;
+            if(list == null){
+                size = 0;
+            }else{
+                size = list.size();
+            }
+
+            return size;
         }
 
         class CustomHolder extends RecyclerView.ViewHolder{
