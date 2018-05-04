@@ -25,6 +25,19 @@
         app:layout_constraintVertical_bias="0.891" />
 
     <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="match_parent"
+        android:layout_height="133dp"
+        android:layout_marginBottom="8dp"
+        android:background="#d9d9d9"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
         android:id="@+id/imageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -103,8 +116,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </FrameLayout>
-
-
 
 
 </android.support.constraint.ConstraintLayout>
