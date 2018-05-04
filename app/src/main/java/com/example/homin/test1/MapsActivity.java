@@ -222,7 +222,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     FriendFragment friendFragment = new FriendFragment();
                     transaction.replace(R.id.container_main, friendFragment);
                     transaction.commit();
-
+                    bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
                     return true;
 
                 case R.id.navigation_dashboard:
