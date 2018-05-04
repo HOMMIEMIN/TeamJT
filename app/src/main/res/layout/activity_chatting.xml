@@ -11,6 +11,7 @@
         android:id="@+id/button_sends"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
+        android:layout_marginStart="8dp"
         android:background="@android:color/background_light"
         android:text="전송"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -34,17 +35,17 @@
 
     <EditText
         android:id="@+id/editText_sends"
-        android:layout_width="0dp"
+        android:layout_width="275dp"
         android:layout_height="35dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="3dp"
         android:background="@android:color/background_light"
         android:ems="10"
         android:inputType="textPersonName"
         android:text=""
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button_sends"
-        app:layout_constraintHorizontal_bias="0.012"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerView_chatting" />
+        app:layout_constraintTop_toBottomOf="@+id/recyclerView_chatting"
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>
