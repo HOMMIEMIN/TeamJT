@@ -203,7 +203,7 @@ public class ChattingActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ChatAdapter();
         recyclerView.setAdapter(adapter);
-
+        Log.i("1234",youId);
 
         if(check){
             putKey = getPutKey(DaoImple.getInstance().getKey(),getKey(youId));

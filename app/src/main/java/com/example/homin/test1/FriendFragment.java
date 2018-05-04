@@ -180,6 +180,7 @@ public class FriendFragment extends Fragment {
                        for(int a = 0 ; a < friendList.size() ; a++){
                            if(friendList.get(a).getUserId().equals(list.get(position))){
                                chatId = realFriendList.get(position).getUserId();
+                               Log.i("1234","프렌드 : "+realFriendList.get(position).getUserId());
                                chatName = realFriendList.get(position).getUserName();
                            }
                        }

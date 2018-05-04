@@ -161,6 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<ItemMemo> memoList;
     private List<ItemPerson> personMarkerList;
     private int pressedTime;
+    private int sendTime;
     private Location getLocation;
     private long chatCheck;
     public static String MARKER_LIST = "markerList";
@@ -169,6 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean memoAddCheck;
     private boolean blueToothCheck;
     private int wattingCount;
+    private boolean sendCheck;
 
     // MyPage에 이용
     private static final int CAMERA_CODE = 1000;
@@ -569,6 +571,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Snackbar.make(rootView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
+                                sendCheck = true;
                                 if (mMarker != null) {
                                     mMarker.remove();
                                     mMarker = null;
@@ -616,7 +619,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Snackbar.make(rootView, "목적지로 설정하시겠습니까?", 5000).setAction("네", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-
+                                sendCheck = true;
                                 distanceIndicator.setText("위치 확인중");
                                 if (mMarker != null) {
                                     mMarker.remove();
@@ -1732,6 +1735,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void
     setDestination() {
 
+
+
         blutoothBtn.setVisibility(View.VISIBLE);
 
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow_final);
@@ -1781,10 +1786,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             String blueTooth = km + "\n" + degree;
-            Log.i("1234","1 : " + blueTooth);
-            if(index != 1) {
+
+            int second = (int) System.currentTimeMillis() - sendTime;
+            if(sendCheck){
                 sendData(blueTooth);
+                Log.i("1234","처음 보냄 : " + blueTooth);
+                sendTime = (int) System.currentTimeMillis();
+                sendCheck = false;
             }
+            if(index != 1) {
+                if(second > 6000) {
+                    sendData(blueTooth);
+                    Log.i("1234","보냄 : " + blueTooth);
+                    sendTime = (int) System.currentTimeMillis();
+                }
+            }
+
+
+
+
 
             if (distance < 100) {
                 if(arrow!= null){
@@ -1828,9 +1848,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             String blueTooth = km + "\n" + degree;
             Log.i("1234","1 : " + blueTooth);
-            if(index != 1) {
+
+            int second = (int) System.currentTimeMillis() - sendTime;
+            if(sendCheck){
                 sendData(blueTooth);
+                Log.i("1234","처음 보냄 : " + blueTooth);
+                sendTime = (int) System.currentTimeMillis();
+                sendCheck = false;
             }
+            if(index != 1) {
+                if(second > 6000) {
+                    sendData(blueTooth);
+                    Log.i("1234","보냄 : " + blueTooth);
+                    sendTime = (int) System.currentTimeMillis();
+                }
+            }
+
 
             if (distance < 100) {
                 if(arrow!= null){
@@ -1882,10 +1915,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             String blueTooth = km + "\n" + degree;
-            Log.i("1234","1 : " + blueTooth);
-            if(index != 1) {
+
+            int second = (int) System.currentTimeMillis() - sendTime;
+            if(sendCheck){
                 sendData(blueTooth);
+                sendTime = (int) System.currentTimeMillis();
+                sendCheck = false;
             }
+            if(index != 1) {
+                if(second > 6000) {
+                    sendData(blueTooth);
+                    sendTime = (int) System.currentTimeMillis();
+                }
+            }
+
 
             if (distance < 100) {
                 if(arrow!= null){
@@ -2074,6 +2117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(!checkBlue) {
             checkBluetooth();
             checkBlue = true;
+            sendCheck = true;
         }
 
     }
