@@ -262,8 +262,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Log.i("dd4434", "MapsActivity onCreate");
         setContentView(R.layout.activity_maps);
+        getWindow().setStatusBarColor(getResources().getColor(R.color.colorRealWhite, getResources().newTheme()));
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         blutoothBtn = findViewById(R.id.button_blueTooth);
         rootView = findViewById(R.id.container);//Snackbar위한 View member변수
@@ -333,7 +336,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     actionLayout.setVisibility(View.VISIBLE);
                     getWindow().setStatusBarColor(getResources().getColor(R.color.colorRealWhite, getResources().newTheme()));
                     getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-                    bottomview.setBackgroundColor(R.color.colorRealWhite);
 
                 }
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
@@ -1749,20 +1751,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.rotation((float) degree - 90.0f);
+        markerOptions.rotation((float) degree);
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
 
         markerOptions.position(myMarker.getPosition());
-        markerOptions.anchor(0.0f, 0.5f);
+        markerOptions.anchor(0.5f, 1.0f);
         arrow = mMap.addMarker(markerOptions);
 
         shapeView.setBackground(getDrawable(R.drawable.shape));
         distanceIndicator.setVisibility(View.VISIBLE);
+        double km = 0;
 //        Log.i("KSJ", myMarker.getPosition() + "||"+ mMarker.getPosition() + "");
         if (myMarker != null && mMarker != null) {
             double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), mMarker.getPosition());
             String stringDistance = Double.toString(distance);
             int index = stringDistance.indexOf(".");
+
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
             km = Double.parseDouble(m) * 0.001d;
@@ -1774,7 +1778,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 degree = 360+degree;
             }
 
-            String blueTooth = m + "\n" + degree;
+            String blueTooth = km + "\n" + degree;
             Log.i("1234","1 : " + blueTooth);
             if(index != 1) {
                 sendData(blueTooth);

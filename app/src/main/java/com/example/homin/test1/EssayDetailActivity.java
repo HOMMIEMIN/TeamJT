@@ -45,7 +45,6 @@ public class EssayDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_essay_detail);
-        getWindow().setStatusBarColor(getResources().getColor(R.color.colorLightBlack, getResources().newTheme()));
 
         myView = findViewById(R.id.mypageView);
         // 어플 위에 뜨는 액션바 숨기는 코드!
