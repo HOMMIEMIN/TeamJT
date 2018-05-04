@@ -99,6 +99,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -222,7 +223,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     FriendFragment friendFragment = new FriendFragment();
                     transaction.replace(R.id.container_main, friendFragment);
                     transaction.commit();
-
+                    bottomSheetBehavior.setState(bottomSheetBehavior.STATE_EXPANDED);
                     return true;
 
                 case R.id.navigation_dashboard:
@@ -1767,20 +1768,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         shapeView.setBackground(getDrawable(R.drawable.shape));
         distanceIndicator.setVisibility(View.VISIBLE);
-        double km = 0;
+        BigDecimal km = new BigDecimal("1");
 //        Log.i("KSJ", myMarker.getPosition() + "||"+ mMarker.getPosition() + "");
         if (myMarker != null && mMarker != null) {
             double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), mMarker.getPosition());
             String stringDistance = Double.toString(distance);
             int index = stringDistance.indexOf(".");
 
-            String m = stringDistance.substring(0, index);
-            String cm = stringDistance.substring(index + 1, index + 3);
-            km = Integer.parseInt(m) * 0.001;
+            BigDecimal m = new BigDecimal(stringDistance.substring(0, index));
+            BigDecimal convert = new BigDecimal("0.001");
+            km = m.multiply(convert);
 
 
 
-            distanceIndicator.setText("목적지까지의 거리: " + m + "M " + cm + "CM");
+
+            distanceIndicator.setText("목적지까지의 거리: " + km.toString() + "KM ");
             if(degree < 0) {
                 degree = 360+degree;
             }
@@ -1832,15 +1834,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetMarker.getPosition());
             String stringDistance = Double.toString(distance);
             int index = stringDistance.indexOf(".");
-            String m = stringDistance.substring(0, index);
-            String cm = stringDistance.substring(index + 1, index + 3);
-            Log.i("KSJ", "distance: " + distance);
-            km = Double.parseDouble(m) * 0.001d;
-            Log.i("asdasd33",km+"");
-            Log.i("asdasd33","index : " + index);
+            BigDecimal m = new BigDecimal(stringDistance.substring(0, index));
+            BigDecimal convert = new BigDecimal("0.001");
+            km = m.multiply(convert);
 
 
-            distanceIndicator.setText("목적지까지의 거리: " + km + "KM ");
+            distanceIndicator.setText("목적지까지의 거리: " + km.toString() + "KM ");
 
             if(degree < 0) {
                 degree = 360+degree;
@@ -1890,25 +1889,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double distance = SphericalUtil.computeDistanceBetween(myMarker.getPosition(), targetIdMarker.getPosition());
             String stringDistance = Double.toString(distance);
             int index = stringDistance.indexOf(".");
-            String m = stringDistance.substring(0, index);
-            String cm = stringDistance.substring(index + 1, index + 3);
-            Log.i("KSJ", "distance: " + distance);
-            km = Double.parseDouble(m) * 0.001d;
-            Log.i("asdasd33",km+"");
-
-//            Collection<ClusterItem> items = clusterManager.getAlgorithm().getItems();
-//            Iterator<ClusterItem> itemIterator = items.iterator();
-//            while(itemIterator.hasNext()){
-//                ClusterItem item = itemIterator.next();
-//                if(item instanceof ItemPerson){
-//                    if(((ItemPerson)item).getUserId() == targetId){
-//
-//                    }
-//                }
-//            }
+            BigDecimal m = new BigDecimal(stringDistance.substring(0, index));
+            BigDecimal convert = new BigDecimal("0.001");
+            km = m.multiply(convert);
 
 
-            distanceIndicator.setText("목적지까지의 거리: " + km + "KM ");
+
+
+
+
+
+            distanceIndicator.setText("목적지까지의 거리: " + km.toString() + "KM ");
 
             if(degree < 0) {
                 degree = 360+degree;
@@ -1953,7 +1944,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.i("KIMMY" , "들어옴?");
             Intent intent = new Intent(MapsActivity.this,NotificationService.class);
             intent.putExtra("name","목적지와의 거리");
-            intent.putExtra("chat",km + "KM ");
+            intent.putExtra("chat",km.toString() + "KM ");
             intent.putExtra("type","distance");
             startService(intent);
 
