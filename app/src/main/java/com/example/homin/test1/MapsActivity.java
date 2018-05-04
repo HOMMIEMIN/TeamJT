@@ -104,6 +104,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1129,7 +1130,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         realFriendList.add(DaoImple.getInstance().getLoginEmail());
 
                         if(targetIdMarker!= null) {
-                            clusterManager.addItem(targetMarker);
+                            clusterManager.addItem(targetIdMarker);
                             clusterManager.cluster();
                         }
                         if (!memoAddCheck) {
@@ -1747,6 +1748,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         if (arrow != null) {
             arrow.remove();
+            arrow = null;
         }
 
 
@@ -1769,7 +1771,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             String m = stringDistance.substring(0, index);
             String cm = stringDistance.substring(index + 1, index + 3);
-            km = Double.parseDouble(m) * 0.001d;
+            km = Integer.parseInt(m) * 0.001;
 
 
 
@@ -1861,6 +1863,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             km = Double.parseDouble(m) * 0.001d;
             Log.i("asdasd33",km+"");
 
+//            Collection<ClusterItem> items = clusterManager.getAlgorithm().getItems();
+//            Iterator<ClusterItem> itemIterator = items.iterator();
+//            while(itemIterator.hasNext()){
+//                ClusterItem item = itemIterator.next();
+//                if(item instanceof ItemPerson){
+//                    if(((ItemPerson)item).getUserId() == targetId){
+//
+//                    }
+//                }
+//            }
 
 
             distanceIndicator.setText("목적지까지의 거리: " + km + "KM ");
